@@ -1,7 +1,10 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,14 +14,26 @@ import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 
 public class ManHinhChinh extends JFrame implements ActionListener{
 	private JMenuBar menuBar;
+	private JToolBar toolBar;
+	private JButton btnDatVe;
+	private JButton btnHuyVe;
+	private JButton btnTimChuyenTau;
+	private JButton btnDangXuat;
+	private JButton btnDoiVe;
+	private JPanel pnlTBar;
+	private JPanel pnlChinh;
+	private JPanel pnlChucNang;
 
 
 	public ManHinhChinh() throws IOException{
@@ -26,18 +41,65 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 		setSize(1500,1000);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-
-//		backgroundPanel BackgPn = new backgroundPanel("/img/train.jpg");
-//		BackgPn.setLayout(null);
-//		this.setContentPane(BackgPn);
+		
 		setJMenuBar(taoMenuBar());
+		pnlChinh = new JPanel(new BorderLayout());
+		pnlChucNang = new JPanel();
+		pnlChucNang.setLayout(new GridLayout(0,1,0,10));
+		pnlChucNang.setBackground(new Color(221, 218, 208));
+		
+		btnDatVe = new JButton("Đặt vé");
+		btnDatVe.setBackground(new Color(122, 122, 115));
+		btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 40));
+		btnDatVe.setForeground(Color.WHITE);
+		ImageIcon icDatVe = ManHinhChinh.chinhKichThuoc("/img/tickets_icon.png", 60, 60);
+		btnDatVe.setIcon(icDatVe);
+		
+		btnHuyVe = new JButton("Hủy vé");
+		btnHuyVe.setBackground(new Color(122, 122, 115));
+		btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 40));
+		btnHuyVe.setForeground(Color.white);
+		ImageIcon icHuyve = ManHinhChinh.chinhKichThuoc("/img/Cancel_Icon.png", 55, 55);
+		btnHuyVe.setIcon(icHuyve);
+		
+		btnDoiVe = new JButton("Đổi vé");
+		btnDoiVe.setBackground(Color.white);
+		btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 30));
+		btnDoiVe.setForeground(new Color(103, 192, 144));
+		
+		btnTimChuyenTau = new JButton("Tìm chuyến tàu");
+		btnTimChuyenTau.setBackground(Color.white);
+		btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 30));
+		btnTimChuyenTau.setForeground(new Color(103, 192, 144));
+		
+		
+		btnDangXuat = new JButton("Đăng xuất");
+		btnDangXuat.setBackground(Color.white);
+		btnDangXuat.setFont(new Font("Segoe UI", Font.BOLD, 30));
+		btnDangXuat.setForeground(new Color(103, 192, 144));
+		
+		pnlChucNang.add(btnDatVe);
+		pnlChucNang.add(btnHuyVe);
+		pnlChucNang.add(btnDoiVe);
+		pnlChucNang.add(btnTimChuyenTau);
+		pnlChucNang.add(btnDangXuat);
+
+		
+		JPanel pnlCen = new JPanel();
+		pnlCen.setBackground(Color.ORANGE);
+		
+		pnlChucNang.setPreferredSize(new Dimension(350, 70));
+		
+		pnlChinh.add(pnlChucNang, BorderLayout.WEST);
+		pnlChinh.add(pnlCen);
+		add(pnlChinh);
 		
 	}
 	
 	public JMenuBar taoMenuBar() {
 		menuBar = new JMenuBar();
 		menuBar.setBorder(BorderFactory.createEmptyBorder(8,0,8,0));
-		
+		menuBar.setBackground(new Color(220, 220, 220));
 		JMenu mnuHeThong = new JMenu("Hệ Thống");
 		JMenu mnuNghiepVuVe = new JMenu("Nghiệp Vụ Vé");
 		JMenu mnuQly = new JMenu("Quản Lý");
@@ -144,6 +206,7 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 	}
 	public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
 		URL iconUrl = ManHinhChinh.class.getResource(duongDan);
+		
 		ImageIcon iicGoc = new ImageIcon(iconUrl);
 		Image anhGoc = iicGoc.getImage();
 		Image anhDaDoi = anhGoc.getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
@@ -154,11 +217,9 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 		
 	}
 
-	
 	public static void main(String[] args) throws IOException {
 		ManHinhChinh mhc = new ManHinhChinh();
 		mhc.setVisible(true);
-		
 	}
 }
 
