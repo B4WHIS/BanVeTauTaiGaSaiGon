@@ -1,0 +1,8 @@
+# Eclipse and Java/Class files
+*.class
+# Binaries directory created by Eclipse build system
+/bin/
+# Other common Eclipse project files that shouldn't be tracked
+.classpath
+.project
+.settings/
