@@ -69,7 +69,7 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 		lblGsg.setForeground(new Color(74, 140, 103));
 		lblGsg.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
-		ImageIcon TauIC = ManHinhChinh.chinhKichThuoc("/img/trainDN.png",497,300);
+		ImageIcon TauIC = GiaoDienChinh.chinhKichThuoc("/img/trainDN.png",497,300);
 		lblImg = new JLabel(TauIC);
 		lblImg.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -143,7 +143,7 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 	    btnThoat.setBackground(new Color(229, 115, 115));
 	    btnThoat.setForeground(Color.WHITE);
 	    btnThoat.setText("Thoát");
-	    ImageIcon iconThoat = ManHinhChinh.chinhKichThuoc("/img/thoaticon.png", 25, 25);
+	    ImageIcon iconThoat = GiaoDienChinh.chinhKichThuoc("/img/thoaticon.png", 25, 25);
 	    btnThoat.setIcon(iconThoat);
 
 	    pnlNutBam.add(btnThoat);
@@ -152,7 +152,7 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 	    btnDn.setFont(new Font("Segoe UI", Font.BOLD, 16));
 	    btnDn.setBackground(new Color(93, 156, 236));
 	    btnDn.setForeground(Color.WHITE);
-	    ImageIcon iconDN = ManHinhChinh.chinhKichThuoc("/img/loginicon.png", 25, 25);
+	    ImageIcon iconDN = GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 25, 25);
 	    btnDn.setIcon(iconDN);
 
 
