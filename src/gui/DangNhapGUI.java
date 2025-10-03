@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
 
 public class DangNhapGUI extends JFrame implements ActionListener {
 	
@@ -78,6 +80,7 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 		
 		//Phải
 		pnlPhai.setLayout(new BorderLayout(10,10));
+//		pnlPhai.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
 		//form nhập
 		pnlForm = new JPanel(new GridBagLayout());

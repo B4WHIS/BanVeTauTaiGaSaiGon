@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -10,6 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -22,6 +26,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.Timer;
 
 public class ManHinhChinh extends JFrame implements ActionListener{
 	private JMenuBar menuBar;
@@ -34,6 +39,16 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 	private JPanel pnlTBar;
 	private JPanel pnlChinh;
 	private JPanel pnlChucNang;
+	private JLabel lblNguoiDung;
+	private JPanel pnlNorth;
+	private JLabel lblTenND;
+	private JPanel pnlThongTin;
+	private JPanel pnlDate;
+	private JLabel lblNgay;
+	private JLabel lblToday;
+	private JLabel lblGio;
+	private JLabel lblNgayHienTai;
+	private JLabel lblGioThuc;
 
 
 	public ManHinhChinh() throws IOException{
@@ -43,40 +58,48 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 		setLocationRelativeTo(null);
 		
 		setJMenuBar(taoMenuBar());
+		
 		pnlChinh = new JPanel(new BorderLayout());
 		pnlChucNang = new JPanel();
-		pnlChucNang.setLayout(new GridLayout(0,1,0,10));
+		pnlChucNang.setLayout(new GridLayout(0,2,0,10));
 		pnlChucNang.setBackground(new Color(221, 218, 208));
 		
-		btnDatVe = new JButton("Đặt vé");
-		btnDatVe.setBackground(new Color(122, 122, 115));
-		btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 40));
-		btnDatVe.setForeground(Color.WHITE);
+		btnDatVe = new JButton("ĐẶT VÉ");
+		btnDatVe.setBackground(Color.white);
+		btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
+		btnDatVe.setForeground(new Color(74, 140, 103));
 		ImageIcon icDatVe = ManHinhChinh.chinhKichThuoc("/img/tickets_icon.png", 60, 60);
 		btnDatVe.setIcon(icDatVe);
 		
-		btnHuyVe = new JButton("Hủy vé");
-		btnHuyVe.setBackground(new Color(122, 122, 115));
-		btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 40));
-		btnHuyVe.setForeground(Color.white);
-		ImageIcon icHuyve = ManHinhChinh.chinhKichThuoc("/img/Cancel_Icon.png", 55, 55);
+		btnHuyVe = new JButton("HỦY VÉ");
+		btnHuyVe.setBackground(Color.white);
+		btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
+		btnHuyVe.setForeground(new Color(229, 115, 115));
+		ImageIcon icHuyve = ManHinhChinh.chinhKichThuoc("/img/cancel2.png", 55, 55);
 		btnHuyVe.setIcon(icHuyve);
 		
-		btnDoiVe = new JButton("Đổi vé");
+
+		btnDoiVe = new JButton("ĐỔI VÉ");
 		btnDoiVe.setBackground(Color.white);
-		btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 30));
-		btnDoiVe.setForeground(new Color(103, 192, 144));
+		btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
+		btnDoiVe.setForeground(new Color(93, 156, 236));
+		ImageIcon icDoiVe = ManHinhChinh.chinhKichThuoc("/img/exchange.png", 55, 55);
+		btnDoiVe.setIcon(icDoiVe);
 		
-		btnTimChuyenTau = new JButton("Tìm chuyến tàu");
+		
+		btnTimChuyenTau = new JButton("TÌM CHUYẾN");
 		btnTimChuyenTau.setBackground(Color.white);
-		btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 30));
-		btnTimChuyenTau.setForeground(new Color(103, 192, 144));
+		btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 35));
+		btnTimChuyenTau.setForeground(new Color(155, 93, 224));
+		ImageIcon icTimChuyen = ManHinhChinh.chinhKichThuoc("/img/search.png", 65, 65);
+		btnTimChuyenTau.setIcon(icTimChuyen);
 		
-		
-		btnDangXuat = new JButton("Đăng xuất");
+		btnDangXuat = new JButton("ĐĂNG XUẤT");
 		btnDangXuat.setBackground(Color.white);
 		btnDangXuat.setFont(new Font("Segoe UI", Font.BOLD, 30));
-		btnDangXuat.setForeground(new Color(103, 192, 144));
+		btnDangXuat.setForeground(Color.orange);
+		ImageIcon icDangXuat = ManHinhChinh.chinhKichThuoc("/img/export.png", 55, 55);
+		btnDangXuat.setIcon(icDangXuat);
 		
 		pnlChucNang.add(btnDatVe);
 		pnlChucNang.add(btnHuyVe);
@@ -85,13 +108,52 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 		pnlChucNang.add(btnDangXuat);
 
 		
-		JPanel pnlCen = new JPanel();
-		pnlCen.setBackground(Color.ORANGE);
+		pnlNorth = new JPanel(new GridLayout(2,1,10,10));
+		pnlNorth.setBackground(new Color(225, 242, 232));
+		pnlNorth.setPreferredSize(new Dimension(0, 100));
+		pnlNorth.setBorder(BorderFactory.createEtchedBorder());
+		
+		pnlThongTin = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		pnlThongTin.setBackground(new Color(225, 242, 232));
+		lblNguoiDung = new JLabel("Người dùng: ");
+		lblNguoiDung.setFont(new Font("Segoe UI", Font.BOLD, 25));
+		lblTenND = new JLabel("Nhân viên bán vé - NGUYỄN VĂN A");
+		lblTenND.setFont(new Font("Segoe UI", Font.PLAIN, 25));
+		pnlThongTin.add(lblNguoiDung);
+		pnlThongTin.add(lblTenND);
+		
+		pnlDate = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		pnlDate.setBackground(new Color(225, 242, 232));
+		
+		String ngay = ngayHienTai();
+		
+		lblNgay = new JLabel("Ngày: ");
+		lblNgayHienTai = new JLabel(ngay);
+		lblNgay.setFont(new Font("Segoe UI", Font.BOLD, 25));
+		lblNgayHienTai.setFont(new Font("Segoe UI", Font.BOLD, 25));
+		lblNgayHienTai.setForeground(new Color(229, 115, 115));
+		
+		lblGio = new JLabel(" Giờ hệ thống: ");
+		lblGio.setFont(new Font("Segoe UI", Font.BOLD, 25));
+		
+		lblGioThuc = new JLabel();
+		lblGioThuc.setFont(new Font("Segoe UI", Font.BOLD, 25));
+		lblGioThuc.setForeground(new Color(229, 115, 115));
+		
+		pnlDate.add(lblNgay);
+		pnlDate.add(lblNgayHienTai);
+		pnlDate.add(lblGio);
+		pnlDate.add(lblGioThuc);
+		thoiGianThuc();
+		
+		pnlNorth.add(pnlThongTin);
+		pnlNorth.add(pnlDate);
 		
 		pnlChucNang.setPreferredSize(new Dimension(350, 70));
 		
-		pnlChinh.add(pnlChucNang, BorderLayout.WEST);
-		pnlChinh.add(pnlCen);
+		pnlChinh.add(pnlNorth,BorderLayout.NORTH);
+		pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
+		
 		add(pnlChinh);
 		
 	}
@@ -198,6 +260,7 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 		menuBar.add(lbl_NVBV);
 		
 		return menuBar;
+		
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -217,6 +280,31 @@ public class ManHinhChinh extends JFrame implements ActionListener{
 		
 	}
 
+	public String ngayHienTai() {
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter dinhDangNgay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String today = now.format(dinhDangNgay);	
+		return today;
+
+	}
+	
+	public void thoiGianThuc() {
+		Timer dongHo = new Timer(1000, new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				LocalTime gioHienTai = LocalTime.now();
+				
+				DateTimeFormatter dinhDangGio = DateTimeFormatter.ofPattern("HH:mm:ss");
+				String chuoiGio = gioHienTai.format(dinhDangGio);
+				
+				lblGioThuc.setText(chuoiGio);
+			}
+		});
+		dongHo.start();	
+	}
+	
 	public static void main(String[] args) throws IOException {
 		ManHinhChinh mhc = new ManHinhChinh();
 		mhc.setVisible(true);
