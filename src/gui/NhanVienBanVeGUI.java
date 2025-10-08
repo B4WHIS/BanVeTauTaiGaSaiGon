@@ -84,7 +84,6 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		
 	}
 	
-	
 	public static void main(String[] args) throws IOException {
 		NhanVienBanVeGUI mh_nvbv = new NhanVienBanVeGUI();
 		mh_nvbv.setVisible(true);
