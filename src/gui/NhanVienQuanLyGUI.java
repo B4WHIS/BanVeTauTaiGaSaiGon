@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 public class NhanVienQuanLyGUI extends GiaoDienChinh{
 	public NhanVienQuanLyGUI() {
@@ -17,6 +18,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh{
 		
 	}
 	public JPanel taoPanelMenuChinh() {
+		
 		pnlChucNang = new JPanel();
 		pnlChucNang.setLayout(new GridLayout(0,2,0,10));
 		pnlChucNang.setBackground(new Color(221, 218, 208));

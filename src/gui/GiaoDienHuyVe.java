@@ -32,7 +32,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-public class GiaoDienHuyVe extends JFrame {
+public class GiaoDienHuyVe extends GiaoDienChinh {
 	private JPanel jpmenu;
 	private JPanel jpContent;
 	private JPanel jpTrai;
@@ -72,11 +72,7 @@ public class GiaoDienHuyVe extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//Layout của frame tổng.
 		setLayout(new BorderLayout());
-		   try {
-	            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+		lookandFeel();
 		// Frame Menu
 		jpmenu = new JPanel(new FlowLayout());
 		
@@ -118,12 +114,16 @@ public class GiaoDienHuyVe extends JFrame {
 		
 		
 		//add component vào Frame tổng
-		add(jpmenu, BorderLayout.NORTH);
+		
 		add(jpContent, BorderLayout.CENTER);
 		
 		cardLayout.show(jpPhai, "Step1");
 		capNhatTienTrinh();
 		setVisible(true);
+		
+	}
+	private void lookandFeel() {
+		
 		
 	}
 	private JPanel createStep1Panel() {

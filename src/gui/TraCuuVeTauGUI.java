@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.Random;
 
-public class TraCuuVeTauGUI extends JFrame {
+public class TraCuuVeTauGUI extends GiaoDienChinh {
     private JTextField txtMaVe, txtHoTen, txtCMND, txtSDT;
     private JComboBox<String> cmbLoaiVe;
     private JTable tableKetQua;
@@ -73,7 +73,7 @@ public class TraCuuVeTauGUI extends JFrame {
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBorder(new EmptyBorder(0, 30, 0, 20));
         JPanel panelHeader = new JPanel(new FlowLayout());
-        ImageIcon originalIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\ticket.png");
+        ImageIcon originalIcon = chinhKichThuoc("/imgticket.png", 90, 80);
         
         Image scaledImage = originalIcon.getImage().getScaledInstance(90, 80, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
