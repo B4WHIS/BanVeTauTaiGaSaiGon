@@ -228,7 +228,6 @@ public abstract class GiaoDienChinh extends JFrame {
 		DateTimeFormatter dinhDangNgay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String today = now.format(dinhDangNgay);	
 		return today;
-
 	}
 	
 	public void thoiGianThuc() {

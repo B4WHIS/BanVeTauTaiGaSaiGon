@@ -38,7 +38,6 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 	private JPanel pnlNutBam;
 	private JButton btnThoat;
 	private JPanel pnlGop;
-	private Object iconThoat;
 
 	DangNhapGUI() throws IOException{
 		setTitle("Đăng nhập");
@@ -155,6 +154,7 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 
 
 	    pnlNutBam.add(btnDn);
+	    
 		gbc.gridx= 1;
 		gbc.gridy= 3;
 		gbc.anchor = GridBagConstraints.EAST;
@@ -172,11 +172,16 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 	public static void main(String[] args) throws IOException {
 		DangNhapGUI dn = new DangNhapGUI();
 		dn.setVisible(true);
+		
+		
+		
+		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		
 		
 	}
 }
