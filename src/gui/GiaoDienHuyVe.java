@@ -72,7 +72,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//Layout của frame tổng.
 		setLayout(new BorderLayout());
-		lookandFeel();
+		 
 		// Frame Menu
 		jpmenu = new JPanel(new FlowLayout());
 		
@@ -114,16 +114,12 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 		
 		
 		//add component vào Frame tổng
-		
+		add(jpmenu, BorderLayout.NORTH);
 		add(jpContent, BorderLayout.CENTER);
 		
 		cardLayout.show(jpPhai, "Step1");
 		capNhatTienTrinh();
 		setVisible(true);
-		
-	}
-	private void lookandFeel() {
-		
 		
 	}
 	private JPanel createStep1Panel() {
@@ -327,10 +323,9 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 	        stepSubPanel.setMaximumSize(new Dimension(150, 70));
 	        stepSubPanel.setBackground(new Color(74, 140, 103));  
 
-
-	        ImageIcon stepIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\step-icon-" + (i+1) + ".png");
-	        Image scaledStepIcon = stepIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);  
-	        JLabel iconLabel = new JLabel(new ImageIcon(scaledStepIcon));
+	        
+	        ImageIcon stepIcon = chinhKichThuoc("/img/step-icon-" + (i+1) + ".png", 30, 30);
+	        JLabel iconLabel = new JLabel(stepIcon);
 	        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 	        stepSubPanel.add(iconLabel);
 
@@ -447,4 +442,3 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 		new GiaoDienHuyVe();
 	}
 }
-
