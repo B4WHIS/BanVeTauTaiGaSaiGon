@@ -12,6 +12,7 @@ import java.io.IOException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 	private JButton btnDatVe;
@@ -24,7 +25,6 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		super();
 		pnlChucNang = taoPanelMenuChinh();
 		pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
-
 	}
 
 	public JPanel taoPanelMenuChinh() {

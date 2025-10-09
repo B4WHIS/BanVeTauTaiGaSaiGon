@@ -25,6 +25,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 public abstract class GiaoDienChinh extends JFrame {
 	
@@ -54,6 +55,7 @@ public abstract class GiaoDienChinh extends JFrame {
 		
 		setJMenuBar(taoMenuBar());
 		pnlChinh = new JPanel(new BorderLayout());
+		  
 		pnlThongTin = taoPanelThongTin();
 
 		pnlChinh.add(pnlNorth,BorderLayout.NORTH);
@@ -212,13 +214,10 @@ public abstract class GiaoDienChinh extends JFrame {
 	}
 	public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
 		URL iconUrl = GiaoDienChinh.class.getResource(duongDan);
-		
 		ImageIcon iicGoc = new ImageIcon(iconUrl);
 		Image anhGoc = iicGoc.getImage();
 		Image anhDaDoi = anhGoc.getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
-		
 		ImageIcon iicMoi = new ImageIcon(anhDaDoi);
-		
 		return iicMoi;
 		
 	}

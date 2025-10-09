@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.Random;
 
-public class TraCuuVeTauGUI extends JFrame {
+public class TraCuuVeTauGUI extends GiaoDienChinh {
     private JTextField txtMaVe, txtHoTen, txtCMND, txtSDT;
     private JComboBox<String> cmbLoaiVe;
     private JTable tableKetQua;
@@ -73,14 +73,12 @@ public class TraCuuVeTauGUI extends JFrame {
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBorder(new EmptyBorder(0, 30, 0, 20));
         JPanel panelHeader = new JPanel(new FlowLayout());
-        ImageIcon originalIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\ticket.png");
-        
-        Image scaledImage = originalIcon.getImage().getScaledInstance(90, 80, Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+        ImageIcon originalIcon = chinhKichThuoc("/img/ticket.png", 90, 80);
+       
         
         
         JLabel imageLabel = new JLabel();
-        imageLabel.setIcon(scaledIcon);
+       imageLabel.setIcon(originalIcon);
         imageLabel.setBorder(new EmptyBorder(0,100,0,10));
         imageLabel.setVerticalAlignment(SwingConstants.CENTER);
         
@@ -116,9 +114,9 @@ public class TraCuuVeTauGUI extends JFrame {
 
         // Mã vé với ảnh icon
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
-        ImageIcon maVeIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\train-ticket.png");
-        Image scaledMaVeIcon = maVeIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        JLabel lblMaVe = new JLabel("Mã vé:", new ImageIcon(scaledMaVeIcon), SwingConstants.LEFT);
+        ImageIcon maVeIcon = chinhKichThuoc("/img/train-ticket.png", 16, 16);
+        
+        JLabel lblMaVe = new JLabel("Mã vé:", maVeIcon, SwingConstants.LEFT);
         lblMaVe.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblMaVe.setHorizontalTextPosition(SwingConstants.RIGHT);  // Icon trước text
         inputPanel.add(lblMaVe, gbc);
@@ -134,9 +132,8 @@ public class TraCuuVeTauGUI extends JFrame {
 
         // Họ tên với ảnh icon
         gbc.gridx = 0; gbc.gridy = 1;
-        ImageIcon hoTenIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\user.png");  
-        Image scaledHoTenIcon = hoTenIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        JLabel lblHoTen = new JLabel("Họ tên:", new ImageIcon(scaledHoTenIcon), SwingConstants.LEFT);
+        ImageIcon hoTenIcon = chinhKichThuoc("/img/user.png", 16, 16);
+        JLabel lblHoTen = new JLabel("Họ tên:", hoTenIcon, SwingConstants.LEFT);
         lblHoTen.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblHoTen.setHorizontalTextPosition(SwingConstants.RIGHT);  // Icon trước text
         inputPanel.add(lblHoTen, gbc);
@@ -152,9 +149,9 @@ public class TraCuuVeTauGUI extends JFrame {
 
         // CMND/Hộ chiếu với ảnh icon
         gbc.gridx = 0; gbc.gridy = 2;
-        ImageIcon cmndIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\passport.png"); 
-        Image scaledCmndIcon = cmndIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        JLabel lblCMND = new JLabel("CMND/Hộ chiếu:", new ImageIcon(scaledCmndIcon), SwingConstants.LEFT);
+        ImageIcon cmndIcon = chinhKichThuoc("/img/passport.png", 16, 16); 
+       
+        JLabel lblCMND = new JLabel("CMND/Hộ chiếu:", cmndIcon, SwingConstants.LEFT);
         lblCMND.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblCMND.setHorizontalTextPosition(SwingConstants.RIGHT);  // Icon trước text
         inputPanel.add(lblCMND, gbc);
@@ -170,9 +167,9 @@ public class TraCuuVeTauGUI extends JFrame {
 
         // SĐT với ảnh icon
         gbc.gridx = 0; gbc.gridy = 3;
-        ImageIcon sdtIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\phone.png");  
-        Image scaledSdtIcon = sdtIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        JLabel lblSDT = new JLabel("SĐT:", new ImageIcon(scaledSdtIcon), SwingConstants.LEFT);
+        ImageIcon sdtIcon = chinhKichThuoc("/img/phone.png", 16, 16); 
+      
+        JLabel lblSDT = new JLabel("SĐT:", sdtIcon, SwingConstants.LEFT);
         lblSDT.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblSDT.setHorizontalTextPosition(SwingConstants.RIGHT);  // Icon trước text
         inputPanel.add(lblSDT, gbc);
@@ -188,9 +185,9 @@ public class TraCuuVeTauGUI extends JFrame {
 
         // Loại vé combo box với ảnh icon
         gbc.gridx = 0; gbc.gridy = 4;
-        ImageIcon loaiVeIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\ve2.png"); 
-        Image scaledLoaiVeIcon = loaiVeIcon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-        JLabel lblLoaiVe = new JLabel("Loại vé:", new ImageIcon(scaledLoaiVeIcon), SwingConstants.LEFT);
+        ImageIcon loaiVeIcon = chinhKichThuoc("/img/ve2.png", 16, 16); 
+       
+        JLabel lblLoaiVe = new JLabel("Loại vé:", loaiVeIcon, SwingConstants.LEFT);
         lblLoaiVe.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblLoaiVe.setHorizontalTextPosition(SwingConstants.RIGHT);  // Icon trước text
         inputPanel.add(lblLoaiVe, gbc);
@@ -203,9 +200,9 @@ public class TraCuuVeTauGUI extends JFrame {
         inputPanel.add(cmbLoaiVe, gbc);
 
         
-        ImageIcon timKiemIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\traCuu.png"); 
-        Image scaledTimKiemIcon = timKiemIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        btnTimKiem = new JButton("Tìm Kiếm", new ImageIcon(scaledTimKiemIcon));
+        ImageIcon timKiemIcon = chinhKichThuoc("/img/traCuu.png", 20, 20); 
+      
+        btnTimKiem = new JButton("Tìm Kiếm", timKiemIcon);
         btnTimKiem.setBorder(new EmptyBorder(15,25,15,25));
         btnTimKiem.setForeground(Color.WHITE);
         btnTimKiem.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -217,9 +214,9 @@ public class TraCuuVeTauGUI extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         inputPanel.add(btnTimKiem, gbc);
 
-        ImageIcon lamMoiIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\reload.png"); 
-        Image scaledLamMoiIcon = lamMoiIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        btnLamMoi = new JButton("Làm Mới", new ImageIcon(scaledLamMoiIcon));
+        ImageIcon lamMoiIcon = chinhKichThuoc("/img/reload.png", 20, 20); 
+       
+        btnLamMoi = new JButton("Làm Mới", lamMoiIcon);
         btnLamMoi.setBorder(new EmptyBorder(15,25,15,25));
         btnLamMoi.setForeground(Color.WHITE);
         btnLamMoi.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -294,9 +291,9 @@ public class TraCuuVeTauGUI extends JFrame {
          buttonPanel.setBackground(new Color(103, 192, 144));
         
          // Nút Đặt Vé với ảnh icon
-         ImageIcon datVeIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\ve.png");  
-         Image scaledDatVeIcon = datVeIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-         btnInVe = new JButton("In Vé", new ImageIcon(scaledDatVeIcon));
+         ImageIcon datVeIcon = chinhKichThuoc("/img/ve.png", 30, 30);
+
+         btnInVe = new JButton("In Vé", datVeIcon);
          btnInVe.setForeground(Color.BLACK);
          btnInVe.setFont(new Font("Segoe UI", Font.BOLD, 18));
          btnInVe.setBackground(new Color(255, 237, 0));
@@ -305,9 +302,9 @@ public class TraCuuVeTauGUI extends JFrame {
          btnInVe.setVerticalTextPosition(SwingConstants.CENTER);
 
         
-         ImageIcon thoatIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\loginicon.png"); 
-         Image scaledThoatIcon = thoatIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-         btnThoat = new JButton("Trở về", new ImageIcon(scaledThoatIcon));
+         ImageIcon thoatIcon = chinhKichThuoc("/img/loginicon.png", 30, 30);
+        
+         btnThoat = new JButton("Trở về", thoatIcon);
          btnThoat.setForeground(Color.WHITE);
          btnThoat.setFont(new Font("Segoe UI", Font.BOLD, 18));
          btnThoat.setBackground(new Color(93, 156, 236));
