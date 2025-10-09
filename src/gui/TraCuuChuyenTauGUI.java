@@ -74,8 +74,7 @@ public class TraCuuChuyenTauGUI extends JFrame {
 		lblTextChinh.setHorizontalAlignment(SwingConstants.CENTER);
 		pnlTitle.add(lblTextChinh,BorderLayout.NORTH);
 		
-		//Thông tin tra cứu
-		
+		//Thông tin tra cứu	
 		pnlThongTinTim = new JPanel(new GridBagLayout());
 		pnlTraCuu = new JPanel(new BorderLayout());;
 		Font title = new Font("Segoe UI", Font.BOLD, 25);
