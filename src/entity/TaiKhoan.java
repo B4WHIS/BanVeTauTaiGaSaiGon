@@ -6,6 +6,7 @@ public class TaiKhoan {
     private NhanVien nhanVien;
     private String vaiTro;
 
+// Đảm bảo vai trò với chức vụ luôn đồng bộ 
     public TaiKhoan() {}
 
     public TaiKhoan(String tenDangNhap, String matKhau, NhanVien nhanVien, String vaiTro) {

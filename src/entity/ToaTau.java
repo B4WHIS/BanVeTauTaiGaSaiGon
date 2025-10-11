@@ -5,7 +5,8 @@ public class ToaTau {
     private int soLuongCho;  
     private int soThuTu;      
     private Tau tau;          
-
+    //Thêm hệ số giá
+    
     public ToaTau() {
     }
 

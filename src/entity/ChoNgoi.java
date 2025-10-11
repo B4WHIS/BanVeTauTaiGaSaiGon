@@ -6,6 +6,8 @@ public class ChoNgoi {
 	private String trangThai;   // "Trống", "Đã đặt", ...
 	private ToaTau toaTau;   
 
+	//đổi trạng thái thành enum
+	//toaTau không null
 	public ToaTau getToaTau() {
 		return toaTau;
 	}
