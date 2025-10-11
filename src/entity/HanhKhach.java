@@ -13,6 +13,8 @@ public class HanhKhach {
 //  Thêm: loaiHanhKhach
 //	Sửa: Ràng buộc setCmndCccd
 //	Nếu không phải Trẻ em, cmndCccd là bắt buộc và phải đúng định dạng (9 hoặc 12 chữ số).
+//	Sửa: Ràng buộc setNgaySinh: Trẻ em < X tuổi, Người cao tuổi > Y tuổi
+	
 	public HanhKhach() {
 		super();
 	}

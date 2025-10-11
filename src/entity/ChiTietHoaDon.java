@@ -43,7 +43,6 @@ public class ChiTietHoaDon {
         this.donGia = donGia;
     }
     
-
 	@Override
     public String toString() {
         return "ChiTietHoaDon [maHoaDon=" + (hoaDon != null ? hoaDon.getMaHoaDon() : "null") + 
