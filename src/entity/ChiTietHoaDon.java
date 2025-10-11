@@ -2,9 +2,10 @@ package entity;
 
 public class ChiTietHoaDon {
 	private HoaDon hoaDon;
-// 	private Ve ve;
+ 	private Ve ve;
 	private double donGia;
 	private int soLuong;
+	
 
 	public ChiTietHoaDon(){}
 
@@ -18,12 +19,12 @@ public class ChiTietHoaDon {
 		this.hoaDon = hoaDon;
 	}
 	
-//	public void setHoaDon(Ve ve) {
-//		if(ve == null) {
-//			throw new NullPointerException("Vé không được null");
-//		}
-//		this.Ve = ve;
-//	}
+	public void setHoaDon(Ve ve) {
+		if(ve == null) {
+			throw new NullPointerException("Vé không được null");
+		}
+		this.ve = ve;
+	}
 	
 	public double getDonGia() {
 		return donGia;

@@ -32,7 +32,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-public class GiaoDienHuyVe extends JFrame {
+public class GiaoDienHuyVe extends GiaoDienChinh {
 	private JPanel jpmenu;
 	private JPanel jpContent;
 	private JPanel jpTrai;
@@ -72,11 +72,7 @@ public class GiaoDienHuyVe extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//Layout của frame tổng.
 		setLayout(new BorderLayout());
-		   try {
-	            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+		 
 		// Frame Menu
 		jpmenu = new JPanel(new FlowLayout());
 		
@@ -327,10 +323,9 @@ public class GiaoDienHuyVe extends JFrame {
 	        stepSubPanel.setMaximumSize(new Dimension(150, 70));
 	        stepSubPanel.setBackground(new Color(74, 140, 103));  
 
-
-	        ImageIcon stepIcon = new ImageIcon("E:\\STT08_23734471_TranHoaiChau\\QLBVTau\\src\\img\\step-icon-" + (i+1) + ".png");
-	        Image scaledStepIcon = stepIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);  
-	        JLabel iconLabel = new JLabel(new ImageIcon(scaledStepIcon));
+	        
+	        ImageIcon stepIcon = chinhKichThuoc("/img/step-icon-" + (i+1) + ".png", 30, 30);
+	        JLabel iconLabel = new JLabel(stepIcon);
 	        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 	        stepSubPanel.add(iconLabel);
 
@@ -447,4 +442,3 @@ public class GiaoDienHuyVe extends JFrame {
 		new GiaoDienHuyVe();
 	}
 }
-
