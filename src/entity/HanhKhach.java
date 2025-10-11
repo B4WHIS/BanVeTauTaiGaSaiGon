@@ -10,7 +10,9 @@ public class HanhKhach {
 	private String cmndCccd;
 	private String soDT;
 	private LocalDate ngaySinh;
-
+//  Thêm: loaiHanhKhach
+//	Sửa: Ràng buộc setCmndCccd
+//	Nếu không phải Trẻ em, cmndCccd là bắt buộc và phải đúng định dạng (9 hoặc 12 chữ số).
 	public HanhKhach() {
 		super();
 	}
@@ -54,7 +56,8 @@ public class HanhKhach {
 	public String getCmndCccd() {
 		return cmndCccd;
 	}
-
+	
+	//chấp nhận cả 9 chữ số nữa
 	public void setCmndCccd(String cmndCccd) {
 		// Gồm 12 ký tự số
 		if (cmndCccd == null || !cmndCccd.matches("^\\d{12}$")) {

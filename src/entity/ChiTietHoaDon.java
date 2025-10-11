@@ -4,50 +4,51 @@ public class ChiTietHoaDon {
 	private HoaDon hoaDon;
  	private Ve ve;
 	private double donGia;
-	private int soLuong;
-	
 
 	public ChiTietHoaDon(){}
 
-	public HoaDon getHoaDon() {
-		return hoaDon;
-	}
-	public void setHoaDon(HoaDon hoaDon) {
-		if(hoaDon == null) {
-			throw new NullPointerException("Hóa đơn không được null");
-		}
-		this.hoaDon = hoaDon;
-	}
+	public ChiTietHoaDon(HoaDon hoaDon, Ve ve, double donGia) {
+        setHoaDon(hoaDon);
+        setVe(ve);
+        setDonGia(donGia); 
+    }
 	
-	public void setHoaDon(Ve ve) {
-		if(ve == null) {
-			throw new NullPointerException("Vé không được null");
-		}
-		this.ve = ve;
-	}
-	
-	public double getDonGia() {
-		return donGia;
-	}
-	
-	public void setDonGia(double donGia) {
-		if(donGia < 0) {
-			throw new IllegalArgumentException("Đơn giá phải lớn hơn hoặc bằng 0");
-		}
-		this.donGia = donGia;
-	}
-	public int getSoLuong() {
-		return soLuong;
-	}
-	public void setSoLuong(int soLuong) {
-		if(soLuong <= 0) {
-			throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
-		}
-		this.soLuong = soLuong;
-	}
-	
-	public double tinhThanhTien() {
-		return this.soLuong * this.donGia;
-	}
+    public HoaDon getHoaDon() {
+        return hoaDon;
+    }
+    public void setHoaDon(HoaDon hoaDon) {
+        if (hoaDon == null) {
+            throw new IllegalArgumentException("Chi tiết phải thuộc về một Hóa đơn.");
+        }
+        this.hoaDon = hoaDon;
+    }
+    
+    public Ve getVe() {
+        return ve;
+    }
+    public void setVe(Ve ve) {
+        if (ve == null) {
+            throw new IllegalArgumentException("Chi tiết phải có liên kết đến Vé.");
+        }
+        this.ve = ve;
+    }
+    
+    public double getDonGia() {
+        return donGia;
+    }
+    public void setDonGia(double donGia) {
+        if (donGia < 0) {
+            throw new IllegalArgumentException("Đơn giá phải lớn hơn hoặc bằng 0.");
+        }
+        this.donGia = donGia;
+    }
+    
+
+	@Override
+    public String toString() {
+        return "ChiTietHoaDon [maHoaDon=" + (hoaDon != null ? hoaDon.getMaHoaDon() : "null") + 
+               ", maVe=" + (ve != null ? ve.getMaVe() : "null") + 
+               ", donGia=" + donGia + "]";
+    }
 
 }
