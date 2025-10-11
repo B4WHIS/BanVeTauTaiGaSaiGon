@@ -113,8 +113,8 @@ public abstract class GiaoDienChinh extends JFrame {
 		menuBar.setBorder(BorderFactory.createEmptyBorder(8,0,8,0));
 		menuBar.setBackground(new Color(220, 220, 220));
 		JMenu mnuHeThong = new JMenu("Hệ Thống");
-		JMenu mnuNghiepVuVe = new JMenu("Nghiệp Vụ Vé");
-		JMenu mnuQly = new JMenu("Quản Lý");
+		JMenu mnuNghiepVuVe = new JMenu("Xử Lý");
+		JMenu mnuQly = new JMenu("Danh Mục");
 		JMenu mnuTraCuu = new JMenu("Tra Cứu");
 		JMenu mnuThongKe = new JMenu("Thống Kê");
 		JMenu mnuTroGiup = new JMenu("Trợ Giúp");
