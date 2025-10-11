@@ -103,7 +103,7 @@ public class HoaDon {
     }
 	@Override
     public String toString() {
-        // ... Cần bổ sung các trường mới vào toString() ...
+        
         return "HoaDon [maHoaDon=" + maHoaDon + ", ngayLap=" + ngayLap + 
                ", tongThanhToan=" + tongThanhToan + 
                ", maHanhKhach=" + (maHanhKhach != null ? maHanhKhach.getMaKH() : "null") + 
