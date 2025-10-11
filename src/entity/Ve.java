@@ -12,6 +12,7 @@ public class Ve {
 	private HanhKhach maHanhkhach;
 	private KhuyenMai maKhuyenMai;
 	private NhanVien maNhanVien;
+	
 	public Ve(String maVe, LocalDateTime ngayDat, String trangThai, ChoNgoi maChoNgoi, ChuyenTau maChuyenTau,
 			HanhKhach maHanhkhach, KhuyenMai maKhuyenMai, NhanVien maNhanVien) throws Exception {
 		super();

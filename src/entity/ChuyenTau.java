@@ -13,7 +13,6 @@ public class ChuyenTau {
     private LichTrinh lichTrinh;    
     private BigDecimal giaChuyen;  
 
-
     public ChuyenTau() {
     }
 

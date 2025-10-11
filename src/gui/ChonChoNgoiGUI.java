@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrainSeatBookingUI extends GiaoDienChinh {
+public class ChonChoNgoiGUI extends GiaoDienChinh {
     private JComboBox<String> toaComboBox;
     private JPanel mainPanel;
     private JPanel leftPanel;
@@ -20,7 +20,7 @@ public class TrainSeatBookingUI extends GiaoDienChinh {
     private Color darkBg;
    
 
-    public TrainSeatBookingUI() {
+    public ChonChoNgoiGUI() {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
@@ -350,7 +350,7 @@ public class TrainSeatBookingUI extends GiaoDienChinh {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            new TrainSeatBookingUI().setVisible(true);
+            new ChonChoNgoiGUI().setVisible(true);
         });
     }
 }
