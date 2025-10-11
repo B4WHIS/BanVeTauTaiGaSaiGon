@@ -5,6 +5,7 @@ public class ChiTietHoaDon {
 // 	private Ve ve;
 	private double donGia;
 	private int soLuong;
+	
 
 	public ChiTietHoaDon(){}
 
