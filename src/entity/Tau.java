@@ -1,7 +1,7 @@
 package entity;
 
 public class Tau {
-    private Integer IDtau;     
+   
     private String maTau;    
     private String tenTau;   
     private Integer soToa;       
@@ -11,8 +11,7 @@ public class Tau {
     	
     }
 
-    public Tau(Integer IDtau, String maTau, String tenTau, int soToa) {
-        setId(IDtau);
+    public Tau( String maTau, String tenTau, int soToa) {      
         setMaTau(maTau);
         setTenTau(tenTau);
         setSoToa(soToa);
@@ -22,20 +21,6 @@ public class Tau {
     public Tau(String tenTau, int soToa) {
         setTenTau(tenTau);
         setSoToa(soToa);
-    }
-
-    public Integer getId() {
-        return IDtau;
-    }
-
-    public void setId(Integer id) {
-        if (id == null ) {
-            throw new IllegalArgumentException("ID tàu không được trống");
-        }
-        else if(id < 1000 || id > 9999) {
-        	throw new IllegalArgumentException("ID tàu chỉ được nằm trong khoảng 1000 đến 9999");
-        }
-        this.IDtau = id;
     }
 
     public String getMaTau() {
@@ -79,6 +64,6 @@ public class Tau {
 
     @Override
     public String toString() {
-        return "Tau [id=" + IDtau + ", maTau=" + maTau + ", tenTau=" + tenTau + ", soToa=" + soToa + "]";
+        return "Tau [ maTau=" + maTau + ", tenTau=" + tenTau + ", soToa=" + soToa + "]";
     }
 }

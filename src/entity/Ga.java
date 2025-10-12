@@ -1,7 +1,6 @@
 package entity;
 
-public class Ga {
-    private Integer IDga;   
+public class Ga { 
     private String maGa;    
     private String tenGa;
     private String diaChi;
@@ -10,32 +9,12 @@ public class Ga {
     	
     }
 
-    public Ga(Integer IDga, String maGa, String tenGa, String diaChi) throws IllegalAccessException {
-        setIDga(IDga);
+    public Ga( String maGa, String tenGa, String diaChi){
         setMaGa(maGa);
         setTenGa(tenGa);
         setDiaChi(diaChi);
     }
-
-    public Integer getIDga() {
-        return IDga;
-    }
-
-    
-    public void setIDga(Integer IDga) throws IllegalAccessException {
-        if (IDga == null) {
-            throw new IllegalArgumentException("ID ga không được để trống");
-        }
-        else if(IDga < 1) {
-        	throw new IllegalArgumentException("ID ga không được nhỏ hơn 1");
-        }
-        else if(IDga > 99) {
-        	throw new IllegalAccessException("ID ga không được lớp hơn 99");
-        }
-        this.IDga = IDga;
-    }
-
-    
+   
     public String getMaGa() {
         return maGa;
     }
@@ -80,6 +59,6 @@ public class Ga {
 
     @Override
     public String toString() {
-        return "Ga [IDga=" + IDga + ", maGa=" + maGa + ", tenGa=" + tenGa + ", diaChi=" + diaChi + "]";
+        return "Ga [maGa=" + maGa + ", tenGa=" + tenGa + ", diaChi=" + diaChi + "]";
     }
 }

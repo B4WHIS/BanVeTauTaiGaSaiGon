@@ -3,9 +3,7 @@ package entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class ChuyenTau {
-
-    private Integer IDct;                        
+public class ChuyenTau {                    
     private String maChuyenTau;                  
     private LocalDateTime thoiGianKhoiHanh;      
     private LocalDateTime thoiGianDen;          
@@ -17,9 +15,9 @@ public class ChuyenTau {
     	
     }
 
-    public ChuyenTau(Integer IDct, String maChuyenTau, LocalDateTime thoiGianKhoiHanh,
+    public ChuyenTau( String maChuyenTau, LocalDateTime thoiGianKhoiHanh,
                      LocalDateTime thoiGianDen, String maTau, String maLichTrinh, BigDecimal giaChuyen) {
-        setId(IDct);
+  
         setMaChuyenTau(maChuyenTau);
         setThoiGianKhoiHanh(thoiGianKhoiHanh);
         setThoiGianDen(thoiGianDen);
@@ -27,21 +25,6 @@ public class ChuyenTau {
         setMaLichTrinh(maLichTrinh);
         setGiaChuyen(giaChuyen);
     }
-
-    public Integer getId() {
-        return IDct;
-    }
-
-    public void setId(Integer id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID chuyến tàu không được để trống");
-        }
-        if (id < 1 || id > 999) {
-            throw new IllegalArgumentException("ID chuyến tàu phải nằm trong khoảng 001 - 999");
-        }
-        this.IDct = id;
-    }
-
     public String getMaChuyenTau() {
         return maChuyenTau;
     }
@@ -129,8 +112,7 @@ public class ChuyenTau {
 
     @Override
     public String toString() {
-        return "ChuyenTau [" +
-                "IDct=" + IDct +
+        return "ChuyenTau [" +              
                 ", maChuyenTau='" + maChuyenTau + '\'' +
                 ", thoiGianKhoiHanh=" + thoiGianKhoiHanh +
                 ", thoiGianDen=" + thoiGianDen +
