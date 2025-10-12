@@ -116,7 +116,7 @@ public class Ve {
 	    }
 
 	    public void setMaKhuyenMai(KhuyenMai maKhuyenMai) {
-	        this.maKhuyenMai = maKhuyenMai; // có thể null vì trong SQL không NOT NULL
+	        this.maKhuyenMai = maKhuyenMai; 
 	    }
 
 	    public NhanVien getMaNhanVien() {
