@@ -5,26 +5,28 @@ import java.time.LocalDateTime;
 public class Ve {
 	private String maVe;
 	private LocalDateTime ngayDat;
-	// private BigDecimal giaVe;
 	private String trangThai;
+	private double giaVeGoc;
+	private double giaThanhToan;
 	private ChoNgoi maChoNgoi;
 	private ChuyenTau maChuyenTau;
 	private HanhKhach maHanhkhach;
 	private KhuyenMai maKhuyenMai;
 	private NhanVien maNhanVien;
-	//thêm giá gốc với giá thanh toán
-	
-	public Ve(String maVe, LocalDateTime ngayDat, String trangThai, ChoNgoi maChoNgoi, ChuyenTau maChuyenTau,
+
+	public Ve(String maVe, LocalDateTime ngayDat, String trangThai, double giaVeGoc, double giaThanhToan, ChoNgoi maChoNgoi, ChuyenTau maChuyenTau,
 			HanhKhach maHanhkhach, KhuyenMai maKhuyenMai, NhanVien maNhanVien) throws Exception {
 		super();
 		setMaChoNgoi(maChoNgoi);
 		setMaChuyenTau(maChuyenTau);
 		setMaHanhkhach(maHanhkhach);
 		setMaNhanVien(maNhanVien);
-		this.maKhuyenMai = maKhuyenMai;
+		setMaKhuyenMai(maKhuyenMai);
 		setMaVe(maVe);
 		setNgayDat(ngayDat);
 		setTrangThai(trangThai);
+		setGiaVeGoc(giaVeGoc);
+		setGiaThanhToan(giaThanhToan);
 	}
 	public Ve() {
 		super();
@@ -57,6 +59,26 @@ public class Ve {
 	        if (trangThai == null || trangThai.trim().isEmpty())
 	            throw new IllegalArgumentException("Trạng thái không được rỗng (NOT NULL)");
 	        this.trangThai = trangThai;
+	    }
+
+	    public double getGiaVeGoc() {
+	        return giaVeGoc;
+	    }
+
+	    public void setGiaVeGoc(double giaVeGoc) {
+	        if (giaVeGoc <= 0)
+	            throw new IllegalArgumentException("Giá vé gốc phải lớn hơn 0");
+	        this.giaVeGoc = giaVeGoc;
+	    }
+
+	    public double getGiaThanhToan() {
+	        return giaThanhToan;
+	    }
+
+	    public void setGiaThanhToan(double giaThanhToan) {
+	        if (giaThanhToan <= 0)
+	            throw new IllegalArgumentException("Giá thanh toán phải lớn hơn 0");
+	        this.giaThanhToan = giaThanhToan;
 	    }
 
 	    public ChoNgoi getMaChoNgoi() {
@@ -103,20 +125,19 @@ public class Ve {
 
 	    public void setMaNhanVien(NhanVien maNhanVien) throws Exception {
 	       if(maNhanVien == null)
-	    	   	throw new Exception("Mã nhân viên không được để trống");
+	    	   	throw new IllegalArgumentException("Mã nhân viên không được để trống");
+	       this.maNhanVien = maNhanVien;
 	    }
 
 	    // ===== toString() =====
 	    @Override
 	    public String toString() {
 	        return "Ve [maVe=" + maVe + ", ngayDat=" + ngayDat  + ", trangThai=" + trangThai
+	                + ", giaVeGoc=" + giaVeGoc + ", giaThanhToan=" + giaThanhToan
 	                + ", maChoNgoi=" + (maChoNgoi != null ? maChoNgoi.toString() : "null")
 	                + ", maChuyenTau=" + (maChuyenTau != null ? maChuyenTau.toString() : "null")
 	                + ", maHanhkhach=" + (maHanhkhach != null ? maHanhkhach.toString() : "null")
 	                + ", maKhuyenMai=" + (maKhuyenMai != null ? maKhuyenMai.toString() : "null")
 	                + ", maNhanVien=" + (maNhanVien != null ? maNhanVien.toString() : "null") + "]";
 	    }
-
-	
-	
 }
