@@ -59,5 +59,6 @@ public class LichTrinh {
 	            + ", maGaDen=" + (maGaDen != null ? maGaDen.toString() : "null")
 	            + "]";
 	}
+	//chauchau
 	
 }
