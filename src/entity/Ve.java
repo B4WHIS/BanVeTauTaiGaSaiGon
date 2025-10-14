@@ -1,20 +1,21 @@
 package entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Ve {
 	private String maVe;
 	private LocalDateTime ngayDat;
 	private String trangThai;
-	private double giaVeGoc;
-	private double giaThanhToan;
+	private BigDecimal giaVeGoc;
+	private BigDecimal giaThanhToan;
 	private ChoNgoi maChoNgoi;
 	private ChuyenTau maChuyenTau;
 	private HanhKhach maHanhkhach;
 	private KhuyenMai maKhuyenMai;
 	private NhanVien maNhanVien;
 
-	public Ve(String maVe, LocalDateTime ngayDat, String trangThai, double giaVeGoc, double giaThanhToan, ChoNgoi maChoNgoi, ChuyenTau maChuyenTau,
+	public Ve(String maVe, LocalDateTime ngayDat, String trangThai, BigDecimal giaVeGoc, BigDecimal giaThanhToan, ChoNgoi maChoNgoi, ChuyenTau maChuyenTau,
 			HanhKhach maHanhkhach, KhuyenMai maKhuyenMai, NhanVien maNhanVien) throws Exception {
 		super();
 		setMaChoNgoi(maChoNgoi);
@@ -61,23 +62,21 @@ public class Ve {
 	        this.trangThai = trangThai;
 	    }
 
-	    public double getGiaVeGoc() {
+	    public BigDecimal getGiaVeGoc() {
 	        return giaVeGoc;
 	    }
 
-	    public void setGiaVeGoc(double giaVeGoc) {
-	        if (giaVeGoc <= 0)
-	            throw new IllegalArgumentException("Giá vé gốc phải lớn hơn 0");
+	    public void setGiaVeGoc(BigDecimal giaVeGoc) {
+	      
 	        this.giaVeGoc = giaVeGoc;
 	    }
 
-	    public double getGiaThanhToan() {
+	    public BigDecimal getGiaThanhToan() {
 	        return giaThanhToan;
 	    }
 
-	    public void setGiaThanhToan(double giaThanhToan) {
-	        if (giaThanhToan <= 0)
-	            throw new IllegalArgumentException("Giá thanh toán phải lớn hơn 0");
+	    public void setGiaThanhToan(BigDecimal giaThanhToan) {
+	
 	        this.giaThanhToan = giaThanhToan;
 	    }
 
