@@ -2,30 +2,29 @@ package entity;
 
 import java.time.LocalDate;
 import java.time.Period;
-
+//DONE
 public class NhanVien {
     private String maNhanVien;
     private String hoTen;
     private LocalDate ngaySinh;
     private String soDienThoai;
     private String cmndCccd;
-    private String chucVu;
-
-    // Constructor mặc định
+    private int IDloaiChucVu;
+  
     public NhanVien() {}
+    
+    public NhanVien(String maNhanVien, String hoTen, LocalDate ngaySinh, String soDienThoai, String cmndCccd,
+			int iDloaiChucVu) {
+		
+		setMaNhanVien(maNhanVien);
+		setHoTen(hoTen);
+		setNgaySinh(ngaySinh);
+		setSoDienThoai(soDienThoai);
+		setCmndCccd(cmndCccd);
+		setIDloaiChucVu(iDloaiChucVu);
+	}
 
-    // Constructor đầy đủ
-    public NhanVien(String maNV, String hoTen, LocalDate ngaySinh, String sdt, String cccd, String chucVu) {
-        setMaNhanVien(maNV);
-        setHoTen(hoTen);
-        setNgaySinh(ngaySinh);
-        setSoDienThoai(sdt);
-        setCmndCccd(cccd);
-        setChucVu(chucVu);
-    }
-
-    // Getter - Setter với kiểm tra ràng buộc
-    public String getMaNhanVien() {
+	public String getMaNhanVien() {
         return maNhanVien;
     }
 
@@ -75,26 +74,19 @@ public class NhanVien {
         this.cmndCccd = cccd;
     }
 
-    public String getChucVu() {
-        return chucVu;
-    }
+	public int getIDloaiChucVu() {
+		return IDloaiChucVu;
+	}
 
-    public void setChucVu(String chucVu) {
-        if (!chucVu.equals("Nhân viên bán vé") && !chucVu.equals("Nhân viên quản lý"))
-            throw new IllegalArgumentException("Chức vụ không hợp lệ");
-        this.chucVu = chucVu;
-    }
+	public void setIDloaiChucVu(int iDloaiChucVu) {
+		IDloaiChucVu = iDloaiChucVu;
+	}
 
-    @Override
-    public String toString() {
-        return "NhanVien {" +
-                "maNhanVien='" + maNhanVien + '\'' +
-                ", hoTen='" + hoTen + '\'' +
-                ", ngaySinh=" + ngaySinh +
-                ", soDienThoai='" + soDienThoai + '\'' +
-                ", cmndCccd='" + cmndCccd + '\'' +
-                ", chucVu='" + chucVu + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "NhanVien [maNhanVien=" + maNhanVien + ", hoTen=" + hoTen + ", ngaySinh=" + ngaySinh + ", soDienThoai="
+				+ soDienThoai + ", cmndCccd=" + cmndCccd + ", IDloaiChucVu=" + IDloaiChucVu + "]";
+	}
+
     
 }

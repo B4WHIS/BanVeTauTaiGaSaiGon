@@ -4,20 +4,12 @@ public class TaiKhoan {
     private String tenDangNhap;
     private String matKhau;
     private NhanVien nhanVien;
-    private String vaiTro;
-
-// Đảm bảo vai trò với chức vụ luôn đồng bộ 
+//	DONE
     public TaiKhoan() {}
 
-    public TaiKhoan(String tenDangNhap, String matKhau, NhanVien nhanVien, String vaiTro) {
-        setTenDangNhap(tenDangNhap);
-        setMatKhau(matKhau);
+    public TaiKhoan(String matKhau, NhanVien nhanVien) {
         setNhanVien(nhanVien);
-        setVaiTro(vaiTro);
-    }
-
-    public TaiKhoan(String tenDangNhap, String matKhau) {
-        setTenDangNhap(tenDangNhap);
+        this.tenDangNhap = nhanVien.getSoDienThoai();
         setMatKhau(matKhau);
     }
 
@@ -26,18 +18,18 @@ public class TaiKhoan {
     }
 
     public void setTenDangNhap(String tenDangNhap) {
-        if (!tenDangNhap.matches("^\\d{8}$"))
-            throw new IllegalArgumentException("Tên đăng nhập không hợp lệ! Phải là 8 chữ số.");
+        if (!tenDangNhap.matches("^\\d{10}$"))
+            throw new IllegalArgumentException("Tên đăng nhập không hợp lệ! Phải là 10 chữ số (số điện thoại).");
         this.tenDangNhap = tenDangNhap;
     }
-
+    
     public String getMatKhau() {
         return matKhau;
     }
 
     public void setMatKhau(String matKhau) {
         if (!matKhau.matches("^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$"))
-            throw new IllegalArgumentException("Mật khẩu không hợp lệ!");
+            throw new IllegalArgumentException("Mật khẩu phải có ít nhất 6 ký tự, gồm 1 chữ hoa, 1 số và 1 ký tự đặc biệt.");
         this.matKhau = matKhau;
     }
 
@@ -48,26 +40,16 @@ public class TaiKhoan {
     public void setNhanVien(NhanVien nhanVien) {
         if (nhanVien == null)
             throw new IllegalArgumentException("Nhân viên không được rỗng!");
+
+        this.tenDangNhap = nhanVien.getSoDienThoai();
         this.nhanVien = nhanVien;
-    }
-
-    public String getVaiTro() {
-        return vaiTro;
-    }
-
-    public void setVaiTro(String vaiTro) {
-        if (!vaiTro.equals("Nhân viên bán vé") && !vaiTro.equals("Nhân viên quản lý"))
-            throw new IllegalArgumentException("Vai trò không hợp lệ!");
-        this.vaiTro = vaiTro;
     }
 
     @Override
     public String toString() {
-        return "TaiKhoan {" +
+        return "TaiKhoan [" +
                 "tenDangNhap='" + tenDangNhap + '\'' +
-                ", matKhau='" + matKhau + '\'' +
-                ", nhanVien=" + nhanVien +
-                ", vaiTro='" + vaiTro + '\'' +
-                '}';
+                ", nhanVien=" + (nhanVien != null ? nhanVien.getMaNhanVien() : "null") +
+                ']';
     }
 }

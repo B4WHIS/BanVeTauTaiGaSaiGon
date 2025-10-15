@@ -1,18 +1,19 @@
 package entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-
+//done
 public class KhuyenMai {
     private String maKhuyenMai;
     private String tenKhuyenMai;
-    private int mucGiamGia;
+    private BigDecimal mucGiamGia;
     private LocalDate ngayBatDau;
     private LocalDate ngayKetThuc;
     private String dieuKien;
 
     public KhuyenMai() {}
 
-    public KhuyenMai(String maKhuyenMai, String tenKhuyenMai, int mucGiamGia,
+    public KhuyenMai(String maKhuyenMai, String tenKhuyenMai, BigDecimal mucGiamGia,
                      LocalDate ngayBatDau, LocalDate ngayKetThuc, String dieuKien) {
         setMaKhuyenMai(maKhuyenMai);
         setTenKhuyenMai(tenKhuyenMai);
@@ -42,16 +43,25 @@ public class KhuyenMai {
         this.tenKhuyenMai = tenKhuyenMai;
     }
 
-    public int getMucGiamGia() {
+//    public int getMucGiamGia() {
+//        return mucGiamGia;
+//    }
+//
+//    public void setMucGiamGia(int mucGiamGia) {
+//        if (mucGiamGia < 0 || mucGiamGia > 100)
+//            throw new IllegalArgumentException("Mức giảm giá phải từ 0 đến 100%");
+//        this.mucGiamGia = mucGiamGia;
+//    }
+
+    public BigDecimal getMucGiamGia() {
         return mucGiamGia;
     }
-
-    public void setMucGiamGia(int mucGiamGia) {
-        if (mucGiamGia < 0 || mucGiamGia > 100)
-            throw new IllegalArgumentException("Mức giảm giá phải từ 0 đến 100%");
+    public void setMucGiamGia(BigDecimal mucGiamGia) {
+        if (mucGiamGia == null || mucGiamGia.compareTo(BigDecimal.ZERO) < 0)
+            throw new IllegalArgumentException("Mức giảm giá phải từ 0% trở lên.");
         this.mucGiamGia = mucGiamGia;
     }
-
+    
     public LocalDate getNgayBatDau() {
         return ngayBatDau;
     }
@@ -77,8 +87,6 @@ public class KhuyenMai {
     }
 
     public void setDieuKien(String dieuKien) {
-        if (dieuKien == null || dieuKien.trim().isEmpty())
-            throw new IllegalArgumentException("Điều kiện áp dụng không được rỗng!");
         this.dieuKien = dieuKien;
     }
 

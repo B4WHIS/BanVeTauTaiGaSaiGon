@@ -1,25 +1,29 @@
 package entity;
 
 import java.time.LocalDateTime;
-
+//done
 public class PhieuDatCho {
 	private String maPhieuDatCho;
-	private LocalDateTime ngayDat; //ngày đặt vé
-	private VeStatus trangThai;
+	private LocalDateTime ngayDat; 
+	private String trangThai;
 	private HanhKhach maHanhKhach;
 	private NhanVien maNhanVien;
+
+	public PhieuDatCho() {}
+
 	
-	 public PhieuDatCho(String maPhieuDatCho, LocalDateTime ngayDat, VeStatus trangThai,
-             HanhKhach maHanhKhach, NhanVien maNhanVien) {
-		
+	
+	public PhieuDatCho(String maPhieuDatCho, LocalDateTime ngayDat, String trangThai, HanhKhach maHanhKhach,
+			NhanVien maNhanVien) {
+		super();
 		setMaPhieuDatCho(maPhieuDatCho);
 		setNgayDat(ngayDat);
 		setTrangThai(trangThai);
-		setMaHanhKhach(maHanhKhach); 
-		setMaNhanVien(maNhanVien);   
-	 }
-	
-	public PhieuDatCho() {}
+		setMaHanhKhach(maHanhKhach);
+		setMaNhanVien(maNhanVien);
+	}
+
+
 
 	public String getMaPhieuDatCho() {
 		return maPhieuDatCho;
@@ -47,16 +51,16 @@ public class PhieuDatCho {
 	    this.ngayDat = ngayDat;
 	}
 
-	public VeStatus getTrangThai() {
-		return trangThai;
-	}
+    public String getTrangThai() {
+        return trangThai;
+    }
 
-	public void setTrangThai(VeStatus trangThai) {
-	    if (trangThai == null) {
-	        throw new IllegalArgumentException("Trạng thái vé không được null.");
-	    }
-	    this.trangThai = trangThai;
-	}
+    public void setTrangThai(String trangThai) {
+        if (trangThai == null || (!trangThai.equalsIgnoreCase("Chưa thanh toán") && !trangThai.equalsIgnoreCase("Đã thanh toán"))) {
+            throw new IllegalArgumentException("Trạng thái phải là 'Đã thanh toán' hoặc 'Chưa thanh toán'.");
+        }
+        this.trangThai = trangThai;
+    }
 
 	public HanhKhach getMaHanhKhach() {
 		return maHanhKhach;

@@ -1,5 +1,5 @@
 package entity;
-
+//DONE
 public class LichTrinh {
 	private String maLichTrinh;
 	private String tenLichTrinh;
