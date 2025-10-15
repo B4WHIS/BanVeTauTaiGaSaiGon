@@ -1,7 +1,7 @@
 package entity;
 
 import java.math.BigDecimal;
-
+//done
 public class ToaTau {
     private String maToa;
     private int soLuongCho;
@@ -60,13 +60,10 @@ public class ToaTau {
     public BigDecimal getHeSoGia() {
         return heSoGia;
     }
-    //cái chỗ này là nó hệ số giá nó sẽ so sánh với số 0 nếu mà:
-    //+ hệ số giá bé hơn 0 thì nó sẽ trả về giá trị là -1 
-    //+ nếu mà nó bằng 0 thì trả về 0
-    //+ nếu mà nó lớn hơn 0 thì nó sẽ trả về số 1
+
     public void setHeSoGia(BigDecimal heSoGia) {
     	if (heSoGia == null) {
-         	throw new IllegalArgumentException("Hệ số giá không được đểb trống");
+         	throw new IllegalArgumentException("Hệ số giá không được để trống");
          }
     	else  if (heSoGia.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Hệ số giá phải lớn hơn 0");

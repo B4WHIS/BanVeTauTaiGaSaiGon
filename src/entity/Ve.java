@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class Ve {
     private String maVe;
     private LocalDateTime ngayDat;
-    private TrangThaiVe trangThai; // Sử dụng enum
+    private String trangThai; 
     private BigDecimal giaVeGoc;
     private BigDecimal giaThanhToan;
     private ChoNgoi maChoNgoi;
@@ -15,32 +15,8 @@ public class Ve {
     private KhuyenMai maKhuyenMai;
     private NhanVien maNhanVien;
 
-    // ===== Enum trạng thái vé =====
-    public enum TrangThaiVe {
-        CON_KHA_DUNG("Còn khả dụng"),
-        DA_SU_DUNG("Đã sử dụng"),
-        HET_HAN("Hết hạn"),
-        DA_HUY("Đã hủy"),
-        DA_DOI("Đã đổi");
-
-        private final String moTa;
-
-        TrangThaiVe(String moTa) {
-            this.moTa = moTa;
-        }
-
-        public String getMoTa() {
-            return moTa;
-        }
-
-        @Override
-        public String toString() {
-            return moTa;
-        }
-    }
-
-    // ===== Constructor =====
-    public Ve(String maVe, LocalDateTime ngayDat, TrangThaiVe trangThai,
+    
+    public Ve(String maVe, LocalDateTime ngayDat, String trangThai,
               BigDecimal giaVeGoc, BigDecimal giaThanhToan,
               ChoNgoi maChoNgoi, ChuyenTau maChuyenTau,
               HanhKhach maHanhkhach, KhuyenMai maKhuyenMai, NhanVien maNhanVien) throws Exception {
@@ -82,11 +58,11 @@ public class Ve {
         this.ngayDat = ngayDat;
     }
 
-    public TrangThaiVe getTrangThai() {
+    public String getTrangThai() {
         return trangThai;
     }
 
-    public void setTrangThai(TrangThaiVe trangThai) {
+    public void setTrangThai(String trangThai) {
         if (trangThai == null)
             throw new IllegalArgumentException("Trạng thái vé không được rỗng!");
         this.trangThai = trangThai;
@@ -97,6 +73,8 @@ public class Ve {
     }
 
     public void setGiaVeGoc(BigDecimal giaVeGoc) {
+        if (giaVeGoc == null || giaVeGoc.compareTo(BigDecimal.ZERO) <= 0)
+            throw new IllegalArgumentException("Giá vé gốc phải lớn hơn 0");
         this.giaVeGoc = giaVeGoc;
     }
 
@@ -105,6 +83,8 @@ public class Ve {
     }
 
     public void setGiaThanhToan(BigDecimal giaThanhToan) {
+        if (giaThanhToan == null || giaThanhToan.compareTo(BigDecimal.ZERO) <= 0)
+            throw new IllegalArgumentException("Giá thanh toán phải lớn hơn 0");
         this.giaThanhToan = giaThanhToan;
     }
 
@@ -156,20 +136,12 @@ public class Ve {
         this.maNhanVien = maNhanVien;
     }
 
-    // ===== toString() =====
-    @Override
-    public String toString() {
-        return "Ve [" +
-                "maVe=" + maVe +
-                ", ngayDat=" + ngayDat +
-                ", trangThai=" + (trangThai != null ? trangThai.getMoTa() : "null") +
-                ", giaVeGoc=" + giaVeGoc +
-                ", giaThanhToan=" + giaThanhToan +
-                ", maChoNgoi=" + (maChoNgoi != null ? maChoNgoi.toString() : "null") +
-                ", maChuyenTau=" + (maChuyenTau != null ? maChuyenTau.toString() : "null") +
-                ", maHanhkhach=" + (maHanhkhach != null ? maHanhkhach.toString() : "null") +
-                ", maKhuyenMai=" + (maKhuyenMai != null ? maKhuyenMai.toString() : "null") +
-                ", maNhanVien=" + (maNhanVien != null ? maNhanVien.toString() : "null") +
-                "]";
-    }
+	@Override
+	public String toString() {
+		return "Ve [maVe=" + maVe + ", ngayDat=" + ngayDat + ", trangThai=" + trangThai + ", giaVeGoc=" + giaVeGoc
+				+ ", giaThanhToan=" + giaThanhToan + ", maChoNgoi=" + maChoNgoi + ", maChuyenTau=" + maChuyenTau
+				+ ", maHanhkhach=" + maHanhkhach + ", maKhuyenMai=" + maKhuyenMai + ", maNhanVien=" + maNhanVien + "]";
+	}
+
+    
 }

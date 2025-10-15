@@ -2,7 +2,7 @@ package entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+//DONE
 public class ChuyenTau {                    
     private String maChuyenTau;                  
     private LocalDateTime thoiGianKhoiHanh;      
@@ -44,13 +44,12 @@ public class ChuyenTau {
     }
 
     public void setThoiGianKhoiHanh(LocalDateTime thoiGianKhoiHanh) {
-//        if (thoiGianKhoiHanh == null) {
-//            throw new IllegalArgumentException("Thời gian khởi hành không được để trống");
-//        } else if (thoiGianKhoiHanh.isBefore(LocalDateTime.now())) {
-//            throw new IllegalArgumentException("Thời gian khởi hành không được trước hiện tại");
-//        } else if (this.thoiGianDen != null && thoiGianKhoiHanh.isAfter(this.thoiGianDen)) {
-//            throw new IllegalArgumentException("Thời gian khởi hành không được sau thời gian đến");
-//        }
+        if (thoiGianKhoiHanh == null) {
+             throw new IllegalArgumentException("Thời gian khởi hành không được để trống");
+        } 
+        else if (this.thoiGianDen != null && thoiGianKhoiHanh.isAfter(this.thoiGianDen)) {
+            throw new IllegalArgumentException("Thời gian khởi hành không được sau thời gian đến");
+        }
         this.thoiGianKhoiHanh = thoiGianKhoiHanh;
     }
 

@@ -25,9 +25,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 
-public abstract class GiaoDienChinh extends JFrame {
+public abstract class GiaoDienChinh extends JFrame{
 	
 	protected JLabel lblGioThuc;
 	protected JMenuBar menuBar;
@@ -49,7 +48,7 @@ public abstract class GiaoDienChinh extends JFrame {
 	
 	public GiaoDienChinh() {
 		setTitle("Ứng dụng bán vé tàu");
-		setSize(1500,1000);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		

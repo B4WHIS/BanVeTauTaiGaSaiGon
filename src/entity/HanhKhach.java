@@ -1,28 +1,38 @@
 package entity;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
-
+//done
 public class HanhKhach {
     private String maKH;
     private String hoTen;
     private String cmndCccd;
     private String soDT;
     private LocalDate ngaySinh;
-    private UuDai maUuDai; // liên kết ưu đãi
+    private String maUuDai;
 
     public HanhKhach() {}
 
-    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, UuDai maUuDai) {
-        setMaKH(maKH);
-        setHoTen(hoTen);
-        setCmndCccd(cmndCccd);
-        setSoDT(soDT);
-        setNgaySinh(ngaySinh);
-        setUuDai(maUuDai);
+    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
+		super();
+		setMaKH(maKH);
+		setHoTen(hoTen);
+		setCmndCccd(cmndCccd);
+		setSoDT(soDT);
+		setNgaySinh(ngaySinh);
+		setMaUuDai(maUuDai);
+	}
+    
+	public String getMaUuDai() {
+        return maUuDai;
     }
 
+    public void setMaUuDai(String maUuDai) {
+        if (maUuDai == null || maUuDai.trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã ưu đãi không được để trống.");
+        }
+        this.maUuDai = maUuDai;
+    }
+    
     public String getMaKH() {
         return maKH;
     }
@@ -56,11 +66,15 @@ public class HanhKhach {
     public String getSoDT() {
         return soDT;
     }
-
     public void setSoDT(String soDT) {
-        if (soDT == null || !soDT.matches("^0\\d{9}$"))
-            throw new IllegalArgumentException("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0!");
-        this.soDT = soDT;
+        
+        if (soDT != null && !soDT.trim().isEmpty()) {
+            if (!soDT.matches("^0\\d{9}$"))
+                throw new IllegalArgumentException("Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0!");
+            this.soDT = soDT;
+        } else {
+            this.soDT = null;
+        }
     }
 
     public LocalDate getNgaySinh() {
@@ -73,23 +87,13 @@ public class HanhKhach {
         this.ngaySinh = ngaySinh;
     }
 
-    public UuDai getUuDai() {
-        return maUuDai;
-    }
+	@Override
+	public String toString() {
+		return "HanhKhach [maKH=" + maKH + ", hoTen=" + hoTen + ", cmndCccd=" + cmndCccd + ", soDT=" + soDT
+				+ ", ngaySinh=" + ngaySinh + ", maUuDai=" + maUuDai + "]";
+	}
 
-    public void setUuDai(UuDai uuDai) {
-        if (uuDai == null)
-            throw new IllegalArgumentException("Ưu đãi không được null!");
-        this.maUuDai = uuDai;
-    }
-
-    @Override
-    public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        return String.format("HanhKhach[maKH=%s, hoTen=%s, cmndCccd=%s, soDT=%s, ngaySinh=%s, uuDai=%s]",
-                maKH, hoTen, cmndCccd, soDT, ngaySinh.format(formatter),
-                maUuDai != null ? maUuDai.getLoaiUuDai().getTenHienThi() : "Không có");
-    }
+   
 
   
 }

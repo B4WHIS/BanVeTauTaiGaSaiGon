@@ -4,7 +4,7 @@ public class Ga {
     private String maGa;    
     private String tenGa;
     private String diaChi;
-
+//DONE
     public Ga() {
     	
     }

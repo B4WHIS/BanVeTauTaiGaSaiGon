@@ -9,11 +9,11 @@ public class HoaDon {
 	private LocalDateTime ngayLap;
 	private HanhKhach maHanhKhach;
 	private NhanVien maNhanVien;
-	private final double tongThanhToan; 
+	private double tongTien; 
 	private List<ChiTietHoaDon> danhSachChiTiet;
 
 	public HoaDon() {
-        this.tongThanhToan = 0.0;
+        this.tongTien = 0.0;
         this.danhSachChiTiet = new ArrayList<>();
     }
 	public HoaDon(String maHoaDon, LocalDateTime ngayLap, HanhKhach maHanhKhach, NhanVien maNhanVien, 
@@ -24,11 +24,17 @@ public class HoaDon {
 		setMaNhanVien(maNhanVien);
 
   		this.danhSachChiTiet = (danhSachChiTiet != null) ? danhSachChiTiet : new ArrayList<>();
-  		this.tongThanhToan = tinhTongTien();
+  		this.tongTien = tinhTongTien();
 	}
     
-    public double getTongThanhToan() {
-        return tongThanhToan;
+    public double getTongTien() {
+        return tongTien;
+    }
+    public void setTongTien(double tongTien) {
+        if (tongTien <= 0) {
+            throw new IllegalArgumentException("Tổng tiền hóa đơn phải lớn hơn 0.");
+        }
+        this.tongTien = tongTien;
     }
     
 	public String getMaHoaDon() {
@@ -77,6 +83,13 @@ public class HoaDon {
 	    this.maNhanVien = maNhanVien;
 	}
 	
+	public List<ChiTietHoaDon> getDanhSachChiTiet() {
+	    if (danhSachChiTiet == null) {
+	        danhSachChiTiet = new ArrayList<>();
+	    }
+	    return danhSachChiTiet;
+	}
+
 	public void setDanhSachChiTiet(List<ChiTietHoaDon> danhSachChiTiet) {
 	    if (danhSachChiTiet == null) { 
 	        this.danhSachChiTiet = new ArrayList<>();
@@ -85,30 +98,22 @@ public class HoaDon {
 	    this.danhSachChiTiet = danhSachChiTiet;
 	}
 
-	public List<ChiTietHoaDon> getDanhSachChiTiet() {
-	    if (danhSachChiTiet == null) {
-	        danhSachChiTiet = new ArrayList<>();
-	    }
-	    return danhSachChiTiet;
-	}
 
     public double tinhTongTien() {
         double tong = 0.0;
         if (danhSachChiTiet != null) {
-             for (ChiTietHoaDon cthd : danhSachChiTiet) {
-                 tong += cthd.getDonGia();
-             }
+            for (ChiTietHoaDon cthd : danhSachChiTiet) {
+                tong += cthd.getDonGia();
+            }
         }
-        return tong;
+        return tong; 
     }
 	@Override
-    public String toString() {
-        
-        return "HoaDon [maHoaDon=" + maHoaDon + ", ngayLap=" + ngayLap + 
-               ", tongThanhToan=" + tongThanhToan + 
-               ", maHanhKhach=" + (maHanhKhach != null ? maHanhKhach.getMaKH() : "null") + 
-               ", maNhanVien=" + (maNhanVien != null ? maNhanVien.getMaNhanVien() : "null") + "]";
-    }
+	public String toString() {
+		return "HoaDon [maHoaDon=" + maHoaDon + ", ngayLap=" + ngayLap + ", maHanhKhach=" + maHanhKhach
+				+ ", maNhanVien=" + maNhanVien + ", tongTien=" + tongTien + ", danhSachChiTiet=" + danhSachChiTiet
+				+ "]";
+	}
 
 
 	

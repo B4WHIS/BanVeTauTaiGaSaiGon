@@ -1,37 +1,29 @@
 package entity;
 
 import java.time.LocalDateTime;
-
+//done
 public class PhieuDatCho {
 	private String maPhieuDatCho;
-	private LocalDateTime ngayDat; //ngày đặt vé
-	private TrangThai trangThai;
+	private LocalDateTime ngayDat; 
+	private String trangThai;
 	private HanhKhach maHanhKhach;
 	private NhanVien maNhanVien;
-	 public PhieuDatCho(String maPhieuDatCho, LocalDateTime ngayDat, TrangThai trangThai,
-             HanhKhach maHanhKhach, NhanVien maNhanVien) {
-		
+
+	public PhieuDatCho() {}
+
+	
+	
+	public PhieuDatCho(String maPhieuDatCho, LocalDateTime ngayDat, String trangThai, HanhKhach maHanhKhach,
+			NhanVien maNhanVien) {
+		super();
 		setMaPhieuDatCho(maPhieuDatCho);
 		setNgayDat(ngayDat);
 		setTrangThai(trangThai);
-		setMaHanhKhach(maHanhKhach); 
-		setMaNhanVien(maNhanVien);   
-	 }
-	 public enum TrangThai{
-		 DA_THANH_TOAN("Đã thanh toán"),
-		 CHUA_THANH_TOAN("Chưa thanh toán");
-		 private final String display;
-			
-			TrangThai(String display) {
-				this.display = display;
-			}
-			
-			public String getDisplay() {
-				return display;
-			}
-	 }
-	
-	public PhieuDatCho() {}
+		setMaHanhKhach(maHanhKhach);
+		setMaNhanVien(maNhanVien);
+	}
+
+
 
 	public String getMaPhieuDatCho() {
 		return maPhieuDatCho;
@@ -59,16 +51,16 @@ public class PhieuDatCho {
 	    this.ngayDat = ngayDat;
 	}
 
-	public TrangThai getTrangThai() {
-		return trangThai;
-	}
+    public String getTrangThai() {
+        return trangThai;
+    }
 
-	public void setTrangThai(TrangThai trangThai) {
-	    if (trangThai == null) {
-	        throw new IllegalArgumentException("Trạng thái vé không được null.");
-	    }
-	    this.trangThai = trangThai;
-	}
+    public void setTrangThai(String trangThai) {
+        if (trangThai == null || (!trangThai.equalsIgnoreCase("Chưa thanh toán") && !trangThai.equalsIgnoreCase("Đã thanh toán"))) {
+            throw new IllegalArgumentException("Trạng thái phải là 'Đã thanh toán' hoặc 'Chưa thanh toán'.");
+        }
+        this.trangThai = trangThai;
+    }
 
 	public HanhKhach getMaHanhKhach() {
 		return maHanhKhach;

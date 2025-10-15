@@ -1,54 +1,49 @@
 package entity;
-
+//DONE
 public class ChiTietPDC {
-	private PhieuDatCho phieuDatCho;
-	private ChoNgoi choNgoi;
-	private ChuyenTau chuyenTau;
+	private PhieuDatCho maPhieuDatCho;
+	private ChoNgoi maChoNgoi;
+	private ChuyenTau maChuyenTau;
 	
 	public ChiTietPDC() {}
-	    
-	public ChiTietPDC(PhieuDatCho phieuDatCho, ChoNgoi choNgoi, ChuyenTau chuyenTau) {
-	    setPhieuDatCho(phieuDatCho);
-	    setChoNgoi(choNgoi);
-	    setChuyenTau(chuyenTau);
+
+	public ChiTietPDC(PhieuDatCho maPhieuDatCho, ChoNgoi maChoNgoi, ChuyenTau maChuyenTau) {
+		super();
+		setMaPhieuDatCho(maPhieuDatCho);
+		setMaChoNgoi(maChoNgoi);
+		setMaChuyenTau(maChuyenTau);
 	}
 	
-	public PhieuDatCho getPhieuDatCho() {
-		return phieuDatCho;
+	public PhieuDatCho getMaPhieuDatCho() {
+		return maPhieuDatCho;
 	}
-    public void setPhieuDatCho(PhieuDatCho phieuDatCho) {
-        if (phieuDatCho == null) {
+    public void setMaPhieuDatCho(PhieuDatCho maPhieuDatCho) {
+        if (maPhieuDatCho == null) {
             throw new IllegalArgumentException("Chi tiết phải thuộc về một Phiếu đặt chỗ.");
         }
-        this.phieuDatCho = phieuDatCho;
+        this.maPhieuDatCho = maPhieuDatCho;
     }
     
-    public ChoNgoi getChoNgoi() {
-		return choNgoi;
+    public ChoNgoi getMaChoNgoi() {
+		return maChoNgoi;
 	}
-    public void setChoNgoi(ChoNgoi choNgoi) {
-        if (choNgoi == null) {
+    public void setMaChoNgoi(ChoNgoi maChoNgoi) {
+        if (maChoNgoi == null) {
             throw new IllegalArgumentException("Chi tiết phải gắn với Chỗ ngồi.");
         }
-        this.choNgoi = choNgoi;
+        this.maChoNgoi = maChoNgoi;
     }
 
-    public void setChuyenTau(ChuyenTau chuyenTau) {
-        if (chuyenTau == null) {
+    public void setMaChuyenTau(ChuyenTau maChuyenTau) {
+        if (maChuyenTau == null) {
             throw new IllegalArgumentException("Chi tiết phải gắn với Chuyến tàu.");
         }
-        this.chuyenTau = chuyenTau;
+        this.maChuyenTau = maChuyenTau;
     }
 	
-	public ChuyenTau getChuyenTau() {
-		return chuyenTau;
+	public ChuyenTau getMaChuyenTau() {
+		return maChuyenTau;
 	}
 	
-    @Override
-    public String toString() {
-        return "ChiTietPhieuDatCho"
-               + "[maPhieuDatCho=" + (phieuDatCho != null ? phieuDatCho.getMaPhieuDatCho() : "null")
-               + ", maChoNgoi=" + (choNgoi != null ? choNgoi.getMaChoNgoi() : "null")
-               + ", maChuyenTau=" + (chuyenTau != null ? chuyenTau.getMaChuyenTau() : "null") + "]";
-    }
+	
 }

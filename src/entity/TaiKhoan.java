@@ -4,20 +4,12 @@ public class TaiKhoan {
     private String tenDangNhap;
     private String matKhau;
     private NhanVien nhanVien;
-   
-
+//	DONE
     public TaiKhoan() {}
 
-    // Constructor có đầy đủ tham số
     public TaiKhoan(String matKhau, NhanVien nhanVien) {
         setNhanVien(nhanVien);
-        setMatKhau(matKhau);
-        // tenDangNhap và vaiTro sẽ tự động đồng bộ từ nhanVien
-    }
-
-    // Constructor đăng nhập (chỉ cần tên đăng nhập + mật khẩu)
-    public TaiKhoan(String tenDangNhap, String matKhau) {
-        setTenDangNhap(tenDangNhap);
+        this.tenDangNhap = nhanVien.getSoDienThoai();
         setMatKhau(matKhau);
     }
 
@@ -25,15 +17,12 @@ public class TaiKhoan {
         return tenDangNhap;
     }
 
-    // Chỉ cho phép set nếu không có nhân viên gắn kèm
     public void setTenDangNhap(String tenDangNhap) {
-        if (nhanVien != null)
-            throw new IllegalStateException("Không thể đặt tên đăng nhập thủ công khi đã có nhân viên!");
         if (!tenDangNhap.matches("^\\d{10}$"))
-            throw new IllegalArgumentException("Tên đăng nhập không hợp lệ! Phải là số điện thoại 10 chữ số.");
+            throw new IllegalArgumentException("Tên đăng nhập không hợp lệ! Phải là 10 chữ số (số điện thoại).");
         this.tenDangNhap = tenDangNhap;
     }
-
+    
     public String getMatKhau() {
         return matKhau;
     }
@@ -50,23 +39,17 @@ public class TaiKhoan {
 
     public void setNhanVien(NhanVien nhanVien) {
         if (nhanVien == null)
-            throw new IllegalArgumentException("Nhân viên không được null!");
+            throw new IllegalArgumentException("Nhân viên không được rỗng!");
 
-        this.nhanVien = nhanVien;
-
-        // ✅ Tự động lấy số điện thoại làm tên đăng nhập
         this.tenDangNhap = nhanVien.getSoDienThoai();
-
-        
+        this.nhanVien = nhanVien;
     }
 
     @Override
     public String toString() {
-        return "TaiKhoan {" +
+        return "TaiKhoan [" +
                 "tenDangNhap='" + tenDangNhap + '\'' +
-                ", matKhau='" + matKhau + '\'' +
-                ", nhanVien=" + (nhanVien != null ? nhanVien.getHoTen() : "null") +
-                +
-                '}';
+                ", nhanVien=" + (nhanVien != null ? nhanVien.getMaNhanVien() : "null") +
+                ']';
     }
 }

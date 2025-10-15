@@ -1,5 +1,5 @@
 package entity;
-
+//Done
 public class ChiTietHoaDon {
 	private HoaDon hoaDon;
  	private Ve ve;
@@ -37,8 +37,8 @@ public class ChiTietHoaDon {
         return donGia;
     }
     public void setDonGia(double donGia) {
-        if (donGia < 0) {
-            throw new IllegalArgumentException("Đơn giá phải lớn hơn hoặc bằng 0.");
+        if (donGia <= 0) {
+            throw new IllegalArgumentException("Đơn giá phải lớn hơn 0.");
         }
         this.donGia = donGia;
     }
