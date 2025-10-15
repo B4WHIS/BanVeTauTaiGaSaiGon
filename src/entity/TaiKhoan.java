@@ -4,18 +4,18 @@ public class TaiKhoan {
     private String tenDangNhap;
     private String matKhau;
     private NhanVien nhanVien;
-    private String vaiTro;
+   
 
-// Đảm bảo vai trò với chức vụ luôn đồng bộ 
     public TaiKhoan() {}
 
-    public TaiKhoan(String tenDangNhap, String matKhau, NhanVien nhanVien, String vaiTro) {
-        setTenDangNhap(tenDangNhap);
-        setMatKhau(matKhau);
+    // Constructor có đầy đủ tham số
+    public TaiKhoan(String matKhau, NhanVien nhanVien) {
         setNhanVien(nhanVien);
-        setVaiTro(vaiTro);
+        setMatKhau(matKhau);
+        // tenDangNhap và vaiTro sẽ tự động đồng bộ từ nhanVien
     }
 
+    // Constructor đăng nhập (chỉ cần tên đăng nhập + mật khẩu)
     public TaiKhoan(String tenDangNhap, String matKhau) {
         setTenDangNhap(tenDangNhap);
         setMatKhau(matKhau);
@@ -25,9 +25,12 @@ public class TaiKhoan {
         return tenDangNhap;
     }
 
+    // Chỉ cho phép set nếu không có nhân viên gắn kèm
     public void setTenDangNhap(String tenDangNhap) {
-        if (!tenDangNhap.matches("^\\d{8}$"))
-            throw new IllegalArgumentException("Tên đăng nhập không hợp lệ! Phải là 8 chữ số.");
+        if (nhanVien != null)
+            throw new IllegalStateException("Không thể đặt tên đăng nhập thủ công khi đã có nhân viên!");
+        if (!tenDangNhap.matches("^\\d{10}$"))
+            throw new IllegalArgumentException("Tên đăng nhập không hợp lệ! Phải là số điện thoại 10 chữ số.");
         this.tenDangNhap = tenDangNhap;
     }
 
@@ -37,7 +40,7 @@ public class TaiKhoan {
 
     public void setMatKhau(String matKhau) {
         if (!matKhau.matches("^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$"))
-            throw new IllegalArgumentException("Mật khẩu không hợp lệ!");
+            throw new IllegalArgumentException("Mật khẩu phải có ít nhất 6 ký tự, gồm 1 chữ hoa, 1 số và 1 ký tự đặc biệt.");
         this.matKhau = matKhau;
     }
 
@@ -47,18 +50,14 @@ public class TaiKhoan {
 
     public void setNhanVien(NhanVien nhanVien) {
         if (nhanVien == null)
-            throw new IllegalArgumentException("Nhân viên không được rỗng!");
+            throw new IllegalArgumentException("Nhân viên không được null!");
+
         this.nhanVien = nhanVien;
-    }
 
-    public String getVaiTro() {
-        return vaiTro;
-    }
+        // ✅ Tự động lấy số điện thoại làm tên đăng nhập
+        this.tenDangNhap = nhanVien.getSoDienThoai();
 
-    public void setVaiTro(String vaiTro) {
-        if (!vaiTro.equals("Nhân viên bán vé") && !vaiTro.equals("Nhân viên quản lý"))
-            throw new IllegalArgumentException("Vai trò không hợp lệ!");
-        this.vaiTro = vaiTro;
+        
     }
 
     @Override
@@ -66,8 +65,8 @@ public class TaiKhoan {
         return "TaiKhoan {" +
                 "tenDangNhap='" + tenDangNhap + '\'' +
                 ", matKhau='" + matKhau + '\'' +
-                ", nhanVien=" + nhanVien +
-                ", vaiTro='" + vaiTro + '\'' +
+                ", nhanVien=" + (nhanVien != null ? nhanVien.getHoTen() : "null") +
+                +
                 '}';
     }
 }

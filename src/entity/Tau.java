@@ -1,12 +1,9 @@
 package entity;
 
 public class Tau {
-   
     private String maTau;    
     private String tenTau;   
     private Integer soToa;       
-
-
     public Tau() {
     	
     }
