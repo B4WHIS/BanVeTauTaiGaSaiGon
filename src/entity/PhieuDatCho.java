@@ -5,11 +5,10 @@ import java.time.LocalDateTime;
 public class PhieuDatCho {
 	private String maPhieuDatCho;
 	private LocalDateTime ngayDat; //ngày đặt vé
-	private VeStatus trangThai;
+	private TrangThai trangThai;
 	private HanhKhach maHanhKhach;
 	private NhanVien maNhanVien;
-	
-	 public PhieuDatCho(String maPhieuDatCho, LocalDateTime ngayDat, VeStatus trangThai,
+	 public PhieuDatCho(String maPhieuDatCho, LocalDateTime ngayDat, TrangThai trangThai,
              HanhKhach maHanhKhach, NhanVien maNhanVien) {
 		
 		setMaPhieuDatCho(maPhieuDatCho);
@@ -17,6 +16,19 @@ public class PhieuDatCho {
 		setTrangThai(trangThai);
 		setMaHanhKhach(maHanhKhach); 
 		setMaNhanVien(maNhanVien);   
+	 }
+	 public enum TrangThai{
+		 DA_THANH_TOAN("Đã thanh toán"),
+		 CHUA_THANH_TOAN("Chưa thanh toán");
+		 private final String display;
+			
+			TrangThai(String display) {
+				this.display = display;
+			}
+			
+			public String getDisplay() {
+				return display;
+			}
 	 }
 	
 	public PhieuDatCho() {}
@@ -47,11 +59,11 @@ public class PhieuDatCho {
 	    this.ngayDat = ngayDat;
 	}
 
-	public VeStatus getTrangThai() {
+	public TrangThai getTrangThai() {
 		return trangThai;
 	}
 
-	public void setTrangThai(VeStatus trangThai) {
+	public void setTrangThai(TrangThai trangThai) {
 	    if (trangThai == null) {
 	        throw new IllegalArgumentException("Trạng thái vé không được null.");
 	    }

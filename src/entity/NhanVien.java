@@ -1,7 +1,8 @@
 package entity;
-
 import java.time.LocalDate;
 import java.time.Period;
+
+
 
 public class NhanVien {
     private String maNhanVien;
@@ -9,13 +10,36 @@ public class NhanVien {
     private LocalDate ngaySinh;
     private String soDienThoai;
     private String cmndCccd;
-    private String chucVu;
+    private ChucVu chucVu;
 
+    public enum ChucVu {
+        NHAN_VIEN_BAN_VE("Nhân viên bán vé"),
+        NHAN_VIEN_QUAN_LY("Nhân viên quản lý");
+
+        private final String displayName;
+
+        ChucVu(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public static ChucVu fromString(String name) {
+            for (ChucVu chucVu : ChucVu.values()) {
+                if (chucVu.displayName.equals(name)) {
+                    return chucVu;
+                }
+            }
+            throw new IllegalArgumentException("Chức vụ không hợp lệ: " + name);
+        }
+    }
     // Constructor mặc định
     public NhanVien() {}
 
     // Constructor đầy đủ
-    public NhanVien(String maNV, String hoTen, LocalDate ngaySinh, String sdt, String cccd, String chucVu) {
+    public NhanVien(String maNV, String hoTen, LocalDate ngaySinh, String sdt, String cccd, ChucVu chucVu) {
         setMaNhanVien(maNV);
         setHoTen(hoTen);
         setNgaySinh(ngaySinh);
@@ -24,13 +48,6 @@ public class NhanVien {
         setChucVu(chucVu);
     }
 
-    // Constructor sao chép
-    public NhanVien(NhanVien another) {
-        this(another.maNhanVien, another.hoTen, another.ngaySinh,
-             another.soDienThoai, another.cmndCccd, another.chucVu);
-    }
-
-    // Getter - Setter với kiểm tra ràng buộc
     public String getMaNhanVien() {
         return maNhanVien;
     }
@@ -81,14 +98,19 @@ public class NhanVien {
         this.cmndCccd = cccd;
     }
 
-    public String getChucVu() {
+    public ChucVu getChucVu() {
         return chucVu;
     }
 
-    public void setChucVu(String chucVu) {
-        if (!chucVu.equals("Nhân viên bán vé") && !chucVu.equals("Nhân viên quản lý"))
-            throw new IllegalArgumentException("Chức vụ không hợp lệ");
+    public void setChucVu(ChucVu chucVu) {
+        if (chucVu == null) {
+            throw new IllegalArgumentException("Chức vụ không được null");
+        }
         this.chucVu = chucVu;
+    }
+
+    public void setChucVu(String chucVuStr) {
+        this.chucVu = ChucVu.fromString(chucVuStr);
     }
 
     @Override
@@ -99,7 +121,7 @@ public class NhanVien {
                 ", ngaySinh=" + ngaySinh +
                 ", soDienThoai='" + soDienThoai + '\'' +
                 ", cmndCccd='" + cmndCccd + '\'' +
-                ", chucVu='" + chucVu + '\'' +
+                ", chucVu=" + chucVu.getDisplayName() +
                 '}';
     }
 }

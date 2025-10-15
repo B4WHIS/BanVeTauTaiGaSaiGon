@@ -2,10 +2,22 @@ package entity;
 
 public class ChoNgoi {
 	private String maChoNgoi;   
-	private String loaiGhe;     // "Ghế mềm", "Giường nằm", ...
+	private LoaiGhe loaiGhe;     // "Ghế mềm", "Giường nằm", ...
 	private TrangThai trangThai;   // Enum cho trạng thái
 	private ToaTau toaTau;   
 
+	public enum LoaiGhe{
+		GHE_MEM("Ghế mềm"),
+		GIUONG_NAM("Giường nằm");
+		private final String display;
+		 LoaiGhe(String display) {
+			// TODO Auto-generated constructor stub
+			 this.display = display;
+		}
+		 public String getDisplay() {
+			 return display;
+		 }
+	}
 	// Enum cho trạng thái
 	public enum TrangThai {
 		TRONG("Trống"),
@@ -39,14 +51,14 @@ public class ChoNgoi {
 		super();
 	}
 
-	public ChoNgoi(String maChoNgoi, String loaiGhe, TrangThai trangThai) {
+	public ChoNgoi(String maChoNgoi, LoaiGhe loaiGhe, TrangThai trangThai) {
 		super();
 		this.maChoNgoi = maChoNgoi;
 		setLoaiGhe(loaiGhe);
 		this.trangThai = trangThai;
 	}
 
-	public ChoNgoi(String maChoNgoi, String loaiGhe, TrangThai trangThai, ToaTau toaTau) {
+	public ChoNgoi(String maChoNgoi, LoaiGhe loaiGhe, TrangThai trangThai, ToaTau toaTau) {
 		this(maChoNgoi, loaiGhe, trangThai);
 		setToaTau(toaTau);
 	}
@@ -61,11 +73,11 @@ public class ChoNgoi {
 		this.maChoNgoi = maChoNgoi;
 	}
 
-	public String getLoaiGhe() {
+	public LoaiGhe getLoaiGhe() {
 		return loaiGhe;
 	}
 
-	public void setLoaiGhe(String loaiGhe) {
+	public void setLoaiGhe(LoaiGhe loaiGhe) {
 		if (loaiGhe == null || !(loaiGhe.equals("Ghế mềm") || loaiGhe.equals("Giường nằm"))) {
 			throw new IllegalArgumentException("Loại ghế không hợp lệ! Phải là 'Ghế mềm' hoặc 'Giường nằm'.");
 		}

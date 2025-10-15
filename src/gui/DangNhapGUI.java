@@ -11,15 +11,22 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import connectDB.connectDB; // Import class connectDB từ package connectDB
 
 public class DangNhapGUI extends JFrame implements ActionListener {
 	
@@ -77,7 +84,6 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 		
 		//Phải
 		pnlPhai.setLayout(new BorderLayout(10,10));
-//		pnlPhai.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
 		//form nhập
 		pnlForm = new JPanel(new GridBagLayout());
@@ -142,6 +148,8 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 	    btnThoat.setText("Thoát");
 	    ImageIcon iconThoat = GiaoDienChinh.chinhKichThuoc("/img/thoaticon.png", 25, 25);
 	    btnThoat.setIcon(iconThoat);
+	    // Thêm sự kiện cho nút Thoát
+	    btnThoat.addActionListener(this);
 
 	    pnlNutBam.add(btnThoat);
 	    
@@ -151,7 +159,8 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 	    btnDn.setForeground(Color.WHITE);
 	    ImageIcon iconDN = GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 25, 25);
 	    btnDn.setIcon(iconDN);
-
+	    // Thêm sự kiện cho nút Đăng nhập
+	    btnDn.addActionListener(this);
 
 	    pnlNutBam.add(btnDn);
 	    
@@ -172,16 +181,74 @@ public class DangNhapGUI extends JFrame implements ActionListener {
 	public static void main(String[] args) throws IOException {
 		DangNhapGUI dn = new DangNhapGUI();
 		dn.setVisible(true);
-		
-		
-		
-		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
-		
+		if (e.getSource() == btnThoat) {
+			// Sự kiện nút Thoát: Đóng ứng dụng
+			connectDB.closeConnection(); // Đóng kết nối trước khi thoát
+			System.exit(0);
+		} else if (e.getSource() == btnDn) {
+			// Sự kiện nút Đăng nhập: Kiểm tra thông tin với DB
+			String tenDN = txtTenDN.getText().trim();
+			String matKhau = new String(txtMatKhau.getPassword()).trim();
+			
+			if (tenDN.isEmpty() || matKhau.isEmpty()) {
+				JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			// Kết nối và kiểm tra DB
+			if (kiemTraDangNhap(tenDN, matKhau)) {
+				JOptionPane.showMessageDialog(this, "Đăng nhập thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+				// Mở giao diện chính (giả sử GiaoDienChinh là class giao diện chính)
+				try {
+					NhanVienBanVeGUI gdChinh = new NhanVienBanVeGUI(); // Thay đổi constructor nếu cần truyền dữ liệu
+					gdChinh.setVisible(true);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+				// Đóng cửa sổ đăng nhập
+				this.dispose();
+			} else {
+				JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+				txtTenDN.setText("");
+				txtMatKhau.setText("");
+				txtTenDN.requestFocus();
+			}
+		}
+	}
+	
+	// Phương thức kiểm tra đăng nhập với DB sử dụng class connectDB
+	private boolean kiemTraDangNhap(String username, String password) {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try {
+			// Sử dụng kết nối từ class connectDB
+			Connection conn = connectDB.getConnection();
+			
+			// Query kiểm tra (giả sử bảng 'users' với cột 'username' và 'password' - thay đổi theo bảng thực tế của bạn, ví dụ: NhanVien, MaNV, MatKhau)
+			String sql = "SELECT * FROM TaiKhoan WHERE tenDangNhap = ? AND matKhau = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, username);
+			pstmt.setString(2, password); // Nên hash password thực tế để bảo mật
+			
+			rs = pstmt.executeQuery();
+			
+			return rs.next(); // Trả về true nếu tìm thấy record khớp
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Lỗi kết nối hoặc truy vấn DB: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+			return false;
+		} finally {
+			// Đóng tài nguyên (không đóng connection vì class connectDB quản lý singleton)
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 }

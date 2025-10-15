@@ -77,8 +77,6 @@ public class KhuyenMai {
     }
 
     public void setDieuKien(String dieuKien) {
-        if (dieuKien == null || dieuKien.trim().isEmpty())
-            throw new IllegalArgumentException("Điều kiện áp dụng không được rỗng!");
         this.dieuKien = dieuKien;
     }
 
