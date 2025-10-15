@@ -24,12 +24,6 @@ public class NhanVien {
         setChucVu(chucVu);
     }
 
-    // Constructor sao chép
-    public NhanVien(NhanVien another) {
-        this(another.maNhanVien, another.hoTen, another.ngaySinh,
-             another.soDienThoai, another.cmndCccd, another.chucVu);
-    }
-
     // Getter - Setter với kiểm tra ràng buộc
     public String getMaNhanVien() {
         return maNhanVien;
@@ -102,4 +96,5 @@ public class NhanVien {
                 ", chucVu='" + chucVu + '\'' +
                 '}';
     }
+    
 }
