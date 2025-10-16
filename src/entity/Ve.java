@@ -9,6 +9,7 @@ public class Ve {
     private String trangThai; 
     private BigDecimal giaVeGoc;
     private BigDecimal giaThanhToan;
+    
     private ChoNgoi maChoNgoi;
     private ChuyenTau maChuyenTau;
     private HanhKhach maHanhkhach;
@@ -130,7 +131,7 @@ public class Ve {
         return maNhanVien;
     }
 
-    public void setMaNhanVien(NhanVien maNhanVien) throws Exception {
+    public void setMaNhanVien(NhanVien maNhanVien) {
         if (maNhanVien == null)
             throw new IllegalArgumentException("Mã nhân viên không được để trống");
         this.maNhanVien = maNhanVien;

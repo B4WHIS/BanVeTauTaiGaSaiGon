@@ -13,9 +13,10 @@ public class LichSuVe {
     private String maNhanVien;
     private String maHoaDon;
     private String maHanhKhach;
-    
-    
  
+    public LichSuVe() {
+         
+    }
     public LichSuVe(String maLichSuVe, int IDloaiGiaoDich, LocalDateTime ngayGiaoDich, String maVe, String maNhanVien) {
         setMaLichSuVe(maLichSuVe);
         setIDloaiGiaoDich(IDloaiGiaoDich);
@@ -24,6 +25,7 @@ public class LichSuVe {
         setMaNhanVien(maNhanVien);
         this.phiXuLy = BigDecimal.ZERO; 
     }
+    
 	
 	public String getMaLichSuVe() {
 		return maLichSuVe;
