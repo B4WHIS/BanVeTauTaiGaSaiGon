@@ -5,20 +5,34 @@ public class LichTrinh {
 	private String tenLichTrinh;
 	private Ga maGaDi;
 	private Ga maGaDen;
+	private double khoangCach;
 	
 	public LichTrinh() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
-	public LichTrinh(String maLichTrinh, String tenLichTrinh, Ga maGaDi, Ga maGaDen) throws Exception {
+	public LichTrinh(String maLichTrinh, String tenLichTrinh, Ga maGaDi, Ga maGaDen, double khoangCach) throws Exception {
 		super();
 	setMaGaDen(maGaDen);
 	setMaGaDi(maGaDi);
 	setTenLichTrinh(tenLichTrinh);
 	setMaLichTrinh(maLichTrinh);
+	setKhoangCach(khoangCach);
+	
 	}
 	
+	public double getKhoangCach() {
+		return khoangCach;
+	}
+
+	public void setKhoangCach(double khoangCach) throws Exception {
+		if(khoangCach <0) {
+			throw new Exception("Khoảng cách không được bé hơn 0");
+		}
+		this.khoangCach = khoangCach;
+	}
+
 	public String getMaLichTrinh() {
 		return maLichTrinh;
 	}
@@ -57,8 +71,9 @@ public class LichTrinh {
 	            + ", tenLichTrinh=" + tenLichTrinh
 	            + ", maGaDi=" + (maGaDi != null ? maGaDi.toString() : "null")
 	            + ", maGaDen=" + (maGaDen != null ? maGaDen.toString() : "null")
-	            + "]";
+	            +", khoangCach="+khoangCach
+	            +"]";
 	}
-	//chauchau
+
 	
 }
