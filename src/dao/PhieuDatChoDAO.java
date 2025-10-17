@@ -21,7 +21,7 @@ public class PhieuDatChoDAO {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("❌ Lỗi thêm phiếu đặt chỗ: " + e.getMessage());
+            System.err.println("Lỗi thêm phiếu đặt chỗ: " + e.getMessage());
             return false;
         }
     }
@@ -39,7 +39,7 @@ public class PhieuDatChoDAO {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("❌ Lỗi cập nhật phiếu đặt chỗ: " + e.getMessage());
+            System.err.println("Lỗi cập nhật phiếu đặt chỗ: " + e.getMessage());
             return false;
         }
     }
@@ -52,7 +52,7 @@ public class PhieuDatChoDAO {
             ps.setString(1, maPhieuDatCho);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("❌ Lỗi xóa phiếu đặt chỗ: " + e.getMessage());
+            System.err.println("Lỗi xóa phiếu đặt chỗ: " + e.getMessage());
             return false;
         }
     }
@@ -74,7 +74,7 @@ public class PhieuDatChoDAO {
                 );
             }
         } catch (SQLException e) {
-            System.err.println("❌ Lỗi tìm phiếu đặt chỗ: " + e.getMessage());
+            System.err.println("Lỗi tìm phiếu đặt chỗ: " + e.getMessage());
         }
         return null;
     }
