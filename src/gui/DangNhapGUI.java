@@ -10,245 +10,233 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import connectDB.connectDB; // Import class connectDB từ package connectDB
+public class DangNhapGUI extends JFrame implements ActionListener, MouseListener {
 
-public class DangNhapGUI extends JFrame implements ActionListener {
-	
-	private JPanel pnlChinh;
-	private JPanel pnlTrai;
-	private JLabel lblImg;
-	private JPanel pnlPhai;
-	private JLabel lblDn;
-	private JLabel lblTenDN;
-	private JTextField txtTenDN;
-	private JLabel lblMatKhau;
-	private JPasswordField txtMatKhau;
-	private JButton btnDn;
-	private JLabel lblGsg;
-	private JPanel pnlForm;
-	private JPanel pnlNutBam;
-	private JButton btnThoat;
-	private JPanel pnlGop;
+    private JPanel pnlChinh;
+    private JPanel pnlTrai;
+    private JLabel lblImg;
+    private JPanel pnlPhai;
+    private JLabel lblDn;
+    private JLabel lblTenDN;
+    private JTextField txtTenDN;
+    private JLabel lblMatKhau;
+    private JPasswordField txtMatKhau;
+    private JButton btnDn;
+    private JLabel lblGsg;
+    private JPanel pnlForm;
+    private JPanel pnlNutBam;
+    private JButton btnThoat;
+    private JPanel pnlGop;
 
-	DangNhapGUI() throws IOException{
-		setTitle("Đăng nhập");
-		setSize(1000,650);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
-		setResizable(false);
+    //Màu sắc
+    private final Color COLOR_PRIMARY = new Color(74, 140, 103);    
+    private final Color COLOR_BG_LIGHT = new Color(250, 247, 243);    
+    private final Color COLOR_LOGIN_BUTTON = new Color(93, 156, 236); 
+    private final Color COLOR_EXIT_BUTTON = new Color(229, 115, 115); 
+    
+    DangNhapGUI() throws IOException {
+        setTitle("Đăng nhập");
+        setSize(1000, 650);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        
+        // Khởi tạo các thành phần và bố cục
+        setupUI();
+        
+        // ActionListener 
+        txtTenDN.addActionListener(this);
+        txtMatKhau.addActionListener(this);
+        btnDn.addActionListener(this);
+        btnThoat.addActionListener(this);
 
-		//Bo Cuc
-		pnlChinh = new JPanel(new GridLayout(1,2));
-		pnlTrai = new JPanel();
-		pnlPhai = new JPanel();
-		
-		pnlTrai.setBackground(new Color(250, 247, 243));
-		pnlPhai.setBackground(new Color(250, 247, 243));
-		
-		//Trái
-		pnlTrai.setLayout(new GridBagLayout());
-		pnlGop = new JPanel();
-		pnlGop.setLayout(new BoxLayout(pnlGop, BoxLayout.Y_AXIS));
-		pnlGop.setBackground(new Color(250, 247, 243));
-		
-		//thành phần
-		lblGsg = new JLabel("GA SÀI GÒN");
-		lblGsg.setFont(new Font("Segoe UI", Font.BOLD, 60));
-		lblGsg.setForeground(new Color(74, 140, 103));
-		lblGsg.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-		ImageIcon TauIC = GiaoDienChinh.chinhKichThuoc("/img/trainDN.png",497,300);
-		lblImg = new JLabel(TauIC);
-		lblImg.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // MouseListener
+        btnDn.addMouseListener(this);
+        btnThoat.addMouseListener(this);
+    }
+    
+    private void setupUI() throws IOException {
+        //Panel Chính
+        pnlChinh = new JPanel(new GridLayout(1, 2));
+        pnlTrai = new JPanel();
+        pnlPhai = new JPanel();
+        pnlTrai.setBackground(COLOR_BG_LIGHT);
+        pnlPhai.setBackground(COLOR_BG_LIGHT);
+        
+        //Panel Trái
+        pnlTrai.setLayout(new GridBagLayout());
+        pnlGop = new JPanel();
+        pnlGop.setLayout(new BoxLayout(pnlGop, BoxLayout.Y_AXIS));
+        pnlGop.setBackground(COLOR_BG_LIGHT);
+        
+        // Thành phần trái
+        lblGsg = new JLabel();
+        lblGsg.setFont(new Font("Segoe UI", Font.BOLD, 60));
+        lblGsg.setForeground(COLOR_PRIMARY);
+        lblGsg.setAlignmentX(Component.CENTER_ALIGNMENT);
+//        1.72
+        ImageIcon TauIC = GiaoDienChinh.chinhKichThuoc("/img/trainDN.png", 500, 290);
+        lblImg = new JLabel(TauIC);
+        lblImg.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        pnlGop.add(lblGsg);
+        pnlGop.add(lblImg);
+        pnlTrai.add(pnlGop);
+        
+        // Panel Phải (Form Đăng nhập)
+        pnlPhai.setLayout(new BorderLayout(10, 10));
+        pnlForm = new JPanel(new GridBagLayout());
+        pnlForm.setBackground(COLOR_BG_LIGHT);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        
+        // Đăng Nhập Title
+        lblDn = new JLabel("ĐĂNG NHẬP");
+        lblDn.setFont(new Font("Segoe UI", Font.BOLD, 45));
+        lblDn.setForeground(COLOR_PRIMARY);
+        gbc.gridx= 0; gbc.gridy= 0; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.CENTER;
+        pnlForm.add(lblDn,gbc);
+        
+        // Tên DN Label
+        lblTenDN = new JLabel("Tên đăng nhập");
+        lblTenDN.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTenDN.setForeground(new Color(66, 66, 66));
+        gbc.gridx= 0; gbc.gridy= 1; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.LINE_END;
+        pnlForm.add(lblTenDN,gbc);
+        
+        // Tên DN Field
+        txtTenDN = new JTextField(20);
+        txtTenDN.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        gbc.gridx= 1; gbc.gridy= 1; gbc.anchor = GridBagConstraints.LINE_START;
+        pnlForm.add(txtTenDN,gbc);
+        
+        // Mật khẩu Label
+        lblMatKhau = new JLabel("Mật khẩu");
+        lblMatKhau.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblMatKhau.setForeground(new Color(66, 66, 66));
+        gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.gridx= 0; gbc.gridy= 2;
+        pnlForm.add(lblMatKhau,gbc);
+        
+        // Mật khẩu Field
+        txtMatKhau = new JPasswordField(20);
+        txtMatKhau.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.gridx= 1; gbc.gridy= 2;
+        pnlForm.add(txtMatKhau,gbc);
 
-		//thêm vào trái
-		pnlGop.add(lblGsg);
-		pnlGop.add(lblImg);
-		pnlTrai.add(pnlGop);
-		
-		//Phải
-		pnlPhai.setLayout(new BorderLayout(10,10));
+        // Nút bấm Panel
+        pnlNutBam = new JPanel(new GridLayout(1, 2, 10, 0));
+        
+        // Nút Thoát
+        btnThoat = new JButton("Thoát");
+        btnThoat.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnThoat.setBackground(COLOR_EXIT_BUTTON);
+        btnThoat.setForeground(Color.WHITE);
+        ImageIcon iconThoat = GiaoDienChinh.chinhKichThuoc("/img/thoaticon.png", 25, 25);
+        btnThoat.setIcon(iconThoat);
+        gbc.gridx = 0; gbc.gridy = 3;
+        pnlNutBam.add(btnThoat);
 
-		//form nhập
-		pnlForm = new JPanel(new GridBagLayout());
-		pnlForm.setBackground(new Color(250, 247, 243));
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(10, 10, 10, 10);
-		
-		//Đăng Nhập
-		lblDn = new JLabel("ĐĂNG NHẬP");
-		lblDn.setFont(new Font("Segoe UI", Font.BOLD, 40));
-		lblDn.setForeground(new Color(66, 66, 66));
-		gbc.gridx= 0;
-		gbc.gridy= 0;
-		gbc.gridwidth = 2;
-		gbc.anchor = GridBagConstraints.CENTER;
-		
-		pnlForm.add(lblDn,gbc);
-	
-		lblTenDN = new JLabel("Tên đăng nhập");
-		lblTenDN.setFont(new Font("Segoe UI", Font.BOLD, 20));
-		lblTenDN.setForeground(new Color(158, 158, 158));
-		gbc.gridx= 0;
-		gbc.gridy= 1;
-		gbc.gridwidth = 1;
-		gbc.anchor = GridBagConstraints.LINE_END;
-		pnlForm.add(lblTenDN,gbc);
-		
-	    txtTenDN = new JTextField(20);
-	    txtTenDN.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		gbc.gridx= 1;
-		gbc.gridy= 1;
+        // Nút Đăng nhập
+        btnDn = new JButton("Đăng nhập");
+        btnDn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnDn.setBackground(COLOR_LOGIN_BUTTON);
+        btnDn.setForeground(Color.WHITE);
+        ImageIcon iconDN = GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 25, 25);
+        btnDn.setIcon(iconDN);
+        pnlNutBam.add(btnDn);
 
-		gbc.anchor = GridBagConstraints.LINE_START;
-		pnlForm.add(txtTenDN,gbc);
-		
-	    //Mật khẩu
-	    lblMatKhau = new JLabel("Mật khẩu");
-	    lblMatKhau.setFont(new Font("Segoe UI", Font.BOLD, 20));
-	    lblMatKhau.setForeground(new Color(158, 158, 158));
-	    gbc.anchor = GridBagConstraints.LINE_END;
-	    
-		gbc.gridx= 0;
-		gbc.gridy= 2;
-		pnlForm.add(lblMatKhau,gbc);
-		
-	    txtMatKhau = new JPasswordField(20);
-	    txtMatKhau.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-	    gbc.anchor = GridBagConstraints.LINE_START;
-		gbc.gridx= 1;
-		gbc.gridy= 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		pnlForm.add(txtMatKhau,gbc);
+        // Thêm các panel con vào panel chính
+        gbc.gridx= 1; gbc.gridy= 3; gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL; gbc.anchor = GridBagConstraints.CENTER;
+        pnlForm.add(pnlNutBam,gbc);
+        pnlPhai.add(pnlForm);
+        pnlChinh.add(pnlTrai);
+        pnlChinh.add(pnlPhai);
+        add(pnlChinh);
+    }
+ 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object src = e.getSource();
+        
+        // 1. Xử lý Enter
+        if (src == txtTenDN) {
+            txtMatKhau.requestFocus();
+            return;
+        } else if (src == txtMatKhau) {
+            btnDn.doClick();
+            return;
+        }
+        
+        // 2. Xử lý nút bấm
+        if (src == btnThoat) {
+        	xuLyThoat(); 
+        } else if (src == btnDn) {
+            
+        }
+    }
+    private void xuLyThoat() {
+        int choice = JOptionPane.showOptionDialog(
+            this,
+            "Bạn có chắc chắn muốn thoát khỏi hệ thống?",
+            "Xác Nhận Thoát Ứng Dụng",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new String[]{"Thoát", "Hủy Bỏ"},
+            "Hủy Bỏ"
+        );
+        
+        if (choice == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }
 
-	    
-	    //nut bam	
-		pnlNutBam = new JPanel(new GridLayout(1, 2, 10, 0));
+    @Override
+    public void mouseClicked(MouseEvent e) { } 
+    @Override
+    public void mousePressed(MouseEvent e) { } 
+    @Override
+    public void mouseReleased(MouseEvent e) { } 
 
-	    btnThoat = new JButton();
-	    btnThoat.setFont(new Font("Segoe UI", Font.BOLD, 16));
-	    btnThoat.setBackground(new Color(229, 115, 115));
-	    btnThoat.setForeground(Color.WHITE);
-	    btnThoat.setText("Thoát");
-	    ImageIcon iconThoat = GiaoDienChinh.chinhKichThuoc("/img/thoaticon.png", 25, 25);
-	    btnThoat.setIcon(iconThoat);
-	    // Thêm sự kiện cho nút Thoát
-	    btnThoat.addActionListener(this);
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        JButton btn = (JButton) e.getSource();
+        if (btn == btnDn) {
+            btn.setBackground(COLOR_LOGIN_BUTTON.darker()); 
+        } else if (btn == btnThoat) {
+            btn.setBackground(COLOR_EXIT_BUTTON.darker());
+        }
+    }
 
-	    pnlNutBam.add(btnThoat);
-	    
-	    btnDn = new JButton("Đăng nhập");
-	    btnDn.setFont(new Font("Segoe UI", Font.BOLD, 16));
-	    btnDn.setBackground(new Color(93, 156, 236));
-	    btnDn.setForeground(Color.WHITE);
-	    ImageIcon iconDN = GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 25, 25);
-	    btnDn.setIcon(iconDN);
-	    // Thêm sự kiện cho nút Đăng nhập
-	    btnDn.addActionListener(this);
-
-	    pnlNutBam.add(btnDn);
-	    
-		gbc.gridx= 1;
-		gbc.gridy= 3;
-		gbc.anchor = GridBagConstraints.EAST;
-		
-		pnlForm.add(pnlNutBam,gbc);
-	    //them
-	    pnlPhai.add(pnlForm);
-
-	    
-	    pnlChinh.add(pnlTrai);
-	    pnlChinh.add(pnlPhai);
-	    add(pnlChinh);
-	}
-	
-	public static void main(String[] args) throws IOException {
-		DangNhapGUI dn = new DangNhapGUI();
-		dn.setVisible(true);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnThoat) {
-			// Sự kiện nút Thoát: Đóng ứng dụng
-			connectDB.closeConnection(); // Đóng kết nối trước khi thoát
-			System.exit(0);
-		} else if (e.getSource() == btnDn) {
-			// Sự kiện nút Đăng nhập: Kiểm tra thông tin với DB
-			String tenDN = txtTenDN.getText().trim();
-			String matKhau = new String(txtMatKhau.getPassword()).trim();
-			
-			if (tenDN.isEmpty() || matKhau.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			
-			// Kết nối và kiểm tra DB
-			if (kiemTraDangNhap(tenDN, matKhau)) {
-				JOptionPane.showMessageDialog(this, "Đăng nhập thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-				// Mở giao diện chính (giả sử GiaoDienChinh là class giao diện chính)
-				try {
-					NhanVienBanVeGUI gdChinh = new NhanVienBanVeGUI(); // Thay đổi constructor nếu cần truyền dữ liệu
-					gdChinh.setVisible(true);
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
-				// Đóng cửa sổ đăng nhập
-				this.dispose();
-			} else {
-				JOptionPane.showMessageDialog(this, "Tên đăng nhập hoặc mật khẩu không đúng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-				txtTenDN.setText("");
-				txtMatKhau.setText("");
-				txtTenDN.requestFocus();
-			}
-		}
-	}
-	
-	// Phương thức kiểm tra đăng nhập với DB sử dụng class connectDB
-	private boolean kiemTraDangNhap(String username, String password) {
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try {
-			// Sử dụng kết nối từ class connectDB
-			Connection conn = connectDB.getConnection();
-			
-			// Query kiểm tra (giả sử bảng 'users' với cột 'username' và 'password' - thay đổi theo bảng thực tế của bạn, ví dụ: NhanVien, MaNV, MatKhau)
-			String sql = "SELECT * FROM TaiKhoan WHERE tenDangNhap = ? AND matKhau = ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, username);
-			pstmt.setString(2, password); // Nên hash password thực tế để bảo mật
-			
-			rs = pstmt.executeQuery();
-			
-			return rs.next(); // Trả về true nếu tìm thấy record khớp
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Lỗi kết nối hoặc truy vấn DB: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-			return false;
-		} finally {
-			// Đóng tài nguyên (không đóng connection vì class connectDB quản lý singleton)
-			try {
-				if (rs != null) rs.close();
-				if (pstmt != null) pstmt.close();
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
+    @Override
+    public void mouseExited(MouseEvent e) {
+        JButton btn = (JButton) e.getSource();
+        if (btn == btnDn) {
+            btn.setBackground(COLOR_LOGIN_BUTTON);
+        } else if (btn == btnThoat) {
+            btn.setBackground(COLOR_EXIT_BUTTON);
+        }
+    }
+ 
+    public static void main(String[] args) throws IOException {
+        DangNhapGUI dn = new DangNhapGUI();
+        dn.setVisible(true);
+    }
 }
