@@ -16,6 +16,8 @@ public class QuanLyVeControl {
 		hanhKhachDao = new HanhKhachDAO();
 		uuDaiDao = new UuDaiDAO();
 		lichSuVeDao = new LichSuVeDAO();
+		
+		
 	}
 	
 	

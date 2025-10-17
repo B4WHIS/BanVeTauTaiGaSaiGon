@@ -14,7 +14,7 @@ public class ChonChoNgoiGUI extends GiaoDienChinh {
     private JPanel leftPanel;
     private JPanel seatPanel;
     private JButton bookButton;
-    private JPanel seatDisplayPanel; // Panel hiển thị chỗ ngồi (sẽ được cập nhật động)
+    private JPanel seatDisplayPanel;
 
     private Color primaryColor;
     private Color darkBg;
