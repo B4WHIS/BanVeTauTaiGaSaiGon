@@ -20,6 +20,9 @@ public class ToaTau {
         setHeSoGia(heSoGia);
         setTau(tau);
     }
+    public ToaTau(String maToa) {
+    	setMaToa(maToa);
+    }
 
     public String getMaToa() {
         return maToa;

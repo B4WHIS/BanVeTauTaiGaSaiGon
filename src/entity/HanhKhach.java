@@ -22,6 +22,11 @@ public class HanhKhach {
 		setMaUuDai(maUuDai);
 	}
     
+	public HanhKhach(String maKH) {
+		// TODO Auto-generated constructor stub
+		setMaKH(maKH);
+	}
+
 	public String getMaUuDai() {
         return maUuDai;
     }

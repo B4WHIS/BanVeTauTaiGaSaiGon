@@ -14,7 +14,7 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
 
     public DanhSachKhuyenMai() {
         setTitle("Quản lý khuyến mãi");
-        setSize(1500, 1000);
+        setSize(1400, 950);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -215,7 +215,10 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) { }
+    public void actionPerformed(ActionEvent e) { 
+    	
+    	
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new DanhSachKhuyenMai().setVisible(true));

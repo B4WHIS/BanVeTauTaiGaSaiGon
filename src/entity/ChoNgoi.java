@@ -1,6 +1,6 @@
 package entity;
 
-//DONE
+
 public class ChoNgoi {
     private String maChoNgoi;
     private int IDloaiGhe;     
@@ -15,6 +15,11 @@ public class ChoNgoi {
 		setIDloaiGhe(iDloaiGhe);
 		setTrangThai(trangThai);
 		setToaTau(toaTau);
+	}
+
+	public ChoNgoi(String maChoNgoi) {
+		// TODO Auto-generated constructor stub
+		setMaChoNgoi(maChoNgoi);
 	}
 
 	public String getMaChoNgoi() {

@@ -24,6 +24,10 @@ public class NhanVien {
 		setIDloaiChucVu(iDloaiChucVu);
 	}
 
+	public NhanVien(String maNhanVien) {
+		setMaNhanVien(maNhanVien);
+	}
+
 	public String getMaNhanVien() {
         return maNhanVien;
     }

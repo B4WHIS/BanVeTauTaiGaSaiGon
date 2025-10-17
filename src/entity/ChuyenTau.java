@@ -25,7 +25,12 @@ public class ChuyenTau {
         setMaLichTrinh(maLichTrinh);
         setGiaChuyen(giaChuyen);
     }
-    public String getMaChuyenTau() {
+    public ChuyenTau(String ChuyenTau) {
+		// TODO Auto-generated constructor stub
+    	setMaChuyenTau(ChuyenTau);
+	}
+
+	public String getMaChuyenTau() {
         return maChuyenTau;
     }
 
