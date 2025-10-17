@@ -9,6 +9,8 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -244,6 +246,23 @@ public abstract class GiaoDienChinh extends JFrame{
 		});
 		dongHo.start();	
 	}
-	
+	protected void addHoverEffect(JButton btn, Color mainColor) {
+	    btn.setFocusPainted(false); 
+	    // Thiết lập viền mặc định mỏng, không màu
+	    btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1)); 
+	    btn.addMouseListener(new MouseAdapter() {
+	        @Override
+	        public void mouseEntered(MouseEvent e) {
+	            btn.setBackground(new Color(240, 240, 240)); // Nền xám nhạt khi hover
+	            // Dùng màu chủ đạo làm viền đậm khi hover
+	            btn.setBorder(BorderFactory.createLineBorder(mainColor, 3));
+	        }
+	        @Override
+	        public void mouseExited(MouseEvent e) {
+	            btn.setBackground(Color.white); // Trở lại nền trắng [10]
+	            btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+	        }
+	    });
+	}
 	
 }
