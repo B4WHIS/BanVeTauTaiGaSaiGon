@@ -97,4 +97,8 @@ public class PhieuDatCho {
 	            ", maHanhKhach=" + (maHanhKhach != null ? maHanhKhach.getMaKH() : "null") + 
 	            ", maNhanVien=" + (maNhanVien != null ? maNhanVien.getMaNhanVien() : "null") + "]";
 	    }
+
+
+
+	
 }
