@@ -3,8 +3,6 @@ package connectDB;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class connectDB {
 
@@ -19,16 +17,6 @@ public class connectDB {
                 String user = "sa";
                 String password = "sapassword"; 
 
-    // Tải driver một lần (static block)
-    static {
-        try {
-            Class.forName(DRIVER);
-            LOGGER.info("SQL Server JDBC Driver đã tải thành công.");
-        } catch (ClassNotFoundException e) {
-            LOGGER.severe("Không tìm thấy SQL Server JDBC Driver! Thêm jar mssql-jdbc vào classpath.");
-            throw new RuntimeException(e);
-        }
-    }
 
                 return DriverManager.getConnection(url, user, password);
                

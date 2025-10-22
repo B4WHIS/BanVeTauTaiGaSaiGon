@@ -11,9 +11,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +20,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -36,7 +32,6 @@ import javax.swing.table.DefaultTableModel;
 import control.QuanLyVeControl;
 import entity.ChoNgoi;
 import entity.ChuyenTau;
-import entity.HanhKhach;
 import entity.NhanVien;
 import entity.Ve;
 
@@ -298,7 +293,12 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener{
     }
 
     public static void main(String[] args) {
-    	LookAndFeelManager.setNimbusLookAndFeel();
-         new ThongTinKhachHangGUI().setVisible(true);
+
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -12,8 +12,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -21,7 +19,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -34,9 +31,7 @@ import javax.swing.table.DefaultTableModel;
 
 import dao.ChiTietHoaDonDAO;
 import dao.HoaDonDAO;
-import entity.ChiTietHoaDon;
 import entity.HanhKhach;
-import entity.HoaDon;
 import entity.NhanVien;
 import entity.Ve;
 
@@ -253,8 +248,13 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-    	LookAndFeelManager.setNimbusLookAndFeel();
-        new ThanhToanGUI().setVisible(true);
+ 
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

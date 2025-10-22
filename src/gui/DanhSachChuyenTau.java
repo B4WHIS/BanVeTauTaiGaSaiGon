@@ -1,6 +1,28 @@
 package gui;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import control.QuanLyChuyenTauController;
@@ -8,14 +30,6 @@ import dao.ChuyenTauDAO;
 import dao.LichTrinhDAO;
 import dao.TauDAO;
 import entity.ChuyenTau;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class DanhSachChuyenTau extends GiaoDienChinh {
     // Components
@@ -365,4 +379,10 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
             new DanhSachChuyenTau().setVisible(true);
       
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }
