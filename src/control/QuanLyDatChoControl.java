@@ -1,5 +1,6 @@
 package control;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import dao.ChiTietPhieuDatChoDAO;
@@ -26,53 +27,53 @@ public class QuanLyDatChoControl {
     }
     
   //cập nhật phiếu đặt chỗ 
-    public boolean capnhatPDC(PhieuDatCho pdc) {
-    	return phieuDatCho.CapNhatPhieuDatCho(pdc);
+    public boolean capnhatPDC(PhieuDatCho pdc) throws SQLException {
+    	return phieuDatCho.updatePhieuDatCho(pdc);
     }
     
     //xóa phiếu đặt chỗ
-    public boolean xoaPDC(String maPDC) {
-    	return phieuDatCho.XoaPhieuDatCho(maPDC);
+    public boolean xoaPDC(String maPDC) throws SQLException {
+    	return phieuDatCho.deletePhieuDatCho(maPDC);
     }
     
     //tìm phiếu đặtc h theo mã 
-    public PhieuDatCho timPDCtheoma(String maPDC) {
-    	return phieuDatCho.TimPhieuDatChoTheoMa(maPDC);
+    public PhieuDatCho timPDCtheoma(String maPDC) throws SQLException {
+    	return phieuDatCho.getPhieuDatChoByMa(maPDC);
     }
     
     // tạo phiếu đăt chỗ và câp nhật trạng thái là đã đặt
-    public boolean themPDC(PhieuDatCho pdc, ArrayList<ChiTietPDC> ds) {
-    	boolean ha = phieuDatCho.ThemPhieuDatCho(pdc);
+    public boolean themPDC(PhieuDatCho pdc, ArrayList<ChiTietPDC> ds) throws SQLException {
+    	boolean ha = phieuDatCho.insertPhieuDatCho(pdc);
     	if(ha && ds != null) {
     		for (ChiTietPDC chiTietPDC : ds) {
-				this.chiTietPDC.ThemChiTietPDC(chiTietPDC);
-				choNgoi.CapNhatTrangThai(chiTietPDC.getMaChoNgoi().toString(),"Đã Đặt" );
+				this.chiTietPDC.themChiTietPDC(chiTietPDC);
+				choNgoi.updateTrangThai(chiTietPDC.getMaChoNgoi().toString(),"Đã Đặt" );
 			}
     	}
     	return ha;
     }
     
     // Hủy phiếu đặt chỗ và cập nhật trạng thái là Trống cho  chỗ ngồi 
-    public boolean huyPDC(String maPDC) {
-        PhieuDatCho pdc = phieuDatCho.TimPhieuDatChoTheoMa(maPDC);
+    public boolean huyPDC(String maPDC) throws SQLException {
+        PhieuDatCho pdc = phieuDatCho.getPhieuDatChoByMa(maPDC);
         if (pdc == null) {
             return false; 
         }
         ArrayList<ChiTietPDC> dsChiTiet = chiTietPDC.LayChiTietTheoMaPDC(maPDC);
         for (ChiTietPDC ct : dsChiTiet) {
-            choNgoi.CapNhatTrangThai(ct.getMaChoNgoi().getMaChoNgoi(), "Trống");
+            choNgoi.updateTrangThai(ct.getMaChoNgoi().getMaChoNgoi(), "Trống");
         }
         pdc.setTrangThai("Đã Hủy");
         return capnhatPDC(pdc);
     }
     
     //ds phiếu đặt chỗ theo chuyến tàu
-    public ArrayList<PhieuDatCho> dsPDCtheoChuyenTau(String maChuyen){
+    public ArrayList<PhieuDatCho> dsPDCtheoChuyenTau(String maChuyen) throws SQLException{
     	ArrayList<PhieuDatCho> dsPDC = new ArrayList<>();
     	ArrayList<ChiTietPDC> dsCTPDC = chiTietPDC.LayTatCaChiTietPDC();
     	for (ChiTietPDC chiTietPDC : dsCTPDC) {
 			if(chiTietPDC.getMaChuyenTau().getMaChuyenTau().equals(maChuyen)){
-				PhieuDatCho PDC = phieuDatCho.TimPhieuDatChoTheoMa(chiTietPDC.getMaPhieuDatCho().getMaPhieuDatCho());
+				PhieuDatCho PDC = phieuDatCho.getPhieuDatChoByMa(chiTietPDC.getMaPhieuDatCho().getMaPhieuDatCho());
 				if(PDC != null && ! dsPDC.contains(PDC)) {
 					dsPDC.add(PDC);
 				}
