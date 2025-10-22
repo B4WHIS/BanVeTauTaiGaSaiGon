@@ -230,6 +230,7 @@ public class LapHoaDonGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         new LapHoaDonGUI().setVisible(true);
     }
 }

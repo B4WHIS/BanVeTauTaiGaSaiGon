@@ -13,7 +13,7 @@ import entity.PhieuDatCho;
 public class ChiTietPhieuDatChoDAO {
 
 	//thêm chi tiết phiếu đặt chỗ
-    public boolean themChiTietPDC(ChiTietPDC chiTiet) {
+    public boolean themChiTietPDC(ChiTietPDC chiTiet) throws SQLException {
         if (chiTiet == null) {
         	return false;
         	}
@@ -39,7 +39,7 @@ public class ChiTietPhieuDatChoDAO {
     }
 
   //lấy tất cả chi tiết pdc 
-    public ArrayList<ChiTietPDC> LayTatCaChiTietPDC() {
+    public ArrayList<ChiTietPDC> LayTatCaChiTietPDC() throws SQLException {
         ArrayList<ChiTietPDC> ds = new ArrayList<>();
         Connection con = connectDB.getConnection();
         Statement stmt = null;
@@ -70,7 +70,7 @@ public class ChiTietPhieuDatChoDAO {
     }
 
     // Lấy chi tiết theo mã phiếu đặt chỗ
-    public ArrayList<ChiTietPDC> LaydsChiTietTheoMaPDC(String maPDC) {
+    public ArrayList<ChiTietPDC> LaydsChiTietTheoMaPDC(String maPDC) throws SQLException {
         ArrayList<ChiTietPDC> ds = new ArrayList<>();
         Connection con = connectDB.getConnection();
         PreparedStatement stmt = null;

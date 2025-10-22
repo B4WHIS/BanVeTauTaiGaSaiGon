@@ -12,25 +12,20 @@ import connectDB.connectDB;
 
 public class ChuyenTauDAO {
 
+    // Các trạng thái hợp lệ theo CHECK constraint trong DB
+    private static final String[] TRANG_THAI_HOP_LE = {
+        "Chưa khởi hành", "Đang khởi hành", "Đã hoàn thành", "Đã hủy"
+    };
+
     // Phương thức lấy tất cả chuyến tàu
     public List<ChuyenTau> getAllChuyenTau() {
         List<ChuyenTau> listChuyenTau = new ArrayList<>();
-        String sql = "SELECT maChuyenTau, thoiGianKhoiHanh, thoiGianDen, maTau, maLichTrinh, trangThai, giaChuyen FROM ChuyenTau";
+        String sql = "SELECT maChuyenTau, thoiGianKhoiHanh, thoiGianDen, maTau, maLichTrinh, trangThai, giaChuyen FROM ChuyenTau ORDER BY thoiGianKhoiHanh";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                ChuyenTau ct = new ChuyenTau();
-                ct.setMaChuyenTau(rs.getString("maChuyenTau"));
-                ct.setThoiGianKhoiHanh(rs.getTimestamp("thoiGianKhoiHanh").toLocalDateTime());
-                ct.setThoiGianDen(rs.getTimestamp("thoiGianDen").toLocalDateTime());
-                ct.setMaTau(rs.getString("maTau"));
-                ct.setMaLichTrinh(rs.getString("maLichTrinh"));
-                ct.setTrangThai(rs.getString("trangThai"));
-                BigDecimal gia = rs.getBigDecimal("giaChuyen");
-                if (gia != null) {
-                    ct.setGiaChuyen(gia);
-                }
+                ChuyenTau ct = taoChuyenTauTuResultSet(rs);
                 listChuyenTau.add(ct);
             }
         } catch (SQLException e) {
@@ -47,18 +42,7 @@ public class ChuyenTauDAO {
             pstmt.setString(1, maChuyenTau);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    ChuyenTau ct = new ChuyenTau();
-                    ct.setMaChuyenTau(rs.getString("maChuyenTau"));
-                    ct.setThoiGianKhoiHanh(rs.getTimestamp("thoiGianKhoiHanh").toLocalDateTime());
-                    ct.setThoiGianDen(rs.getTimestamp("thoiGianDen").toLocalDateTime());
-                    ct.setMaTau(rs.getString("maTau"));
-                    ct.setMaLichTrinh(rs.getString("maLichTrinh"));
-                    ct.setTrangThai(rs.getString("trangThai"));
-                    BigDecimal gia = rs.getBigDecimal("giaChuyen");
-                    if (gia != null) {
-                        ct.setGiaChuyen(gia);
-                    }
-                    return ct;
+                    return taoChuyenTauTuResultSet(rs);
                 }
             }
         } catch (SQLException e) {
@@ -67,33 +51,24 @@ public class ChuyenTauDAO {
         return null;
     }
 
-    // Phương thức lấy chuyến tàu theo ngày và ga đi/đến (phương thức phức tạp) - Sửa: Tìm theo lịch trình (gaDi/gaDen) và ngày
-    public List<ChuyenTau> getChuyenTauTheoNgayVaGa(LocalDateTime ngayKhoiHanh, String maGaDi, String maGaDen) {
+    // Phương thức lấy chuyến tàu theo ngày khởi hành và ga đi/đến (tìm theo lịch trình)
+    public List<ChuyenTau> getChuyenTauTheoNgayVaGa(LocalDate ngayKhoiHanh, String maGaDi, String maGaDen) {
         List<ChuyenTau> listChuyenTau = new ArrayList<>();
-        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, ct.maLichTrinh,ct.trangThai, ct.giaChuyen " +
+        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, ct.maLichTrinh, ct.trangThai, ct.giaChuyen " +
                      "FROM ChuyenTau ct " +
                      "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh " +
-                     "WHERE CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +  // Tiêu chí theo ngày
-                     "AND lt.gaDi = ? " +
-                     "AND lt.gaDen = ?";
+                     "WHERE CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +
+                     "AND lt.gaDi = ? AND lt.gaDen = ? " +
+                     "AND ct.trangThai = 'Chưa khởi hành' " +  // Chỉ lấy chuyến chưa khởi hành
+                     "ORDER BY ct.thoiGianKhoiHanh";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, java.sql.Date.valueOf(ngayKhoiHanh.toLocalDate()));
+            pstmt.setDate(1, java.sql.Date.valueOf(ngayKhoiHanh));
             pstmt.setString(2, maGaDi);
             pstmt.setString(3, maGaDen);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    ChuyenTau ct = new ChuyenTau();
-                    ct.setMaChuyenTau(rs.getString("maChuyenTau"));
-                    ct.setThoiGianKhoiHanh(rs.getTimestamp("thoiGianKhoiHanh").toLocalDateTime());
-                    ct.setThoiGianDen(rs.getTimestamp("thoiGianDen").toLocalDateTime());
-                    ct.setMaTau(rs.getString("maTau"));
-                    ct.setMaLichTrinh(rs.getString("maLichTrinh"));
-                    ct.setTrangThai(rs.getString("trangThai"));
-                    BigDecimal gia = rs.getBigDecimal("giaChuyen");
-                    if (gia != null) {
-                        ct.setGiaChuyen(gia);
-                    }
+                    ChuyenTau ct = taoChuyenTauTuResultSet(rs);
                     listChuyenTau.add(ct);
                 }
             }
@@ -103,14 +78,21 @@ public class ChuyenTauDAO {
         return listChuyenTau;
     }
 
-    // Phương thức thêm chuyến tàu mới (maChuyenTau sẽ được tự động tạo bởi DB) - Sửa: Kiểm tra trùng lịch trình + ngày KH + ngày Đến
+    // Phương thức thêm chuyến tàu mới (maChuyenTau tự động tạo bởi DB)
     public boolean addChuyenTau(ChuyenTau ct) {
-        if (ct.getGiaChuyen() == null || ct.getGiaChuyen().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Giá chuyến tàu phải lớn hơn 0");
+        // Kiểm tra FK: maTau tồn tại
+        if (!tonTaiTau(ct.getMaTau())) {
+            throw new IllegalArgumentException("Mã tàu không tồn tại!");
         }
-        // Kiểm tra trùng chuyến (lịch trình + ngày KH + ngày Đến)
-        if (isTrungChuyen(ct.getMaLichTrinh(), ct.getThoiGianKhoiHanh(), ct.getThoiGianDen())) {
-            throw new IllegalArgumentException("Chuyến tàu trùng lịch trình và thời gian đã tồn tại!");
+        // Kiểm tra FK: maLichTrinh tồn tại
+        if (!tonTaiLichTrinh(ct.getMaLichTrinh())) {
+            throw new IllegalArgumentException("Mã lịch trình không tồn tại!");
+        }
+        // Kiểm tra trạng thái hợp lệ
+        kiemTraTrangThaiHopLe(ct.getTrangThai());
+        // Kiểm tra trùng chuyến (cùng lịch trình và ngày KH)
+        if (isTrungChuyen(ct.getMaLichTrinh(), ct.getThoiGianKhoiHanh().toLocalDate())) {
+            throw new IllegalArgumentException("Chuyến tàu trùng lịch trình và ngày khởi hành đã tồn tại!");
         }
         String sql = "INSERT INTO ChuyenTau (thoiGianKhoiHanh, thoiGianDen, maTau, maLichTrinh, trangThai, giaChuyen) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = connectDB.getConnection();
@@ -119,19 +101,19 @@ public class ChuyenTauDAO {
             pstmt.setTimestamp(2, Timestamp.valueOf(ct.getThoiGianDen()));
             pstmt.setString(3, ct.getMaTau());
             pstmt.setString(4, ct.getMaLichTrinh());
-            pstmt.setString(5,ct.getTrangThai());
+            pstmt.setString(5, ct.getTrangThai());
             pstmt.setBigDecimal(6, ct.getGiaChuyen());
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                // Lấy ID tự động tạo để sinh maChuyenTau
+                // Lấy ID để sinh maChuyenTau
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int id = generatedKeys.getInt(1);
-                        String generatedMaChuyenTau = "C-" + String.format("%03d", id);
-                        ct.setMaChuyenTau(generatedMaChuyenTau);
+                        String generatedMa = "C-" + String.format("%03d", id);
+                        ct.setMaChuyenTau(generatedMa);
+                        return true;
                     }
                 }
-                return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -139,18 +121,16 @@ public class ChuyenTauDAO {
         return false;
     }
 
-    // Phương thức cập nhật chuyến tàu - Sửa: Chỉ update thoiGianKhoiHanh, thoiGianDen, giaChuyen; Kiểm tra trùng
+    // Phương thức cập nhật chuyến tàu (không thay đổi maTau, maLichTrinh)
     public boolean updateChuyenTau(ChuyenTau ct) {
-        if (ct.getGiaChuyen() == null || ct.getGiaChuyen().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Giá chuyến tàu phải lớn hơn 0");
-        }
-        // Lấy maLichTrinh cũ để kiểm tra trùng (không thay đổi maLichTrinh)
-        String maLichTrinhCu = getMaLichTrinhByMaChuyenTau(ct.getMaChuyenTau());
-        if (maLichTrinhCu == null) {
+        ChuyenTau ctCu = getChuyenTauByMaChuyenTau(ct.getMaChuyenTau());
+        if (ctCu == null) {
             throw new IllegalArgumentException("Chuyến tàu không tồn tại!");
         }
-        // Kiểm tra trùng chuyến (trừ chính chuyến đang update)
-        if (isTrungChuyen(maLichTrinhCu, ct.getThoiGianKhoiHanh(), ct.getThoiGianDen(), ct.getMaChuyenTau())) {
+        // Kiểm tra trạng thái hợp lệ
+        kiemTraTrangThaiHopLe(ct.getTrangThai());
+        // Kiểm tra trùng chuyến (cùng lịch trình và ngày KH, trừ chính nó)
+        if (isTrungChuyen(ctCu.getMaLichTrinh(), ct.getThoiGianKhoiHanh().toLocalDate(), ct.getMaChuyenTau())) {
             throw new IllegalArgumentException("Thời gian cập nhật trùng với chuyến khác!");
         }
         String sql = "UPDATE ChuyenTau SET thoiGianKhoiHanh = ?, thoiGianDen = ?, trangThai = ?, giaChuyen = ? WHERE maChuyenTau = ?";
@@ -169,13 +149,13 @@ public class ChuyenTauDAO {
         return false;
     }
 
-    // Phương thức xóa chuyến tàu theo mã chuyến tàu - Sửa: Kiểm tra vé và phiếu đặt chỗ
+    // Phương thức xóa chuyến tàu theo mã chuyến tàu
     public boolean deleteChuyenTau(String maChuyenTau) {
-        // Kiểm tra có vé liên quan không
+        // Kiểm tra có vé liên quan
         if (coVeLienQuan(maChuyenTau)) {
             throw new IllegalArgumentException("Không thể xóa chuyến có vé đã bán!");
         }
-        // Kiểm tra có phiếu đặt chỗ liên quan không
+        // Kiểm tra có phiếu đặt chỗ liên quan
         if (coPhieuDatChoLienQuan(maChuyenTau)) {
             throw new IllegalArgumentException("Không thể xóa chuyến có phiếu đặt chỗ!");
         }
@@ -191,60 +171,61 @@ public class ChuyenTauDAO {
         return false;
     }
 
-    // Helper: Kiểm tra trùng chuyến (lịch trình + ngày KH + ngày Đến)
-    private boolean isTrungChuyen(String maLichTrinh, LocalDateTime thoiGianKhoiHanh, LocalDateTime thoiGianDen) {
-        String sql = "SELECT COUNT(*) FROM ChuyenTau ct " +
-                     "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh " +
-                     "WHERE lt.maLichTrinh = ? " +
-                     "AND CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +
-                     "AND CAST(ct.thoiGianDen AS DATE) = ?";
+    // Phương thức lấy tất cả tên tàu (cho ComboBox hiển thị)
+    public List<String> getAllTenTau() {
+        List<String> listTenTau = new ArrayList<>();
+        String sql = "SELECT tenTau FROM Tau ORDER BY tenTau";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                listTenTau.add(rs.getString("tenTau"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listTenTau;
+    }
+
+    // Phương thức lấy mã tàu theo tên tàu
+    public String getMaTauByTenTau(String tenTau) {
+        String sql = "SELECT maTau FROM Tau WHERE tenTau = ?";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, maLichTrinh);
-            pstmt.setDate(2, java.sql.Date.valueOf(thoiGianKhoiHanh.toLocalDate()));
-            pstmt.setDate(3, java.sql.Date.valueOf(thoiGianDen.toLocalDate()));
+            pstmt.setString(1, tenTau);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) > 0;
+                    return rs.getString("maTau");
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
-    // Helper: Kiểm tra trùng chuyến (trừ chính chuyến đang update)
-    private boolean isTrungChuyen(String maLichTrinh, LocalDateTime thoiGianKhoiHanh, LocalDateTime thoiGianDen, String maChuyenTau) {
-        String sql = "SELECT COUNT(*) FROM ChuyenTau ct " +
-                     "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh " +
-                     "WHERE lt.maLichTrinh = ? " +
-                     "AND CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +
-                     "AND CAST(ct.thoiGianDen AS DATE) = ? " +
-                     "AND ct.maChuyenTau != ?";
+    // Phương thức lấy tất cả tên lịch trình (cho ComboBox hiển thị)
+    public List<String> getAllTenLichTrinh() {
+        List<String> listTenLichTrinh = new ArrayList<>();
+        String sql = "SELECT tenLichTrinh FROM LichTrinh ORDER BY tenLichTrinh";
         try (Connection conn = connectDB.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, maLichTrinh);
-            pstmt.setDate(2, java.sql.Date.valueOf(thoiGianKhoiHanh.toLocalDate()));
-            pstmt.setDate(3, java.sql.Date.valueOf(thoiGianDen.toLocalDate()));
-            pstmt.setString(4, maChuyenTau);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                listTenLichTrinh.add(rs.getString("tenLichTrinh"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return listTenLichTrinh;
     }
 
-    // Helper: Lấy maLichTrinh từ maChuyenTau (cho update)
-    private String getMaLichTrinhByMaChuyenTau(String maChuyenTau) {
-        String sql = "SELECT maLichTrinh FROM ChuyenTau WHERE maChuyenTau = ?";
+    // Phương thức lấy mã lịch trình theo tên lịch trình
+    public String getMaLichTrinhByTenLichTrinh(String tenLichTrinh) {
+        String sql = "SELECT maLichTrinh FROM LichTrinh WHERE tenLichTrinh = ?";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, maChuyenTau);
+            pstmt.setString(1, tenLichTrinh);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString("maLichTrinh");
@@ -254,6 +235,108 @@ public class ChuyenTauDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Helper: Tạo ChuyenTau từ ResultSet
+    private ChuyenTau taoChuyenTauTuResultSet(ResultSet rs) throws SQLException {
+        ChuyenTau ct = new ChuyenTau();
+        ct.setMaChuyenTau(rs.getString("maChuyenTau"));
+        ct.setThoiGianKhoiHanh(rs.getTimestamp("thoiGianKhoiHanh").toLocalDateTime());
+        ct.setThoiGianDen(rs.getTimestamp("thoiGianDen").toLocalDateTime());
+        ct.setMaTau(rs.getString("maTau"));
+        ct.setMaLichTrinh(rs.getString("maLichTrinh"));
+        ct.setTrangThai(rs.getString("trangThai"));
+        BigDecimal gia = rs.getBigDecimal("giaChuyen");
+        if (gia != null) {
+            ct.setGiaChuyen(gia);
+        }
+        return ct;
+    }
+
+    // Helper: Kiểm tra trạng thái hợp lệ
+    private void kiemTraTrangThaiHopLe(String trangThai) {
+        if (trangThai == null) {
+            throw new IllegalArgumentException("Trạng thái không được null!");
+        }
+        for (String tt : TRANG_THAI_HOP_LE) {
+            if (tt.equals(trangThai)) {
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Trạng thái không hợp lệ: " + trangThai);
+    }
+
+    // Helper: Kiểm tra tàu tồn tại
+    private boolean tonTaiTau(String maTau) {
+        String sql = "SELECT COUNT(*) FROM Tau WHERE maTau = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maTau);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Helper: Kiểm tra lịch trình tồn tại
+    private boolean tonTaiLichTrinh(String maLichTrinh) {
+        String sql = "SELECT COUNT(*) FROM LichTrinh WHERE maLichTrinh = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maLichTrinh);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Helper: Kiểm tra trùng chuyến (cùng lịch trình và ngày KH)
+    private boolean isTrungChuyen(String maLichTrinh, LocalDate ngayKhoiHanh) {
+        String sql = "SELECT COUNT(*) FROM ChuyenTau ct " +
+                     "WHERE ct.maLichTrinh = ? AND CAST(ct.thoiGianKhoiHanh AS DATE) = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maLichTrinh);
+            pstmt.setDate(2, java.sql.Date.valueOf(ngayKhoiHanh));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Helper: Kiểm tra trùng chuyến (trừ chính chuyến, cho update)
+    private boolean isTrungChuyen(String maLichTrinh, LocalDate ngayKhoiHanh, String maChuyenTau) {
+        String sql = "SELECT COUNT(*) FROM ChuyenTau ct " +
+                     "WHERE ct.maLichTrinh = ? AND CAST(ct.thoiGianKhoiHanh AS DATE) = ? AND ct.maChuyenTau != ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maLichTrinh);
+            pstmt.setDate(2, java.sql.Date.valueOf(ngayKhoiHanh));
+            pstmt.setString(3, maChuyenTau);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     // Helper: Kiểm tra có vé liên quan không
@@ -273,11 +356,9 @@ public class ChuyenTauDAO {
         return false;
     }
 
-    // Helper: Kiểm tra có phiếu đặt chỗ liên quan không (qua ChiTietPhieuDatCho)
+    // Helper: Kiểm tra có phiếu đặt chỗ liên quan không
     private boolean coPhieuDatChoLienQuan(String maChuyenTau) {
-        String sql = "SELECT COUNT(*) FROM ChiTietPhieuDatCho ctpd " +
-                     "JOIN PhieuDatCho pdc ON ctpd.maPhieuDatCho = pdc.maPhieuDatCho " +
-                     "WHERE ctpd.maChuyenTau = ?";
+        String sql = "SELECT COUNT(*) FROM ChiTietPhieuDatCho WHERE maChuyenTau = ?";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, maChuyenTau);

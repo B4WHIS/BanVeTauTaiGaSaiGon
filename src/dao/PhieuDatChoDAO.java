@@ -10,7 +10,7 @@ public class PhieuDatChoDAO {
 
 
     //  Thêm phiếu đặt chỗ mới
-    public boolean insertPhieuDatCho(PhieuDatCho pdc) {
+    public boolean insertPhieuDatCho(PhieuDatCho pdc) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "INSERT INTO PhieuDatCho (ngayDat, trangThai, maHanhKhach, maNhanVien) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,7 +27,7 @@ public class PhieuDatChoDAO {
     }
 
     // Cập nhật thông tin phiếu đặt chỗ
-    public boolean updatePhieuDatCho(PhieuDatCho pdc) {
+    public boolean updatePhieuDatCho(PhieuDatCho pdc) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "UPDATE PhieuDatCho SET ngayDat = ?, trangThai = ?, maHanhKhach = ?, maNhanVien = ? WHERE maPhieuDatCho = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -45,7 +45,7 @@ public class PhieuDatChoDAO {
     }
 
     // Xóa phiếu đặt chỗ theo mã
-    public boolean deletePhieuDatCho(String maPhieuDatCho) {
+    public boolean deletePhieuDatCho(String maPhieuDatCho) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "DELETE FROM PhieuDatCho WHERE maPhieuDatCho = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -58,7 +58,7 @@ public class PhieuDatChoDAO {
     }
 
     // Tìm phiếu đặt chỗ theo mã
-    public PhieuDatCho getPhieuDatChoByMa(String maPhieuDatCho) {
+    public PhieuDatCho getPhieuDatChoByMa(String maPhieuDatCho) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "SELECT * FROM PhieuDatCho WHERE maPhieuDatCho = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -184,6 +184,7 @@ public class DangNhapGUI extends JFrame {
     public JButton getBtnThoat() { return btnThoat; }
     
     public static void main(String[] args) throws IOException {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         DangNhapGUI dn = new DangNhapGUI();
         dn.setVisible(true);
     }

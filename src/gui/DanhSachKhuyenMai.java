@@ -222,6 +222,7 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> new DanhSachKhuyenMai().setVisible(true));
     }
 }
