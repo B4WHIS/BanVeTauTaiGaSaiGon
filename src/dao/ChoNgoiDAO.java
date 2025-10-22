@@ -54,7 +54,7 @@ public class ChoNgoiDAO {
     }
 
     // Tìm chỗ ngồi theo mã
-    public ChoNgoi getChoNgoiByMa(String maChoNgoi) {
+    public ChoNgoi TimChoNgoiTheoMa(String maChoNgoi) {
         Connection conn = connectDB.getConnection();
         String sql = "SELECT * FROM ChoNgoi WHERE maChoNgoi = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -77,7 +77,7 @@ public class ChoNgoiDAO {
     }
 
     // Cập nhật trạng thái 
-    public boolean updateTrangThai(String maChoNgoi, String trangThai) {
+    public boolean CapNhatTrangThai(String maChoNgoi, String trangThai) {
         Connection conn = connectDB.getConnection();
         String sql = "UPDATE ChoNgoi SET trangThai = ? WHERE maChoNgoi = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -89,4 +89,6 @@ public class ChoNgoiDAO {
             return false;
         }
     }
+
+
 }
