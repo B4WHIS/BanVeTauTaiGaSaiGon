@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
@@ -24,8 +25,6 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		super();
 		pnlChucNang = taoPanelMenuChinh();
 		pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
-
-
 
 	}
 
@@ -90,16 +89,59 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		addHoverEffect(btnTimChuyenTau, mauTimChuyen);
 		addHoverEffect(btnDangXuat, mauDangXuat);
 		
-		return pnlChucNang;
+		btnDatVe.addActionListener(this);
+		btnHuyVe.addActionListener(this);
+		btnDoiVe.addActionListener(this);
+		btnTimChuyenTau.addActionListener(this);
+		btnDangXuat.addActionListener(this);
 		
+		
+		
+		return pnlChucNang;
 		
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
-	}
+		String command = e.getActionCommand(); 
+		try {
+
+			if (command.equals("Đặt vé") || e.getSource() == btnDatVe) {
+                new TraCuuChuyenTauGUI().setVisible(true); 
+            } else if (command.equals("Hủy vé") || e.getSource() == btnHuyVe) {
+                new GiaoDienHuyVe().setVisible(true); 
+            } else if (command.equals("Đổi vé") || e.getSource() == btnDoiVe) {
+                new TraCuuVeTauGUI().setVisible(true);
+            } else if (command.equals("Lập hóa đơn")) {
+                new LapHoaDonGUI(command).setVisible(true); 
+        
+            } 
+
+            else if (command.equals("Tìm vé")) {
+                new TraCuuVeTauGUI().setVisible(true); 
+            } else if (command.equals("Tìm Chuyến tàu") || e.getSource() == btnTimChuyenTau) {
+                new TraCuuChuyenTauGUI().setVisible(true); 
+            } else if (command.equals("Tìm khách hàng")) {
+                new QuanLyHanhKhach().setVisible(true); 
+            }
+            
+            else if (command.equals("Đăng xuất") || e.getSource() == btnDangXuat) {
+                new DangNhapGUI().setVisible(true); 
+                this.dispose();
+            } else if (command.equals("Thoát")) {
+                System.exit(0); 
+            }
+            
+            else if (command.startsWith("Thống kê")) {
+                 new ThongKeBaoCaoDoanhThu().setVisible(true); 
+            }
+            
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Không thể mở giao diện: " + ex.getMessage(), "Lỗi Hệ thống", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
 	
 	
 }

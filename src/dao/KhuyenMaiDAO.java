@@ -75,6 +75,8 @@ public class KhuyenMaiDAO {
         return false;
     }
 
+    
+    
     // Xóa khuyến mãi
     public boolean XoaKhuyenMai(String maKhuyenMai) {
         String sql = "DELETE FROM KhuyenMai WHERE maKhuyenMai = ?";

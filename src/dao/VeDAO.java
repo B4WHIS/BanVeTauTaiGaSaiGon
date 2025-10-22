@@ -135,7 +135,22 @@ public class VeDAO {
 		}
     	return ve;
     }
-    
+    public List<Ve> layDanhSachVeTheoMaHanhKhach(String maHanhKhach) throws SQLException {
+        List<Ve> danhSachVe = new ArrayList<>();
+        String sql = "SELECT * FROM Ve WHERE maHanhKhach = ?"; 
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, maHanhKhach);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    danhSachVe.add(getVeTuResultSet(rs)); 
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return danhSachVe;
+    }
     public List<Ve> layDanhSachVe() throws SQLException {
 
     	List<Ve> danhSachVe = new ArrayList<>();
@@ -182,5 +197,67 @@ public class VeDAO {
     		e.printStackTrace();
     		return false;
     	}
+    }
+    
+    public List<Ve> timVeTongHop(String maVe, String hoTen, String cmnd, String sdt, String loaiVe) 
+            throws SQLException {
+        List<Ve> danhSachVe = new ArrayList<>();
+        String sql = """
+            SELECT V.* 
+            FROM Ve V
+            JOIN HanhKhach HK ON V.maHanhKhach = HK.maHanhKhach
+            JOIN ChoNgoi CN ON V.maChoNgoi = CN.maChoNgoi 
+            JOIN LoaiGhe LG ON CN.IDloaiGhe = LG.IDloaiGhe
+            WHERE 1=1
+        """; 
+        
+        ArrayList<Object> parameters = new ArrayList<>();
+
+        // 1. Lọc theo Mã vé
+        if (maVe != null && !maVe.trim().isEmpty()) {
+            sql += " AND V.maVe LIKE ? ";
+            parameters.add("%" + maVe + "%");
+        }
+
+        // 2. Lọc theo Họ tên
+        if (hoTen != null && !hoTen.trim().isEmpty()) {
+            sql += " AND HK.hoTen LIKE ? "; 
+            parameters.add("%" + hoTen + "%");
+        }
+
+        // 3. Lọc theo CMND/CCCD
+        if (cmnd != null && !cmnd.trim().isEmpty()) {
+            sql += " AND HK.cmndCccd = ? ";
+            parameters.add(cmnd);
+        }
+        
+        // 4. Lọc theo Số điện thoại
+        if (sdt != null && !sdt.trim().isEmpty()) {
+            sql += " AND HK.soDienThoai = ? ";
+            parameters.add(sdt);
+        }
+        
+        // 5. Lọc theo Loại vé (Loại ghế)
+        if (loaiVe != null && !loaiVe.trim().isEmpty() && !loaiVe.equalsIgnoreCase("Tất cả")) {
+            sql += " AND LG.tenLoai = ? ";
+            parameters.add(loaiVe);
+        }
+        
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i)); 
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    danhSachVe.add(getVeTuResultSet(rs)); 
+                }
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+        return danhSachVe;
     }
 }

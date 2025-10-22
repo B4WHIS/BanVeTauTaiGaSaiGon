@@ -9,12 +9,10 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Insets;
-import java.security.PrivateKey;
+import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
 
-import javax.management.modelmbean.ModelMBean;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -22,15 +20,18 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import control.QuanLyVeControl;
+import entity.LichSuVe;
+import entity.NhanVien;
 
 public class GiaoDienHuyVe extends GiaoDienChinh {
 	private JPanel jpmenu;
@@ -65,6 +66,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 	private Component txtHTht;
 	private Component txtSDTht;
 	private JTextField txtCCCDht;
+	
 	public GiaoDienHuyVe() {
 		setTitle("Hệ thống bán vé");
 		setSize(1200,800);
@@ -441,5 +443,53 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 	public static void main(String[] args) {
 		LookAndFeelManager.setNimbusLookAndFeel();
 		new GiaoDienHuyVe();
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		Object obj = e.getSource();
+		if(obj == btnTiepTheo) {
+			if(buocHT < 3) {
+				if(buocHT == 0) {
+					String maVeCanHuy = layMaVeTuForm();
+					NhanVien nvThucHien = layThongTinNhanVien();
+					QuanLyVeControl veCT = new QuanLyVeControl();
+					try {
+						LichSuVe kqHuy = veCT.xuLyHuyVe(maVeCanHuy, "Kiểm tra điều kiện hủy", nvThucHien);
+						BigDecimal phiHuy = kqHuy.getPhiXuLy();
+						
+		                JOptionPane.showMessageDialog(this, 
+		                		"Vé hợp lệ! Phí hủy: " + phiHuy +
+		                		". Chuyển sang Bước 2.",
+                                "Thành công", JOptionPane.INFORMATION_MESSAGE);
+		                
+		                buocHT++;
+		                cardLayout.next(jpPhai);
+		                capNhatTienTrinh();
+		                btnTiepTheo.setText(buocHT == 3 ? "Hoàn tất" : "Tiếp theo");
+		                btnQuayLai.setEnabled(true);
+					}catch (Exception ex) {
+						// TODO: handle exception
+						JOptionPane.showMessageDialog(this, ex.getMessage(),
+								"Lỗi nghiệp vụ", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		}else {
+			buocHT++;
+			cardLayout.next(jpPhai);
+			capNhatTienTrinh();
+			btnTiepTheo.setText(buocHT == 3 ? "Hoàn tất" : "Tiếp theo");
+			btnQuayLai.setEnabled(true);
+			btnTiepTheo.setEnabled(buocHT < 3);
+		}
+	}
+	private NhanVien layThongTinNhanVien() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	private String layMaVeTuForm() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

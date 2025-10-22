@@ -1,11 +1,56 @@
 package gui;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
 
-public class ThanhToanGUI extends JFrame {
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+
+import dao.ChiTietHoaDonDAO;
+import dao.HoaDonDAO;
+import entity.ChiTietHoaDon;
+import entity.HanhKhach;
+import entity.HoaDon;
+import entity.NhanVien;
+import entity.Ve;
+
+public class ThanhToanGUI extends JFrame implements ActionListener {
+	 // THÊM CÁC TRƯỜNG MỚI CHO CONTEXT
+    private List<Ve> danhSachVe;
+    private HanhKhach khachHang;
+    private NhanVien nhanVien;
+    private double tongTienThanhToan;
+    
+    // DAO instances (giả định)
+    private HoaDonDAO hdDao = new HoaDonDAO();
+    private ChiTietHoaDonDAO cthdDao = new ChiTietHoaDonDAO();
+	
     private JTextField txtMaGD;
     private JTextField txtTenKH;
     private JTextField txtTongTien;
@@ -16,8 +61,15 @@ public class ThanhToanGUI extends JFrame {
 
     private JPanel pnlPT;
     private JPanel footer;
+	private JButton btnthanhtoan;
 
-    public ThanhToanGUI() {
+    public ThanhToanGUI(List<Ve> danhSachVeDaDat, HanhKhach finalHkDaLuu, NhanVien nvLap, double tongTien) {
+    	 this.danhSachVe = danhSachVeDaDat;
+         this.khachHang = finalHkDaLuu;
+         this.nhanVien = nvLap;
+         this.tongTienThanhToan = tongTien; // Cần khởi tạo các components GUI
+        
+        btnthanhtoan.addActionListener(this); 
         setTitle("Thanh Toán");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1000);
@@ -183,7 +235,7 @@ public class ThanhToanGUI extends JFrame {
         footer.add(btnquaylai, BorderLayout.WEST);
         
         //btnthanh toán
-        JButton btnthanhtoan = new JButton("Thanh Toán");
+        btnthanhtoan = new JButton("Thanh Toán");
         btnthanhtoan.setFont(new Font("Segoe UI", Font.BOLD, 15));
         btnthanhtoan.setForeground(Color.WHITE);
         btnthanhtoan.setBackground(new Color(0, 128, 0));
@@ -205,3 +257,4 @@ public class ThanhToanGUI extends JFrame {
         new ThanhToanGUI().setVisible(true);
     }
 }
+

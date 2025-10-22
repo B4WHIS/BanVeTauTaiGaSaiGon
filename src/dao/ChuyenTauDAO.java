@@ -1,14 +1,17 @@
 package dao;
 
 import java.math.BigDecimal;
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import entity.ChuyenTau;
 import connectDB.connectDB;
+import entity.ChuyenTau;
 
 public class ChuyenTauDAO {
 
@@ -33,7 +36,6 @@ public class ChuyenTauDAO {
         }
         return listChuyenTau;
     }
-
     // Phương thức lấy chuyến tàu theo mã chuyến tàu
     public ChuyenTau getChuyenTauByMaChuyenTau(String maChuyenTau) {
         String sql = "SELECT maChuyenTau, thoiGianKhoiHanh, thoiGianDen, maTau, maLichTrinh, trangThai, giaChuyen FROM ChuyenTau WHERE maChuyenTau = ?";
