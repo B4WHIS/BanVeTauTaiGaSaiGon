@@ -8,9 +8,6 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -30,10 +27,6 @@ import javax.swing.table.JTableHeader;
 import dao.ChiTietHoaDonDAO;
 import dao.ChuyenTauDAO;
 import dao.HoaDonDAO;
-import entity.ChiTietHoaDon;
-import entity.HanhKhach;
-import entity.HoaDon;
-import entity.Ve;
 
 public class LapHoaDonGUI extends JFrame implements ActionListener{
 	// DAO instances (giả định)
@@ -267,9 +260,13 @@ public class LapHoaDonGUI extends JFrame implements ActionListener{
         add(pnlnd, BorderLayout.CENTER);
     }
 
-    public static void main(String[] args) {
-    	LookAndFeelManager.setNimbusLookAndFeel();
-        new LapHoaDonGUI().setVisible(true);
+    private void taiVaHienThiHoaDon(String maHoaDonFinal) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void main(String[] args) {
+
     }
     
     private void inHoaDon() {

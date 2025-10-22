@@ -2,12 +2,11 @@ package control;
 
 import java.util.ArrayList;
 
-import dao.PhieuDatChoDAO;
-import dao.ChoNgoiDAO;
 import dao.ChiTietPhieuDatChoDAO;
-
-import entity.PhieuDatCho;
+import dao.ChoNgoiDAO;
+import dao.PhieuDatChoDAO;
 import entity.ChiTietPDC;
+import entity.PhieuDatCho;
 
 public class QuanLyDatChoControl {
 
