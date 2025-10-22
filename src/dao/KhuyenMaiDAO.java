@@ -1,5 +1,6 @@
 package dao;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -7,6 +8,30 @@ import connectDB.connectDB;
 import entity.KhuyenMai;
 
 public class KhuyenMaiDAO {
+	
+	//lấy tất cả khuyên mãi
+	public ArrayList<KhuyenMai> LayTatCaKhuyenMai() {
+	    ArrayList<KhuyenMai> ds = new ArrayList<>();
+	    String sql = "SELECT * FROM KhuyenMai";
+	    try (Connection con = connectDB.getConnection();
+	         Statement stmt = con.createStatement();
+	         ResultSet rs = stmt.executeQuery(sql)) {
+
+	        while (rs.next()) {
+	            ds.add(new KhuyenMai(
+	                    rs.getString("maKhuyenMai"),
+	                    rs.getString("tenKhuyenMai"),
+	                    rs.getBigDecimal("mucGiamGia"),
+	                    rs.getDate("ngayBatDau").toLocalDate(),
+	                    rs.getDate("ngayKetThuc").toLocalDate(),
+	                    rs.getString("dieuKien")
+	            ));
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Lỗi lấy tất cả khuyến mãi: " + e.getMessage());
+	    }
+	    return ds;
+	}
 
     // Thêm khuyến mãi
     public boolean ThemKhuyenMai(KhuyenMai km) {
@@ -92,7 +117,7 @@ public class KhuyenMaiDAO {
     
     
     
- // Lấy ds khuyến mãi đang cònđang hoạt động
+ // Lấy ds khuyến mãi đang còn đang hoạt động
     public ArrayList<KhuyenMai> LayKhuyenMaiDangHoatDong() {
         ArrayList<KhuyenMai> ds = new ArrayList<>();
         String sql = "SELECT * FROM KhuyenMai WHERE GETDATE() BETWEEN ngayBatDau AND ngayKetThuc";
@@ -116,4 +141,63 @@ public class KhuyenMaiDAO {
         return ds;
     }
     
+    // liệt kê khuyến mãi theo tên
+    public ArrayList<KhuyenMai> lietkeKhuyenMaiTheoTen(String ten) {
+        ArrayList<KhuyenMai> ds = new ArrayList<>();
+        String sql = "SELECT * FROM KhuyenMai WHERE tenKhuyenMai LIKE ?";
+        
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            
+            stmt.setString(1, "%" + ten + "%"); 
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ds.add(new KhuyenMai(
+                    rs.getString("maKhuyenMai"),
+                    rs.getString("tenKhuyenMai"),
+                    rs.getBigDecimal("mucGiamGia"),
+                    rs.getDate("ngayBatDau").toLocalDate(),
+                    rs.getDate("ngayKetThuc").toLocalDate(),
+                    rs.getString("dieuKien")
+                ));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Lỗi tìm khuyến mãi theo tên: " + e.getMessage());
+        }
+        
+        return ds;
+    }
+    
+    //liệt kê mức theo mức giảm giá
+    public ArrayList<KhuyenMai> lietkeKhuyenMaiTheoMucGiam(BigDecimal mucGiam) {
+        ArrayList<KhuyenMai> ds = new ArrayList<>();
+        String sql = "SELECT * FROM KhuyenMai WHERE mucGiamGia = ?";
+        
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            
+            stmt.setBigDecimal(1, mucGiam); 
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ds.add(new KhuyenMai(
+                    rs.getString("maKhuyenMai"),
+                    rs.getString("tenKhuyenMai"),
+                    rs.getBigDecimal("mucGiamGia"),
+                    rs.getDate("ngayBatDau").toLocalDate(),
+                    rs.getDate("ngayKetThuc").toLocalDate(),
+                    rs.getString("dieuKien")
+                ));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Lỗi tìm khuyến mãi theo mức giảm cụ thể: " + e.getMessage());
+        }
+        
+        return ds;
+    }
+
+
 }

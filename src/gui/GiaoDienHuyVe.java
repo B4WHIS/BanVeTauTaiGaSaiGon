@@ -441,6 +441,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 	}
 	
 	public static void main(String[] args) {
+		LookAndFeelManager.setNimbusLookAndFeel();
 		new GiaoDienHuyVe();
 	}
 	@Override

@@ -69,13 +69,5 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh{
 		pnlChucNang.setPreferredSize(new Dimension(350, 70));
 		return pnlChucNang;
 	}
-	public static void main(String[] args) {
-		NhanVienQuanLyGUI mh_nvql = new NhanVienQuanLyGUI();
-		mh_nvql.setVisible(true);
-	}
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }

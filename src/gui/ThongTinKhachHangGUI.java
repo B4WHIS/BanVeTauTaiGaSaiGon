@@ -297,74 +297,8 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener{
         add(footer, BorderLayout.SOUTH);
     }
 
-    
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnXacNhan) {
-            try {
-                // 1. VALIDATION VÀ TẠO HÀNH KHÁCH
-                String hoTen = txtHoTen.getText();
-                String cmnd = txtCMND.getText();
-                String sdt = txtSDT.getText();
-                LocalDate ngaySinh = LocalDate.parse(txtNgaySinh.getText()); // Cần xử lý ParseException
-                String maUuDai = mapLoaiKhachHangToUuDai(cboLoaiHK.getSelectedItem().toString());
-
-                // Đối tượng Hành khách (MaKH sẽ được xử lý trong Control)
-                HanhKhach hkMoi = new HanhKhach(null, hoTen, cmnd, sdt, ngaySinh, maUuDai);
-                
-                // Lặp qua từng chỗ ngồi để đặt vé
-                danhSachVeDaDat.clear();
-                
-                // Giả định giá gốc lấy từ Chuyến tàu
-                BigDecimal giaGoc = chuyenTauDuocChon.getGiaChuyen();
-
-                for (ChoNgoi choNgoi : danhSachChoNgoi) {
-                    // Tạo đối tượng Ve (cần MaVe tạm thời hoặc để null nếu DB tự sinh)
-                    Ve veMoi = new Ve();
-                    veMoi.setMaChuyenTau(chuyenTauDuocChon);
-                    veMoi.setMaChoNgoi(choNgoi);
-                    veMoi.setGiaVeGoc(giaGoc);
-                    veMoi.setNgayDat(LocalDateTime.now());
-                    veMoi.setMaNhanVien(nvLap);
-                    veMoi.setTrangThai("Khả dụng");
-                    
-                    // GỌI LOGIC NGHIỆP VỤ ĐẶT VÉ
-                    boolean datThanhCong = veControl.datVe(veMoi, hkMoi, nvLap); // Logic chính [1]
-
-                    if (datThanhCong) {
-                        // Sau khi datVe chạy thành công, veMoi (entity) đã có MaVe, MaHK, GiaThanhToan
-                        danhSachVeDaDat.add(veMoi); 
-                    } else {
-                        throw new Exception("Đặt vé thất bại cho ghế: " + choNgoi.getMaChoNgoi());
-                    }
-                }
-
-                // 2. CHUYỂN MÀN HÌNH THANH TOÁN
-                JOptionPane.showMessageDialog(this, "Đặt chỗ thành công! Chuẩn bị Thanh toán.");
-                
-                double tongTien = danhSachVeDaDat.stream()
-                                              .mapToDouble(v -> v.getGiaThanhToan().doubleValue())
-                                              .sum();
-
-                // Cần tìm đối tượng Hành khách đã được lưu (thường là Ve cuối cùng)
-                HanhKhach finalHkDaLuu = danhSachVeDaDat.get(0).getMaHanhkhach();
-                
-                ThanhToanGUI tt = new ThanhToanGUI(danhSachVeDaDat, finalHkDaLuu, nvLap, tongTien);
-                tt.setVisible(true);
-                this.dispose();
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi đặt vé: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                // THÊM LOGIC ROLLBACK: Nếu lỗi xảy ra sau khi một số vé đã được đặt
-            }
-        }
-    }
-
-    // Giả định hàm chuyển đổi loại khách hàng sang Mã ưu đãi (UD-01, UD-02, v.v.)
-    private String mapLoaiKhachHangToUuDai(String loaiKH) {
-        if (loaiKH.contains("Trẻ em")) return "UD-01"; 
-        if (loaiKH.contains("Người cao tuổi")) return "UD-02";
-        return "UD-03"; // Mặc định hoặc Khác
+    public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
+         new ThongTinKhachHangGUI().setVisible(true);
     }
 }

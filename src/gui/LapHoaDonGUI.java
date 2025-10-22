@@ -267,54 +267,9 @@ public class LapHoaDonGUI extends JFrame implements ActionListener{
         add(pnlnd, BorderLayout.CENTER);
     }
 
-//    public static void main(String[] args) {
-//        new LapHoaDonGUI().setVisible(true);
-//    }
-    private void taiVaHienThiHoaDon(String maHoaDon) {
-        try {
-            // Lấy thông tin Hóa đơn (Hd), Hành khách, Nhân viên
-            HoaDon hd = hdDao.findByMaHoaDon(maHoaDon); 
-            List<ChiTietHoaDon> dsChiTiet = cthdDao.getChiTietByMaHoaDon(maHoaDon); 
-
-            if (hd == null) throw new Exception("Không tìm thấy Hóa đơn.");
-
-            // 1. Cập nhật Header (mahd, nhanvien, ngaylap)
-            mahd.setText("Mã hóa đơn: " + hd.getMaHoaDon());
-            nhanvien.setText("Nhân viên lập: " + hd.getMaNhanVien().getHoTen());
-            ngaylap.setText("Ngày lập: " + hd.getNgayLap().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-            
-            // 2. Cập nhật thông tin Hành khách (hanhk, cmnd, sdt)
-            HanhKhach hk = hd.getMaHanhKhach();
-            hanhk.setText("Họ tên hành khách: " + hk.getHoTen());
-            cmnd.setText("CMND/CCCD: " + hk.getCmndCccd());
-            sdt.setText("Số điện thoại: " + hk.getSoDT());
-
-            // 3. Cập nhật Chi tiết vé vào JTable (model)
-            model.setRowCount(0);
-            for (ChiTietHoaDon cthd : dsChiTiet) {
-                Ve ve = cthd.getVe();
-                // Phải truy vấn thêm Chi tiết Chuyến tàu, Chỗ ngồi, Toa...
-                // Giả định các DAO/Entity tương ứng đã load đầy đủ các FK
-                
-                Object[] row = {
-                    model.getRowCount() + 1, 
-                    "TOA-XX", // Mã toa tàu
-                    ve.getMaChoNgoi().getMaChoNgoi(), // Mã ghế/chỗ
-                    cthd.getDonGia(),
-                    1, // Số lượng
-                    cthd.getDonGia() // Thành tiền
-                };
-                model.addRow(row);
-            }
-
-            // 4. Cập nhật Tổng cộng (tongtien, vat, tongcong)
-            tongtien.setText("Tổng tiền vé: " + new DecimalFormat("#,##0.00").format(hd.getTongTien()));
-            // ... Logic tính toán VAT và tổng cộng phải thu (giả định VAT=0)
-            tongcong.setText("Tổng cộng phải thu: " + new DecimalFormat("#,##0.00").format(hd.getTongTien()));
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Không thể tải hóa đơn: " + ex.getMessage(), "Lỗi Dữ liệu", JOptionPane.ERROR_MESSAGE);
-        }
+    public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
+        new LapHoaDonGUI().setVisible(true);
     }
     
     private void inHoaDon() {

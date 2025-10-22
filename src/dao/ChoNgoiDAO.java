@@ -14,7 +14,7 @@ public class ChoNgoiDAO {
     
 
     //Thêm chỗ ngồi mới
-    public boolean insertChoNgoi(ChoNgoi cn) {
+    public boolean insertChoNgoi(ChoNgoi cn) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "INSERT INTO ChoNgoi (IDloaiGhe, trangThai, maToa) VALUES (?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -29,7 +29,7 @@ public class ChoNgoiDAO {
     }
 
     //  Cập nhật thông tin chỗ ngồi
-    public boolean updateChoNgoi(ChoNgoi cn) {
+    public boolean updateChoNgoi(ChoNgoi cn) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "UPDATE ChoNgoi SET IDloaiGhe = ?, trangThai = ?, maToa = ? WHERE maChoNgoi = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -45,7 +45,7 @@ public class ChoNgoiDAO {
     }
 
     // Xóa chỗ ngồi theo mã
-    public boolean deleteChoNgoi(String maChoNgoi) {
+    public boolean deleteChoNgoi(String maChoNgoi) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "DELETE FROM ChoNgoi WHERE maChoNgoi = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -58,7 +58,7 @@ public class ChoNgoiDAO {
     }
 
     // Tìm chỗ ngồi theo mã
-    public ChoNgoi getChoNgoiByMa(String maChoNgoi) {
+    public ChoNgoi getChoNgoiByMa(String maChoNgoi) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "SELECT * FROM ChoNgoi WHERE maChoNgoi = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -81,7 +81,7 @@ public class ChoNgoiDAO {
     }
 
     // Cập nhật trạng thái 
-    public boolean updateTrangThai(String maChoNgoi, String trangThai) {
+    public boolean updateTrangThai(String maChoNgoi, String trangThai) throws SQLException {
         Connection conn = connectDB.getConnection();
         String sql = "UPDATE ChoNgoi SET trangThai = ? WHERE maChoNgoi = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -93,4 +93,6 @@ public class ChoNgoiDAO {
             return false;
         }
     }
+
+
 }

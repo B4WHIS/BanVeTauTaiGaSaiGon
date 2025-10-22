@@ -385,6 +385,7 @@ public class ChonChoNgoiGUI extends GiaoDienChinh {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

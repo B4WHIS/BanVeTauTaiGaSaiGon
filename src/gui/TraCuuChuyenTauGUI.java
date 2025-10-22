@@ -364,6 +364,7 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
 	
 	
 	public static void main(String[] args) {
+		LookAndFeelManager.setNimbusLookAndFeel();
 		TraCuuChuyenTauGUI tcct = new TraCuuChuyenTauGUI();
 		tcct.setVisible(true);
 		

@@ -42,6 +42,22 @@ public class LichTrinhDAO {
         return listLichTrinh;
     }
 
+    // Phương thức lấy tất cả tên lịch trình
+    public List<String> getAllTenLichTrinh() {
+        List<String> listTenLichTrinh = new ArrayList<>();
+        String sql = "SELECT tenLichTrinh FROM LichTrinh ORDER BY tenLichTrinh";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                listTenLichTrinh.add(rs.getString("tenLichTrinh"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listTenLichTrinh;
+    }
+
     // Phương thức lấy lịch trình theo mã lịch trình
     public LichTrinh getLichTrinhByMaLichTrinh(String maLichTrinh) {
         String sql = "SELECT lt.maLichTrinh, lt.tenLichTrinh, lt.gaDi, g1.tenGa AS tenGaDi, g1.diaChi AS diaChiDi, " +
@@ -53,6 +69,40 @@ public class LichTrinhDAO {
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, maLichTrinh);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    try {
+                        Ga gaDi = new Ga(rs.getString("gaDi"), rs.getString("tenGaDi"), rs.getString("diaChiDi"));
+                        Ga gaDen = new Ga(rs.getString("gaDen"), rs.getString("tenGaDen"), rs.getString("diaChiDen"));
+                        LichTrinh lt = new LichTrinh();
+                        lt.setMaLichTrinh(rs.getString("maLichTrinh"));
+                        lt.setTenLichTrinh(rs.getString("tenLichTrinh"));
+                        lt.setMaGaDi(gaDi);
+                        lt.setMaGaDen(gaDen);
+                        lt.setKhoangCach(rs.getDouble("khoangCach"));
+                        return lt;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Phương thức lấy lịch trình theo tên lịch trình
+    public LichTrinh getLichTrinhByTenLichTrinh(String tenLichTrinh) {
+        String sql = "SELECT lt.maLichTrinh, lt.tenLichTrinh, lt.gaDi, g1.tenGa AS tenGaDi, g1.diaChi AS diaChiDi, " +
+                     "lt.gaDen, g2.tenGa AS tenGaDen, g2.diaChi AS diaChiDen, lt.khoangCach " +
+                     "FROM LichTrinh lt " +
+                     "JOIN Ga g1 ON lt.gaDi = g1.maGa " +
+                     "JOIN Ga g2 ON lt.gaDen = g2.maGa " +
+                     "WHERE lt.tenLichTrinh = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tenLichTrinh);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     try {
@@ -132,5 +182,37 @@ public class LichTrinhDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    public String getMaLichTrinhByTenLichTrinh(String tenLichTrinh) {
+        String sql = "SELECT maLichTrinh FROM LichTrinh WHERE tenLichTrinh = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tenLichTrinh);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("maLichTrinh");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Phương thức lấy tên lịch trình theo mã lịch trình
+    public String getTenLichTrinhByMaLichTrinh(String maLichTrinh) {
+        String sql = "SELECT tenLichTrinh FROM LichTrinh WHERE maLichTrinh = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maLichTrinh);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("tenLichTrinh");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

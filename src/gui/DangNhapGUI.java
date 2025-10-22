@@ -8,9 +8,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 
@@ -19,13 +17,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-public class DangNhapGUI extends JFrame implements ActionListener, MouseListener {
+import control.DangNhapController;
 
+public class DangNhapGUI extends JFrame {
+    
+    // Các thành phần UI (giữ nguyên)
     private JPanel pnlChinh;
     private JPanel pnlTrai;
     private JLabel lblImg;
@@ -42,31 +42,28 @@ public class DangNhapGUI extends JFrame implements ActionListener, MouseListener
     private JButton btnThoat;
     private JPanel pnlGop;
 
-    //Màu sắc
-    private final Color COLOR_PRIMARY = new Color(74, 140, 103);    
-    private final Color COLOR_BG_LIGHT = new Color(250, 247, 243);    
-    private final Color COLOR_LOGIN_BUTTON = new Color(93, 156, 236); 
-    private final Color COLOR_EXIT_BUTTON = new Color(229, 115, 115); 
+    //Màu sắc (làm public để Controller truy cập nếu cần)
+    public final Color COLOR_PRIMARY = new Color(74, 140, 103);    
+    public final Color COLOR_BG_LIGHT = new Color(250, 247, 243);    
+    public final Color COLOR_LOGIN_BUTTON = new Color(93, 156, 236); 
+    public final Color COLOR_EXIT_BUTTON = new Color(229, 115, 115); 
     
-    DangNhapGUI() throws IOException {
+    // Controller
+    private DangNhapController controller;
+    
+    public DangNhapGUI() throws IOException {
         setTitle("Đăng nhập");
         setSize(1000, 650);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
         
-        // Khởi tạo các thành phần và bố cục
+        // Khởi tạo UI
         setupUI();
         
-        // ActionListener 
-        txtTenDN.addActionListener(this);
-        txtMatKhau.addActionListener(this);
-        btnDn.addActionListener(this);
-        btnThoat.addActionListener(this);
-
-        // MouseListener
-        btnDn.addMouseListener(this);
-        btnThoat.addMouseListener(this);
+        // Tạo Controller và attach listener (SỬA Ở ĐÂY: Truyền controller hai lần)
+        controller = new DangNhapController(this);
+        attachListeners(controller, controller);  // <-- SỬA: Thêm tham số thứ hai
     }
     
     private void setupUI() throws IOException {
@@ -83,12 +80,11 @@ public class DangNhapGUI extends JFrame implements ActionListener, MouseListener
         pnlGop.setLayout(new BoxLayout(pnlGop, BoxLayout.Y_AXIS));
         pnlGop.setBackground(COLOR_BG_LIGHT);
         
-        // Thành phần trái
-        lblGsg = new JLabel();
+        // Thành phần trái (SỬA: Set text cho lblGsg nếu cần)
+        lblGsg = new JLabel("GA SÀI GÒN");  // <-- THÊM: Set text để tránh rỗng
         lblGsg.setFont(new Font("Segoe UI", Font.BOLD, 60));
         lblGsg.setForeground(COLOR_PRIMARY);
         lblGsg.setAlignmentX(Component.CENTER_ALIGNMENT);
-//        1.72
         ImageIcon TauIC = GiaoDienChinh.chinhKichThuoc("/img/trainDN.png", 500, 290);
         lblImg = new JLabel(TauIC);
         lblImg.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -149,7 +145,6 @@ public class DangNhapGUI extends JFrame implements ActionListener, MouseListener
         btnThoat.setForeground(Color.WHITE);
         ImageIcon iconThoat = GiaoDienChinh.chinhKichThuoc("/img/thoaticon.png", 25, 25);
         btnThoat.setIcon(iconThoat);
-        gbc.gridx = 0; gbc.gridy = 3;
         pnlNutBam.add(btnThoat);
 
         // Nút Đăng nhập
@@ -170,72 +165,26 @@ public class DangNhapGUI extends JFrame implements ActionListener, MouseListener
         pnlChinh.add(pnlPhai);
         add(pnlChinh);
     }
- 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object src = e.getSource();
+    
+    // Phương thức attach listener (SỬA: Giữ nguyên signature, nhưng gọi đúng cách ở constructor)
+    private void attachListeners(ActionListener actionListener, MouseListener mouseListener) {
+        txtTenDN.addActionListener(actionListener);
+        txtMatKhau.addActionListener(actionListener);
+        btnDn.addActionListener(actionListener);
+        btnThoat.addActionListener(actionListener);
         
-        // 1. Xử lý Enter
-        if (src == txtTenDN) {
-            txtMatKhau.requestFocus();
-            return;
-        } else if (src == txtMatKhau) {
-            btnDn.doClick();
-            return;
-        }
-        
-        // 2. Xử lý nút bấm
-        if (src == btnThoat) {
-        	xuLyThoat(); 
-        } else if (src == btnDn) {
-            
-        }
+        btnDn.addMouseListener(mouseListener);
+        btnThoat.addMouseListener(mouseListener);
     }
-    private void xuLyThoat() {
-        int choice = JOptionPane.showOptionDialog(
-            this,
-            "Bạn có chắc chắn muốn thoát khỏi hệ thống?",
-            "Xác Nhận Thoát Ứng Dụng",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            new String[]{"Thoát", "Hủy Bỏ"},
-            "Hủy Bỏ"
-        );
-        
-        if (choice == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) { } 
-    @Override
-    public void mousePressed(MouseEvent e) { } 
-    @Override
-    public void mouseReleased(MouseEvent e) { } 
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        JButton btn = (JButton) e.getSource();
-        if (btn == btnDn) {
-            btn.setBackground(COLOR_LOGIN_BUTTON.darker()); 
-        } else if (btn == btnThoat) {
-            btn.setBackground(COLOR_EXIT_BUTTON.darker());
-        }
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        JButton btn = (JButton) e.getSource();
-        if (btn == btnDn) {
-            btn.setBackground(COLOR_LOGIN_BUTTON);
-        } else if (btn == btnThoat) {
-            btn.setBackground(COLOR_EXIT_BUTTON);
-        }
-    }
- 
+    
+    // Getter để Controller truy cập UI components (giữ nguyên)
+    public JTextField getTxtTenDN() { return txtTenDN; }
+    public JPasswordField getTxtMatKhau() { return txtMatKhau; }
+    public JButton getBtnDn() { return btnDn; }
+    public JButton getBtnThoat() { return btnThoat; }
+    
     public static void main(String[] args) throws IOException {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         DangNhapGUI dn = new DangNhapGUI();
         dn.setVisible(true);
     }

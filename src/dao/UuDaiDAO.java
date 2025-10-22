@@ -63,7 +63,7 @@ public class UuDaiDAO {
         return null;
     }
 //   them
-    public boolean themUuDai(UuDai ud) {
+    public boolean themUuDai(UuDai ud) throws SQLException {
         Connection con = connectDB.getConnection();
         String sql = "INSERT INTO UuDai (IDloaiUuDai, mucGiamGia, dieuKienApDung) VALUES (?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {

@@ -252,61 +252,9 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
         add(footer, BorderLayout.SOUTH);
     }
 
-//    public static void main(String[] args) {
-//        new ThanhToanGUI().setVisible(true);
-//    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnthanhtoan) {
-            try {
-                // 1. TẠO HÓA ĐƠN GỐC
-                HoaDon hoaDonMoi = new HoaDon();
-                hoaDonMoi.setNgayLap(LocalDateTime.now());
-                hoaDonMoi.setMaHanhKhach(khachHang); // Đã có MaKH
-                hoaDonMoi.setMaNhanVien(nhanVien);
-                hoaDonMoi.setTongTien(tongTienThanhToan);
-                
-                // Ghi vào CSDL [2]
-                if (!hdDao.insertHoaDon(hoaDonMoi)) { 
-                    throw new SQLException("Không thể tạo Hóa đơn chính.");
-                }
-
-                // *** LẤY MÃ HÓA ĐƠN VỪA TẠO (Cần DAO hỗ trợ truy vấn lại ID tự động sinh) ***
-                // Giả định DAO có cơ chế lấy lại mã HD gần nhất cho NV này, hoặc HDDAO.insertHoaDon
-                // đã cập nhật mã tự động tạo vào đối tượng hoaDonMoi.
-                String maHoaDonFinal = findLatestMaHoaDon(); // Placeholder function
-                if (maHoaDonFinal == null) throw new Exception("Không lấy được mã hóa đơn.");
-                hoaDonMoi.setMaHoaDon(maHoaDonFinal);
-
-                // 2. TẠO CHI TIẾT HÓA ĐƠN
-                for (Ve ve : danhSachVe) {
-                    ChiTietHoaDon cthd = new ChiTietHoaDon(
-                        hoaDonMoi, 
-                        ve, 
-                        ve.getGiaThanhToan().doubleValue()
-                    );
-                    // Ghi vào CSDL [3]
-                    if (!cthdDao.insertChiTietHoaDon(cthd)) {
-                        throw new SQLException("Lỗi ghi Chi tiết Hóa đơn cho vé: " + ve.getMaVe());
-                    }
-                }
-                
-                // 3. CHUYỂN SANG MÀN HÌNH IN/XEM HÓA ĐƠN
-                JOptionPane.showMessageDialog(this, "Thanh toán thành công! Chuẩn bị in hóa đơn.");
-                new LapHoaDonGUI(maHoaDonFinal).setVisible(true); // Cần constructor nhận mã HD
-                this.dispose();
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi Thanh toán: " + ex.getMessage(), "Lỗi Giao Dịch", JOptionPane.ERROR_MESSAGE);
-                // Xử lý lỗi (Rollback nếu cần thiết, ví dụ xóa vé và hoàn trạng thái chỗ ngồi)
-            }
-        }
-    }
-    
-    // Placeholder - Trong ứng dụng thực tế, hàm này sẽ phức tạp hơn để lấy ID tự sinh
-    private String findLatestMaHoaDon() {
-         return "HD-000001"; // Giả định ID
+    public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
+        new ThanhToanGUI().setVisible(true);
     }
 }
 
