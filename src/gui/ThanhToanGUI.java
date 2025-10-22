@@ -201,6 +201,7 @@ public class ThanhToanGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         new ThanhToanGUI().setVisible(true);
     }
 }

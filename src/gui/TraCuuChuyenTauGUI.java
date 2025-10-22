@@ -325,6 +325,7 @@ public class TraCuuChuyenTauGUI extends JFrame {
 		
 	}
 	public static void main(String[] args) {
+		LookAndFeelManager.setNimbusLookAndFeel();
 		TraCuuChuyenTauGUI tcct = new TraCuuChuyenTauGUI();
 		tcct.setVisible(true);
 		

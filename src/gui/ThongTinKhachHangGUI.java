@@ -247,6 +247,7 @@ public class ThongTinKhachHangGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
          new ThongTinKhachHangGUI().setVisible(true);
     }
 }

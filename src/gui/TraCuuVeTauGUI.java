@@ -29,12 +29,6 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
         setLayout(new BorderLayout());
        
 
-        // Cài đặt LookAndFeel cho siêu đẹp (Nimbus)
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
        
         JPanel headerPanel = createVIPHeader();
@@ -321,6 +315,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
 
    
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> new TraCuuVeTauGUI().setVisible(true));
     }
 }
