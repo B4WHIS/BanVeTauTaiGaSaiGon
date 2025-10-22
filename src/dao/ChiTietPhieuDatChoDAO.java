@@ -73,7 +73,7 @@ public class ChiTietPhieuDatChoDAO {
     }
 
     // Lấy chi tiết theo mã phiếu đặt chỗ
-    public ArrayList<ChiTietPDC> LaydsChiTietTheoMaPDC(String maPDC) throws SQLException {
+    public ArrayList<ChiTietPDC> LayChiTietTheoMaPDC(String maPDC) throws SQLException {
         ArrayList<ChiTietPDC> ds = new ArrayList<>();
         Connection con = connectDB.getConnection();
         PreparedStatement stmt = null;
