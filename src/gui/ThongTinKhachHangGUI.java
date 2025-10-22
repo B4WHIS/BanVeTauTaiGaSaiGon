@@ -1,12 +1,54 @@
 package gui;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
-public class ThongTinKhachHangGUI extends JFrame {
+import control.QuanLyVeControl;
+import entity.ChoNgoi;
+import entity.ChuyenTau;
+import entity.HanhKhach;
+import entity.NhanVien;
+import entity.Ve;
+
+public class ThongTinKhachHangGUI extends JFrame implements ActionListener{
+    // THÊM CÁC TRƯỜNG MỚI
+    private ChuyenTau chuyenTauDuocChon;
+    private List<ChoNgoi> danhSachChoNgoi; // Chỗ ngồi đã chọn
+    private NhanVien nvLap;
+    private List<Ve> danhSachVeDaDat = new ArrayList<>(); // Lưu trữ kết quả đặt vé
+    private QuanLyVeControl veControl = new QuanLyVeControl();
+
+    
     private JPanel header;
     private JLabel lblTieuDe;
     private JPanel pnlCenter;
@@ -35,12 +77,21 @@ public class ThongTinKhachHangGUI extends JFrame {
     private JPanel footer;
     private JButton btnQuayLai;
 
-    public ThongTinKhachHangGUI() {
+    public ThongTinKhachHangGUI(ChuyenTau ct, List<ChoNgoi> seats, NhanVien nv) {
+    	
+        this.chuyenTauDuocChon = ct;
+        this.danhSachChoNgoi = seats;
+        this.nvLap = nv;
+        
+        // ...
+        btnXacNhan.addActionListener(this); // Gắn sự kiện cho nút Xác Nhận
+        
         setTitle("Thông Tin Khách Hàng");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1000);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         // ========================== HEADER ==========================
         header = new JPanel(new BorderLayout());
@@ -246,7 +297,74 @@ public class ThongTinKhachHangGUI extends JFrame {
         add(footer, BorderLayout.SOUTH);
     }
 
-    public static void main(String[] args) {
-         new ThongTinKhachHangGUI().setVisible(true);
+    
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnXacNhan) {
+            try {
+                // 1. VALIDATION VÀ TẠO HÀNH KHÁCH
+                String hoTen = txtHoTen.getText();
+                String cmnd = txtCMND.getText();
+                String sdt = txtSDT.getText();
+                LocalDate ngaySinh = LocalDate.parse(txtNgaySinh.getText()); // Cần xử lý ParseException
+                String maUuDai = mapLoaiKhachHangToUuDai(cboLoaiHK.getSelectedItem().toString());
+
+                // Đối tượng Hành khách (MaKH sẽ được xử lý trong Control)
+                HanhKhach hkMoi = new HanhKhach(null, hoTen, cmnd, sdt, ngaySinh, maUuDai);
+                
+                // Lặp qua từng chỗ ngồi để đặt vé
+                danhSachVeDaDat.clear();
+                
+                // Giả định giá gốc lấy từ Chuyến tàu
+                BigDecimal giaGoc = chuyenTauDuocChon.getGiaChuyen();
+
+                for (ChoNgoi choNgoi : danhSachChoNgoi) {
+                    // Tạo đối tượng Ve (cần MaVe tạm thời hoặc để null nếu DB tự sinh)
+                    Ve veMoi = new Ve();
+                    veMoi.setMaChuyenTau(chuyenTauDuocChon);
+                    veMoi.setMaChoNgoi(choNgoi);
+                    veMoi.setGiaVeGoc(giaGoc);
+                    veMoi.setNgayDat(LocalDateTime.now());
+                    veMoi.setMaNhanVien(nvLap);
+                    veMoi.setTrangThai("Khả dụng");
+                    
+                    // GỌI LOGIC NGHIỆP VỤ ĐẶT VÉ
+                    boolean datThanhCong = veControl.datVe(veMoi, hkMoi, nvLap); // Logic chính [1]
+
+                    if (datThanhCong) {
+                        // Sau khi datVe chạy thành công, veMoi (entity) đã có MaVe, MaHK, GiaThanhToan
+                        danhSachVeDaDat.add(veMoi); 
+                    } else {
+                        throw new Exception("Đặt vé thất bại cho ghế: " + choNgoi.getMaChoNgoi());
+                    }
+                }
+
+                // 2. CHUYỂN MÀN HÌNH THANH TOÁN
+                JOptionPane.showMessageDialog(this, "Đặt chỗ thành công! Chuẩn bị Thanh toán.");
+                
+                double tongTien = danhSachVeDaDat.stream()
+                                              .mapToDouble(v -> v.getGiaThanhToan().doubleValue())
+                                              .sum();
+
+                // Cần tìm đối tượng Hành khách đã được lưu (thường là Ve cuối cùng)
+                HanhKhach finalHkDaLuu = danhSachVeDaDat.get(0).getMaHanhkhach();
+                
+                ThanhToanGUI tt = new ThanhToanGUI(danhSachVeDaDat, finalHkDaLuu, nvLap, tongTien);
+                tt.setVisible(true);
+                this.dispose();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi đặt vé: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                // THÊM LOGIC ROLLBACK: Nếu lỗi xảy ra sau khi một số vé đã được đặt
+            }
+        }
+    }
+
+    // Giả định hàm chuyển đổi loại khách hàng sang Mã ưu đãi (UD-01, UD-02, v.v.)
+    private String mapLoaiKhachHangToUuDai(String loaiKH) {
+        if (loaiKH.contains("Trẻ em")) return "UD-01"; 
+        if (loaiKH.contains("Người cao tuổi")) return "UD-02";
+        return "UD-03"; // Mặc định hoặc Khác
     }
 }

@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -10,6 +11,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -17,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -26,7 +32,13 @@ import javax.swing.border.TitledBorder;
 import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 
-public class TraCuuChuyenTauGUI extends JFrame {
+import dao.ChuyenTauDAO;
+import dao.GaDAO;
+import entity.ChuyenTau;
+import entity.Ga;
+import entity.NhanVien;
+
+public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
 	private JPanel pnlChinh;
 	private JPanel pnlTraCuu;
 	private JLabel lblGaden;
@@ -55,10 +67,14 @@ public class TraCuuChuyenTauGUI extends JFrame {
 	private JLabel lblSLChotrong;
 	private JLabel lblSLChoDat;
 	private JButton btnDatVe;
-
+	private JDateChooser dateChooser;
+	private ChuyenTauDAO chuyenTauDAO = new ChuyenTauDAO();
+    private GaDAO gaDAO = new GaDAO();
+	private ChonChoNgoiGUI ChonChoNgoiGUI; 
+    
 	public TraCuuChuyenTauGUI() {
 		setTitle("Tra cứu chuyến tàu");
-		setSize(1500,1000);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
@@ -127,7 +143,7 @@ public class TraCuuChuyenTauGUI extends JFrame {
 		gbc.anchor = GridBagConstraints.WEST;
 		pnlThongTinTim.add(lblNgayDi,gbc);
 		
-		JDateChooser dateChooser = new JDateChooser();		
+		dateChooser = new JDateChooser(); 
 		dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 		gbc.gridx = 1;
 		gbc.gridy = 3;
@@ -135,6 +151,7 @@ public class TraCuuChuyenTauGUI extends JFrame {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		dateChooser.setPreferredSize(new Dimension(0, 35)); 
 		pnlThongTinTim.add(dateChooser,gbc);
+		
 		
 		//NÚT BẤM
 		pnlNutBam = new JPanel(new GridLayout(1, 2, 10, 0));
@@ -171,27 +188,6 @@ public class TraCuuChuyenTauGUI extends JFrame {
 		
 		ScPTrungTam = new JScrollPane(pnlTrungTam);
 
-		
-		//vé mô phỏng
-		JPanel ve1 = taoVe();
-		pnlTrungTam.add(ve1);
-		JPanel ve2 = taoVe();
-		pnlTrungTam.add(ve2);
-		JPanel ve3 = taoVe();
-		pnlTrungTam.add(ve3);
-		JPanel ve4 = taoVe();
-		pnlTrungTam.add(ve4);
-		JPanel ve5 = taoVe();
-		pnlTrungTam.add(ve5);
-		JPanel ve6 = taoVe();
-		pnlTrungTam.add(ve6);
-		JPanel ve7 = taoVe();
-		pnlTrungTam.add(ve7);
-		JPanel ve8 = taoVe();
-		pnlTrungTam.add(ve8);
-		JPanel ve9 = taoVe();
-		pnlTrungTam.add(ve9);
-		
 		//Nút chức năng phía dưới
 		pnlNutChucNang = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		btnTroVe = new JButton("Trở về");
@@ -206,8 +202,47 @@ public class TraCuuChuyenTauGUI extends JFrame {
 		pnlChinh.add(pnlTitle, BorderLayout.NORTH);
 		pnlChinh.add(pnlTraCuu, BorderLayout.WEST);
 		
+		
+		btnTim.addActionListener(this);
+		
+		
+		 loadGaDataToComboBox(); 
+		 loadAllTripsOnStartup();
+		 
 		add(pnlChinh);
 		
+	}
+	private void loadGaDataToComboBox() {
+	    // Khởi tạo DAO để truy cập CSDL
+	    GaDAO gaDAO = new GaDAO();
+	    List<Ga> danhSachGa = gaDAO.getAllGa(); // Lấy tất cả Ga [2]
+
+	    // 1. Khởi tạo danh sách tạm thời chứa Tên Ga
+	    List<String> tenGaList = new ArrayList<>();
+	    for (Ga ga : danhSachGa) {
+	        // Lấy tên Ga để hiển thị trong combo box
+	        tenGaList.add(ga.getTenGa()); // [3]
+	    }
+
+	    // 2. Xóa dữ liệu cũ (nếu có) và thêm dữ liệu mới vào cả hai ComboBox
+	    cbGaDi.removeAllItems(); // [3]
+	    cbGaDen.removeAllItems(); // [3]
+
+	    for (String tenGa : tenGaList) {
+	        cbGaDi.addItem(tenGa); // Việc quản lý danh sách trong combo box được thực hiện dễ dàng [4, 5]
+	        cbGaDen.addItem(tenGa); // [4]
+	    }
+
+	    // 3. Thiết lập giá trị mặc định (Tùy chọn)
+	    if (!tenGaList.isEmpty()) {
+	        cbGaDi.setSelectedIndex(0); // [4]
+	        if (tenGaList.size() > 1) {
+	            // Đảm bảo Ga đến khác Ga đi ban đầu
+	            cbGaDen.setSelectedIndex(1); // [4]
+	        } else {
+	            cbGaDen.setSelectedIndex(0);
+	        }
+	    }
 	}
 	public JPanel taoVe() {
 		pnlVe = new JPanel(new BorderLayout());
@@ -215,7 +250,7 @@ public class TraCuuChuyenTauGUI extends JFrame {
 //		pnlVe.setBackground(new Color(138, 187, 108));
 		pnlVe.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		pnlNoiDungChuyen = new JPanel(new GridBagLayout());
-	    
+		
 //		pnlNoiDungChuyen.setBackground(new Color(138, 187, 108));
 		GridBagConstraints gbc = new GridBagConstraints();
 		
@@ -321,13 +356,153 @@ public class TraCuuChuyenTauGUI extends JFrame {
 		pnlNoiDungChuyen.add(btnDatVe, gbc);
 		pnlVe.add(pnlNoiDungChuyen, BorderLayout.NORTH);
 		
+		
+		btnDatVe.addActionListener(this);
 		return pnlVe;
 		
 	}
+	
+	
 	public static void main(String[] args) {
 		TraCuuChuyenTauGUI tcct = new TraCuuChuyenTauGUI();
 		tcct.setVisible(true);
 		
 	}
 	
-}
+	private void loadAllTripsOnStartup() {
+	    // 1. Khởi tạo DAO
+	    ChuyenTauDAO ctDAO = new ChuyenTauDAO(); 
+
+	    // 2. Gọi phương thức lấy tất cả chuyến tàu từ CSDL
+	    List<ChuyenTau> danhSachChuyenTau = ctDAO.getAllChuyenTau(); 
+	    // 3. Hiển thị kết quả lên giao diện bằng hàm đã có
+	    updateResultsPanel(danhSachChuyenTau); 
+	}
+	
+	private JButton findDatVeButton(Container parent) {
+	    for (Component comp : parent.getComponents()) {
+	        if (comp instanceof JButton && ((JButton) comp).getText().equals("Đặt vé")) {
+	            return (JButton) comp;
+	        }
+	        // Nếu là Container (JPanel lồng nhau), tiếp tục tìm kiếm sâu hơn (recursive search)
+	        if (comp instanceof Container) {
+	            JButton found = findDatVeButton((Container) comp);
+	            if (found != null) {
+	                return found;
+	            }
+	        }
+	    }
+	    return null;
+	}
+	
+	private void updateResultsPanel(List<ChuyenTau> danhSach) {
+	    pnlTrungTam.removeAll(); 
+	    
+	    if (danhSach.isEmpty()) {
+	        // ... (Logic hiển thị không có kết quả) ...
+	        JLabel lblNoResult = new JLabel("Không tìm thấy chuyến tàu nào phù hợp.",
+	                SwingConstants.CENTER);
+	        // ... (Cấu hình lblNoResult và thêm vào pnlTrungTam)
+	        pnlTrungTam.setLayout(new GridLayout(1, 1));
+	    } else {
+	        pnlTrungTam.setLayout(new GridLayout(0, 3, 15, 15)); 
+
+	        // GIẢ ĐỊNH: Lấy thông tin Nhân viên đang đăng nhập (thay thế bằng logic thực tế của bạn)
+	        NhanVien nvHienTai = new NhanVien("NV001"); 
+	        
+	        for (ChuyenTau ct : danhSach) {
+	            // ***** Đóng gói đối tượng ChuyenTau (Closure) *****
+	            final ChuyenTau selectedCT = ct; 
+
+	            JPanel vePanel = taoVe(); 
+	            updateVePanelData(vePanel, selectedCT); // Cập nhật hiển thị mã chuyến tàu [1, 2]
+
+	            // 1. Tìm nút Đặt vé trong cấu trúc phức tạp của vePanel
+	            JButton btnDatVeHienTai = findDatVeButton(vePanel); // Sử dụng hàm tiện ích
+	            
+	            if (btnDatVeHienTai != null) {
+	                // 2. Gán ActionListener mới cho NÚT NÀY
+	                btnDatVeHienTai.addActionListener(e -> {
+	                    // *** ĐỐI TƯỢNG selectedCT ĐÃ ĐƯỢC CHỤP LẠI (CAPTURED) VÀ SẴN SÀNG SỬ DỤNG ***
+	                    
+	                    if (selectedCT.getMaChuyenTau() == null || selectedCT.getMaChuyenTau().isEmpty()) {
+	                         // Lỗi này xảy ra nếu đối tượng được truyền vào rỗng, nguyên nhân ban đầu của bạn.
+	                         JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin chuyến tàu (Mã chuyến rỗng).");
+	                         return;
+	                    }
+	                    
+	                    // Ẩn màn hình hiện tại
+	                    this.setVisible(false);
+
+	                    // 3. Khởi tạo màn hình Chọn Chỗ Ngồi và TRUYỀN đối tượng Chuyến tàu
+	                    // Cần đảm bảo lớp ChonChoNgoiGUI có constructor này.
+	                    new ChonChoNgoiGUI(selectedCT, nvHienTai).setVisible(true); 
+	                });
+	            }
+
+	            pnlTrungTam.add(vePanel);
+	        }
+	    }
+
+	    pnlTrungTam.revalidate(); 
+	    pnlTrungTam.repaint();
+	}
+	   
+	
+	private void updateVePanelData(JPanel vePanel, ChuyenTau ct) {
+	    // ... logic tìm kiếm các component (JLabel/JTextField) trong cấu trúc panel lồng nhau
+	    
+	    // Ví dụ về cách tìm và cập nhật MaChuyenTau:
+	    // (Giả định rằng lblTenChuyen được đặt text ban đầu là "SE[MaChuyen]")
+	    Component[] components = vePanel.getComponents();
+	    for (Component comp : components) {
+	        if (comp instanceof JPanel) {
+	            // Lặp qua các panel lồng nhau (innerPanel) [20]
+	            JPanel innerPanel = (JPanel) comp;
+	            for (Component deepestComp : innerPanel.getComponents()) {
+	                if (deepestComp instanceof JLabel) {
+	                    JLabel label = (JLabel) deepestComp;
+
+	                    // Nếu tìm thấy JLabel chứa mã chuyến tàu
+	                    if (label.getText().startsWith("SE[")) { 
+	                        label.setText(ct.getMaChuyenTau()); // Cập nhật bằng mã chuyến tàu thực tế
+	                    }
+	                    // Thêm logic cập nhật các trường khác (TG ĐI, TG ĐẾN, SL CHỖ...)
+	                }
+	            }
+	        }
+	    }
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+//	    Object src = e.getSource();
+
+	    // Xử lý nút TÌM KIẾM (btnTim)
+//	    if (src == btnTim) {
+//	        // ... logic tìm kiếm và gọi updateResultsPanel(ketQuaTimKiem) ...
+//	    }
+//
+//	    // Xử lý nút ĐẶT VÉ (btnDatVe) trên mỗi kết quả
+//	    if (src instanceof JButton && ((JButton) src).getText().equals("Đặt vé")) {
+//	        // 1. LẤY CONTEXT: Xác định Chuyến tàu (selectedCT) từ nút được nhấn.
+//	        // ********* THAY THẾ LOGIC LẤY CHUYẾN TÀU THỰC TẾ TẠI ĐÂY *********
+//	        // Đây là phần phức tạp nhất trong Swing GUI động, cần tìm ra
+//	        // đối tượng ChuyenTau liên quan đến JPanel/JButton cha.
+//	        ChuyenTau selectedCT = new ChuyenTau(); // Dùng placeholder
+//	        NhanVien currentNV = new NhanVien(); // Giả định đã có thông tin nhân viên đăng nhập
+//
+//	        if (selectedCT.getMaChuyenTau() != null) {
+//	            // 2. CHUYỂN MÀN HÌNH: Khởi tạo màn hình chọn chỗ ngồi và truyền dữ liệu
+//	            new ChonChoNgoiGUI(selectedCT, currentNV).setVisible(true);
+//	            this.dispose(); // Đóng màn hình tra cứu
+//	        } else {
+//	            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin chuyến tàu.");
+//	        }
+//	    }
+	}
+
+	
+	
+	}
+	 

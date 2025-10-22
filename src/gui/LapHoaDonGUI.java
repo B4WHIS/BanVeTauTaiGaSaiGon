@@ -1,11 +1,46 @@
 package gui;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-public class LapHoaDonGUI extends JFrame {
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
+import dao.ChiTietHoaDonDAO;
+import dao.ChuyenTauDAO;
+import dao.HoaDonDAO;
+import entity.ChiTietHoaDon;
+import entity.HanhKhach;
+import entity.HoaDon;
+import entity.Ve;
+
+public class LapHoaDonGUI extends JFrame implements ActionListener{
+	// DAO instances (giả định)
+    private HoaDonDAO hdDao = new HoaDonDAO();
+    private ChiTietHoaDonDAO cthdDao = new ChiTietHoaDonDAO();
+    private ChuyenTauDAO ctDao = new ChuyenTauDAO(); 
+
 	private JPanel pnldau;
 	private JPanel pnlHanhKhach;
 	private JPanel pnlChuyenTau;
@@ -34,7 +69,10 @@ public class LapHoaDonGUI extends JFrame {
 	private JButton btnThoat;
 	private JButton btnLuu;
 	
-    public LapHoaDonGUI() {
+    public LapHoaDonGUI(String maHoaDonFinal) {
+    	taiVaHienThiHoaDon(maHoaDonFinal);
+    	 btnThoat.addActionListener(e -> this.dispose());
+         btnLuu.addActionListener(e -> inHoaDon());
         setTitle("HÓA ĐƠN BÁN VÉ TÀU HỎA");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1000);
@@ -229,7 +267,65 @@ public class LapHoaDonGUI extends JFrame {
         add(pnlnd, BorderLayout.CENTER);
     }
 
-    public static void main(String[] args) {
-        new LapHoaDonGUI().setVisible(true);
+//    public static void main(String[] args) {
+//        new LapHoaDonGUI().setVisible(true);
+//    }
+    private void taiVaHienThiHoaDon(String maHoaDon) {
+        try {
+            // Lấy thông tin Hóa đơn (Hd), Hành khách, Nhân viên
+            HoaDon hd = hdDao.findByMaHoaDon(maHoaDon); 
+            List<ChiTietHoaDon> dsChiTiet = cthdDao.getChiTietByMaHoaDon(maHoaDon); 
+
+            if (hd == null) throw new Exception("Không tìm thấy Hóa đơn.");
+
+            // 1. Cập nhật Header (mahd, nhanvien, ngaylap)
+            mahd.setText("Mã hóa đơn: " + hd.getMaHoaDon());
+            nhanvien.setText("Nhân viên lập: " + hd.getMaNhanVien().getHoTen());
+            ngaylap.setText("Ngày lập: " + hd.getNgayLap().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            
+            // 2. Cập nhật thông tin Hành khách (hanhk, cmnd, sdt)
+            HanhKhach hk = hd.getMaHanhKhach();
+            hanhk.setText("Họ tên hành khách: " + hk.getHoTen());
+            cmnd.setText("CMND/CCCD: " + hk.getCmndCccd());
+            sdt.setText("Số điện thoại: " + hk.getSoDT());
+
+            // 3. Cập nhật Chi tiết vé vào JTable (model)
+            model.setRowCount(0);
+            for (ChiTietHoaDon cthd : dsChiTiet) {
+                Ve ve = cthd.getVe();
+                // Phải truy vấn thêm Chi tiết Chuyến tàu, Chỗ ngồi, Toa...
+                // Giả định các DAO/Entity tương ứng đã load đầy đủ các FK
+                
+                Object[] row = {
+                    model.getRowCount() + 1, 
+                    "TOA-XX", // Mã toa tàu
+                    ve.getMaChoNgoi().getMaChoNgoi(), // Mã ghế/chỗ
+                    cthd.getDonGia(),
+                    1, // Số lượng
+                    cthd.getDonGia() // Thành tiền
+                };
+                model.addRow(row);
+            }
+
+            // 4. Cập nhật Tổng cộng (tongtien, vat, tongcong)
+            tongtien.setText("Tổng tiền vé: " + new DecimalFormat("#,##0.00").format(hd.getTongTien()));
+            // ... Logic tính toán VAT và tổng cộng phải thu (giả định VAT=0)
+            tongcong.setText("Tổng cộng phải thu: " + new DecimalFormat("#,##0.00").format(hd.getTongTien()));
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Không thể tải hóa đơn: " + ex.getMessage(), "Lỗi Dữ liệu", JOptionPane.ERROR_MESSAGE);
+        }
     }
+    
+    private void inHoaDon() {
+        // Logic in ấn tương tự như trong HomeInventoryManager (Sử dụng Printable interface) [5, 6]
+        JOptionPane.showMessageDialog(this, "Chức năng In hóa đơn đang được phát triển...", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }
+

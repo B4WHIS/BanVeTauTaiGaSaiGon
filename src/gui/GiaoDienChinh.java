@@ -28,7 +28,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public abstract class GiaoDienChinh extends JFrame{
+public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 	
 	protected JLabel lblGioThuc;
 	protected JMenuBar menuBar;
@@ -109,6 +109,7 @@ public abstract class GiaoDienChinh extends JFrame{
 		pnlNorth.add(pnlDate);
 		return pnlNorth;
 	}
+	
 	public JMenuBar taoMenuBar() {
 		menuBar = new JMenuBar();
 		menuBar.setBorder(BorderFactory.createEmptyBorder(8,0,8,0));
@@ -197,6 +198,22 @@ public abstract class GiaoDienChinh extends JFrame{
 				}
 			}
 		}
+
+		ItemDX.addActionListener(this);
+		ItemThoat.addActionListener(this);
+		
+		ItemTimVe.addActionListener(this);
+		ItemChuyenTau.addActionListener(this);
+		ItemTimKhachHang.addActionListener(this);
+		
+		ItemDatVe.addActionListener(this); 
+		ItemHuyVe.addActionListener(this);
+		ItemDoiVe.addActionListener(this);
+		ItemLapHoaDon.addActionListener(this);
+		
+		
+		
+		
 		
 		menuBar.add(Box.createHorizontalGlue());
 		

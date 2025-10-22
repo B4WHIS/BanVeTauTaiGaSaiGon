@@ -1,14 +1,47 @@
 package gui;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+
+import entity.ChoNgoi;
+import entity.ChuyenTau;
+import entity.NhanVien;
+import entity.ToaTau;
+
 public class ChonChoNgoiGUI extends GiaoDienChinh {
+	private ChuyenTau chuyenTauDuocChon;
+	private NhanVien nvHienTai;
+	
+	
     private JComboBox<String> toaComboBox;
     private JPanel mainPanel;
     private JPanel leftPanel;
@@ -20,7 +53,13 @@ public class ChonChoNgoiGUI extends GiaoDienChinh {
     private Color darkBg;
    
 
-    public ChonChoNgoiGUI() {
+    public ChonChoNgoiGUI(ChuyenTau ct, NhanVien nv) {
+        this.chuyenTauDuocChon = ct;
+        this.nvHienTai = nv;
+        initializeComponents();
+        setupLayout();
+        setupListeners();
+        
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
@@ -111,6 +150,8 @@ public class ChonChoNgoiGUI extends GiaoDienChinh {
         mainPanel.add(leftPanel, BorderLayout.WEST);
         mainPanel.add(seatPanel, BorderLayout.CENTER);
         mainPanel.add(footerPanel, BorderLayout.SOUTH);
+        
+        bookButton.addActionListener(this);
     }
 
     // Tải icon cho ghế (thay đổi đường dẫn đến file seat.png trong project)
@@ -350,7 +391,40 @@ public class ChonChoNgoiGUI extends GiaoDienChinh {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            new ChonChoNgoiGUI().setVisible(true);
+            
         });
     }
+    private List<ChoNgoi> collectSelectedSeats(ChuyenTau ct) {
+        // Đây là placeholder. Trong thực tế, bạn cần logic phức tạp hơn.
+        List<ChoNgoi> seats = new ArrayList<>();
+        // Ví dụ: Giả định ghế A-01 (IDloaiGhe=1, Trống) và chuyến tàu đã chọn
+        ChoNgoi cn = new ChoNgoi("A-01", 1, "Trống", new ToaTau("TOA-01")); 
+        seats.add(cn);
+        return seats;
+    }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object obj = e.getSource();
+        if (obj == bookButton) {
+            // 1. THU THẬP: Lấy danh sách chỗ ngồi đã chọn
+            // ********* Cần triển khai hàm này để lấy đối tượng ChoNgoi thực tế *********
+            List<ChoNgoi> selectedSeats = collectSelectedSeats(chuyenTauDuocChon); 
+
+            if (selectedSeats.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn chỗ ngồi.");
+                return;
+            }
+
+            // 2. CHUYỂN MÀN HÌNH: Mở màn hình nhập thông tin khách hàng
+            ThongTinKhachHangGUI tthk = new ThongTinKhachHangGUI(
+                chuyenTauDuocChon, 
+                selectedSeats, 
+                nvHienTai
+            );
+            tthk.setVisible(true);
+            this.dispose(); // Đóng màn hình chọn chỗ ngồi
+        }
+        // ...
+    }
+	
 }

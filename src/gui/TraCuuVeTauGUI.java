@@ -210,7 +210,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
         btnTimKiem.setHorizontalTextPosition(SwingConstants.RIGHT);  // Icon trước text
         btnTimKiem.setVerticalTextPosition(SwingConstants.CENTER);
        
-        gbc.gridx = 0; gbc.gridy = 5; 
+        gbc.gridx = 1; gbc.gridy = 5; 
         gbc.anchor = GridBagConstraints.CENTER;
         inputPanel.add(btnTimKiem, gbc);
 
@@ -223,7 +223,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
         btnLamMoi.setBackground(new Color(229, 115, 115));
         btnLamMoi.setHorizontalTextPosition(SwingConstants.RIGHT);  // Icon trước text
         btnLamMoi.setVerticalTextPosition(SwingConstants.CENTER);
-        gbc.gridx = 1; gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 5;
         inputPanel.add(btnLamMoi, gbc);
 
         formPanel.add(inputPanel, BorderLayout.CENTER);
@@ -323,4 +323,10 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new TraCuuVeTauGUI().setVisible(true));
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

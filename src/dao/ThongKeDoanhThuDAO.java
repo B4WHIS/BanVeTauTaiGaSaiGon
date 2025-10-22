@@ -1,7 +1,12 @@
 package dao;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +152,6 @@ public class ThongKeDoanhThuDAO {
     }
 
 //    Lấy tổng doanh thu trong khoảng thời gian
-
     public BigDecimal getTongDoanhThuTheoKhoang(LocalDate tuNgay, LocalDate denNgay) {
         String sql = "SELECT SUM(tongDoanhThu) AS tong FROM ThongKeDoanhThu WHERE ngayThongKe BETWEEN ? AND ?";
         try (Connection con = connectDB.getConnection();
@@ -165,5 +169,33 @@ public class ThongKeDoanhThuDAO {
             System.err.println("Lỗi tính tổng doanh thu trong khoảng: " + e.getMessage());
         }
         return BigDecimal.ZERO;
+    }
+
+    public ThongKeDoanhThu getThongKeTheoNgayVaNV(LocalDate ngayThongKe, String maNhanVien) {
+        String sql = "SELECT * FROM ThongKeDoanhThu WHERE ngayThongKe = ? AND maNhanVien = ?";
+        
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+             
+            stmt.setDate(1, Date.valueOf(ngayThongKe));
+            stmt.setString(2, maNhanVien);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                ThongKeDoanhThu tk = new ThongKeDoanhThu();
+                tk.setMaThongKe(rs.getString("maThongKe"));
+                tk.setNgayThongKe(rs.getDate("ngayThongKe").toLocalDate());
+                tk.setMaNhanVien(rs.getString("maNhanVien"));
+                tk.setTongDoanhThu(rs.getBigDecimal("tongDoanhThu"));
+                tk.setTongSoVe(rs.getInt("tongSoVe"));
+                tk.setTongSoHoanDoi(rs.getInt("tongSoHoanDoi"));
+                return tk;
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi truy vấn thống kê theo ngày và nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }

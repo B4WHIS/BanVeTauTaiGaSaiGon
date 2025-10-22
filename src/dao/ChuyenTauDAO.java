@@ -1,17 +1,21 @@
 package dao;
 
 import java.math.BigDecimal;
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import entity.ChuyenTau;
 import connectDB.connectDB;
+import entity.ChuyenTau;
 
 public class ChuyenTauDAO {
 
+	
     // Phương thức lấy tất cả chuyến tàu
     public List<ChuyenTau> getAllChuyenTau() {
         List<ChuyenTau> listChuyenTau = new ArrayList<>();
@@ -37,7 +41,6 @@ public class ChuyenTauDAO {
         }
         return listChuyenTau;
     }
-
     // Phương thức lấy chuyến tàu theo mã chuyến tàu
     public ChuyenTau getChuyenTauByMaChuyenTau(String maChuyenTau) {
         String sql = "SELECT maChuyenTau, thoiGianKhoiHanh, thoiGianDen, maTau, maLichTrinh, giaChuyen FROM ChuyenTau WHERE maChuyenTau = ?";
@@ -66,39 +69,39 @@ public class ChuyenTauDAO {
     }
 
     // Phương thức lấy chuyến tàu theo ngày và ga đi/đến (phương thức phức tạp)
-    public List<ChuyenTau> getChuyenTauTheoNgayVaGa(LocalDateTime ngayKhoiHanh, String maGaDi, String maGaDen) {
-        List<ChuyenTau> listChuyenTau = new ArrayList<>();
-        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, ct.maLichTrinh, ct.giaChuyen " +
-                     "FROM ChuyenTau ct " +
-                     "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh " +
-                     "WHERE CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +
-                     "AND lt.gaDi = ? " +
-                     "AND lt.gaDen = ?";
-        try (Connection conn = connectDB.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, java.sql.Date.valueOf(ngayKhoiHanh.toLocalDate()));
-            pstmt.setString(2, maGaDi);
-            pstmt.setString(3, maGaDen);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    ChuyenTau ct = new ChuyenTau();
-                    ct.setMaChuyenTau(rs.getString("maChuyenTau"));
-                    ct.setThoiGianKhoiHanh(rs.getTimestamp("thoiGianKhoiHanh").toLocalDateTime());
-                    ct.setThoiGianDen(rs.getTimestamp("thoiGianDen").toLocalDateTime());
-                    ct.setMaTau(rs.getString("maTau"));
-                    ct.setMaLichTrinh(rs.getString("maLichTrinh"));
-                    BigDecimal gia = rs.getBigDecimal("giaChuyen");
-                    if (gia != null) {
-                        ct.setGiaChuyen(gia);
-                    }
-                    listChuyenTau.add(ct);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return listChuyenTau;
-    }
+//    public List<ChuyenTau> getChuyenTauTheoNgayVaGa(LocalDateTime ngayKhoiHanh, String maGaDi, String maGaDen) {
+//        List<ChuyenTau> listChuyenTau = new ArrayList<>();
+//        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, ct.maLichTrinh, ct.giaChuyen " +
+//                     "FROM ChuyenTau ct " +
+//                     "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh " +
+//                     "WHERE CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +
+//                     "AND lt.gaDi = ? " +
+//                     "AND lt.gaDen = ?";
+//        try (Connection conn = connectDB.getConnection();
+//             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+//            pstmt.setDate(1, java.sql.Date.valueOf(ngayKhoiHanh.toLocalDate()));
+//            pstmt.setString(2, maGaDi);
+//            pstmt.setString(3, maGaDen);
+//            try (ResultSet rs = pstmt.executeQuery()) {
+//                while (rs.next()) {
+//                    ChuyenTau ct = new ChuyenTau();
+//                    ct.setMaChuyenTau(rs.getString("maChuyenTau"));
+//                    ct.setThoiGianKhoiHanh(rs.getTimestamp("thoiGianKhoiHanh").toLocalDateTime());
+//                    ct.setThoiGianDen(rs.getTimestamp("thoiGianDen").toLocalDateTime());
+//                    ct.setMaTau(rs.getString("maTau"));
+//                    ct.setMaLichTrinh(rs.getString("maLichTrinh"));
+//                    BigDecimal gia = rs.getBigDecimal("giaChuyen");
+//                    if (gia != null) {
+//                        ct.setGiaChuyen(gia);
+//                    }
+//                    listChuyenTau.add(ct);
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return listChuyenTau;
+//    }
 
     // Phương thức thêm chuyến tàu mới (maChuyenTau sẽ được tự động tạo bởi DB)
     public boolean addChuyenTau(ChuyenTau ct) {
