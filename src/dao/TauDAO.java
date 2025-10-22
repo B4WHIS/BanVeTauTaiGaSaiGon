@@ -113,4 +113,36 @@ public class TauDAO {
         }
         return false;
     }
+   public String getMaTauByTenTau(String tenTau) {
+        String sql = "SELECT maTau FROM Tau WHERE tenTau = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tenTau);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("maTau");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Phương thức lấy tên tàu theo mã tàu
+    public String getTenTauByMaTau(String maTau) {
+        String sql = "SELECT tenTau FROM Tau WHERE maTau = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maTau);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("tenTau");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

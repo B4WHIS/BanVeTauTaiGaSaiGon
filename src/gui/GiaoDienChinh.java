@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -28,7 +29,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public abstract class GiaoDienChinh extends JFrame{
+public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 	
 	protected JLabel lblGioThuc;
 	protected JMenuBar menuBar;
@@ -109,6 +110,7 @@ public abstract class GiaoDienChinh extends JFrame{
 		pnlNorth.add(pnlDate);
 		return pnlNorth;
 	}
+	
 	public JMenuBar taoMenuBar() {
 		menuBar = new JMenuBar();
 		menuBar.setBorder(BorderFactory.createEmptyBorder(8,0,8,0));
@@ -197,6 +199,22 @@ public abstract class GiaoDienChinh extends JFrame{
 				}
 			}
 		}
+
+		ItemDX.addActionListener(this);
+		ItemThoat.addActionListener(this);
+		
+		ItemTimVe.addActionListener(this);
+		ItemChuyenTau.addActionListener(this);
+		ItemTimKhachHang.addActionListener(this);
+		
+		ItemDatVe.addActionListener(this); 
+		ItemHuyVe.addActionListener(this);
+		ItemDoiVe.addActionListener(this);
+		ItemLapHoaDon.addActionListener(this);
+		
+		
+		
+		
 		
 		menuBar.add(Box.createHorizontalGlue());
 		
@@ -214,13 +232,16 @@ public abstract class GiaoDienChinh extends JFrame{
 		
 	}
 	public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
-		URL iconUrl = GiaoDienChinh.class.getResource(duongDan);
-		ImageIcon iicGoc = new ImageIcon(iconUrl);
-		Image anhGoc = iicGoc.getImage();
-		Image anhDaDoi = anhGoc.getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
-		ImageIcon iicMoi = new ImageIcon(anhDaDoi);
-		return iicMoi;
-		
+	    URL iconUrl = GiaoDienChinh.class.getResource(duongDan);
+	    if (iconUrl == null) {
+	        System.err.println("Không tìm thấy icon tại đường dẫn: " + duongDan);  // Log để debug
+	        return null;  // Trả về null thay vì crash, caller có thể handle
+	    }
+	    ImageIcon iicGoc = new ImageIcon(iconUrl);
+	    Image anhGoc = iicGoc.getImage();
+	    Image anhDaDoi = anhGoc.getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
+	    ImageIcon iicMoi = new ImageIcon(anhDaDoi);
+	    return iicMoi;
 	}
 
 	public String ngayHienTai() {
@@ -229,6 +250,22 @@ public abstract class GiaoDienChinh extends JFrame{
 		String today = now.format(dinhDangNgay);	
 		return today;
 	}
+	public static JButton taoButton(String text, Color bg, String iconPath) {
+	        ImageIcon icon = chinhKichThuoc(iconPath, 24, 24);
+	        JButton btn = new JButton(text, icon != null ? icon : null);
+	        btn.setBackground(bg);
+	        btn.setForeground(Color.WHITE);
+	        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+	        btn.setFocusPainted(false);
+	        btn.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+	        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+	        btn.addMouseListener(new MouseAdapter() {
+	            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+	            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+	        });
+	        return btn;
+	    }
+
 	
 	public void thoiGianThuc() {
 		Timer dongHo = new Timer(1000, new ActionListener() {

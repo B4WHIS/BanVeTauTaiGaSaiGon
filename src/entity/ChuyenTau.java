@@ -8,7 +8,8 @@ public class ChuyenTau {
     private LocalDateTime thoiGianKhoiHanh;      
     private LocalDateTime thoiGianDen;          
     private String maTau;                        
-    private String maLichTrinh;                  
+    private String maLichTrinh;  
+    private String trangThai; 
     private BigDecimal giaChuyen;               
 
     public ChuyenTau() {
@@ -16,19 +17,32 @@ public class ChuyenTau {
     }
 
     public ChuyenTau( String maChuyenTau, LocalDateTime thoiGianKhoiHanh,
-                     LocalDateTime thoiGianDen, String maTau, String maLichTrinh, BigDecimal giaChuyen) {
+                     LocalDateTime thoiGianDen, String maTau, String maLichTrinh,String trangThai, BigDecimal giaChuyen) {
   
         setMaChuyenTau(maChuyenTau);
         setThoiGianKhoiHanh(thoiGianKhoiHanh);
         setThoiGianDen(thoiGianDen);
         setMaTau(maTau);
         setMaLichTrinh(maLichTrinh);
+        setTrangThai(trangThai);
         setGiaChuyen(giaChuyen);
     }
+
+    public String getTrangThai() {
+		return trangThai;
+	}
+
+    public void setTrangThai(String trangThai) {
+        if (trangThai == null)
+            throw new IllegalArgumentException("Trạng thái chuyến tàu không được rỗng!");
+        this.trangThai = trangThai;
+    }
+
     public ChuyenTau(String ChuyenTau) {
 		// TODO Auto-generated constructor stub
     	setMaChuyenTau(ChuyenTau);
 	}
+
 
 	public String getMaChuyenTau() {
         return maChuyenTau;
@@ -123,6 +137,7 @@ public class ChuyenTau {
                 ", maTau='" + maTau + '\'' +
                 ", maLichTrinh='" + maLichTrinh + '\'' +
                 ", giaChuyen=" + giaChuyen +
+                ", trangThai="+trangThai+
                 ']';
     }
 }

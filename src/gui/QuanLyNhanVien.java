@@ -234,6 +234,7 @@ public class QuanLyNhanVien extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) { }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> new QuanLyNhanVien().setVisible(true));
     }
 }

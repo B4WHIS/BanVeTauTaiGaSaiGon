@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -68,8 +69,5 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh{
 		pnlChucNang.setPreferredSize(new Dimension(350, 70));
 		return pnlChucNang;
 	}
-	public static void main(String[] args) {
-		NhanVienQuanLyGUI mh_nvql = new NhanVienQuanLyGUI();
-		mh_nvql.setVisible(true);
-	}
+	
 }

@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import connectDB.connectDB;
 import entity.UuDai;
@@ -61,7 +63,7 @@ public class UuDaiDAO {
         return null;
     }
 //   them
-    public boolean themUuDai(UuDai ud) {
+    public boolean themUuDai(UuDai ud) throws SQLException {
         Connection con = connectDB.getConnection();
         String sql = "INSERT INTO UuDai (IDloaiUuDai, mucGiamGia, dieuKienApDung) VALUES (?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -107,5 +109,66 @@ public class UuDaiDAO {
             return false;
         }
     }
-    
+
+    public Map<Integer, String> layTatCaLoaiUuDai() throws SQLException {
+        Map<Integer, String> danhSachLoaiUD = new HashMap<>(); // Thay thế cho List<LoaiUuDai>
+        String sql = "SELECT IDloaiUD, tenLoai FROM LoaiUuDai"; 
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("IDloaiUD");
+                String tenLoai = rs.getString("tenLoai");
+                danhSachLoaiUD.put(id, tenLoai);
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+        return danhSachLoaiUD;
+    }
+
+    /**
+     * [Hợp nhất] Thêm Loại Ưu đãi mới (chỉ cần tenLoai vì ID là Identity trong DB [3])
+     */
+    public boolean themLoaiUuDai(String tenLoai) throws SQLException {
+        String sql = "INSERT INTO LoaiUuDai (tenLoai) VALUES (?)";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, tenLoai);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * [Hợp nhất] Cập nhật Loại Ưu đãi
+     */
+    public boolean capNhatLoaiUuDai(int idLoaiUD, String tenLoaiMoi) throws SQLException {
+        String sql = "UPDATE LoaiUuDai SET tenLoai = ? WHERE IDloaiUD = ?";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, tenLoaiMoi);
+            ps.setInt(2, idLoaiUD);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * [Hợp nhất] Xóa Loại Ưu đãi theo ID
+     */
+    public boolean xoaLoaiUuDai(int idLoaiUD) throws SQLException {
+        String sql = "DELETE FROM LoaiUuDai WHERE IDloaiUD = ?";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idLoaiUD);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            // Ràng buộc Khóa ngoại từ bảng UuDai (FK_UuDai_LoaiUuDai) [4]
+            throw new SQLException("Không thể xóa Loại Ưu đãi do có Ưu đãi đang tham chiếu.", e);
+        }
+    }
+
 }

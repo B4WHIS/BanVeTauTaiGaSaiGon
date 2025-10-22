@@ -1,6 +1,10 @@
 package dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import connectDB.connectDB;
@@ -11,8 +15,8 @@ import entity.PhieuDatCho;
 
 public class ChiTietPhieuDatChoDAO {
 
-    // Thêm chi tiết phiếu đặt chỗ
-    public boolean ThemChiTietPDC(ChiTietPDC chiTiet) {
+	//thêm chi tiết phiếu đặt chỗ
+    public boolean themChiTietPDC(ChiTietPDC chiTiet) throws SQLException {
         if (chiTiet == null) {
             return false;
         }
@@ -37,8 +41,8 @@ public class ChiTietPhieuDatChoDAO {
         return false;
     }
 
-    // Lấy tất cả chi tiết phiếu đặt chỗ
-    public ArrayList<ChiTietPDC> LayTatCaChiTietPDC() {
+  //lấy tất cả chi tiết pdc 
+    public ArrayList<ChiTietPDC> LayTatCaChiTietPDC() throws SQLException {
         ArrayList<ChiTietPDC> ds = new ArrayList<>();
         Connection con = connectDB.getConnection();
         Statement stmt = null;
@@ -69,7 +73,7 @@ public class ChiTietPhieuDatChoDAO {
     }
 
     // Lấy chi tiết theo mã phiếu đặt chỗ
-    public ArrayList<ChiTietPDC> LayChiTietTheoMaPDC(String maPDC) {
+    public ArrayList<ChiTietPDC> LaydsChiTietTheoMaPDC(String maPDC) throws SQLException {
         ArrayList<ChiTietPDC> ds = new ArrayList<>();
         Connection con = connectDB.getConnection();
         PreparedStatement stmt = null;

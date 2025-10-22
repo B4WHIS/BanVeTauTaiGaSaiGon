@@ -1,11 +1,46 @@
 package gui;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-public class LapHoaDonGUI extends JFrame {
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
+import dao.ChiTietHoaDonDAO;
+import dao.ChuyenTauDAO;
+import dao.HoaDonDAO;
+import entity.ChiTietHoaDon;
+import entity.HanhKhach;
+import entity.HoaDon;
+import entity.Ve;
+
+public class LapHoaDonGUI extends JFrame implements ActionListener{
+	// DAO instances (giả định)
+    private HoaDonDAO hdDao = new HoaDonDAO();
+    private ChiTietHoaDonDAO cthdDao = new ChiTietHoaDonDAO();
+    private ChuyenTauDAO ctDao = new ChuyenTauDAO(); 
+
 	private JPanel pnldau;
 	private JPanel pnlHanhKhach;
 	private JPanel pnlChuyenTau;
@@ -34,7 +69,10 @@ public class LapHoaDonGUI extends JFrame {
 	private JButton btnThoat;
 	private JButton btnLuu;
 	
-    public LapHoaDonGUI() {
+    public LapHoaDonGUI(String maHoaDonFinal) {
+    	taiVaHienThiHoaDon(maHoaDonFinal);
+    	 btnThoat.addActionListener(e -> this.dispose());
+         btnLuu.addActionListener(e -> inHoaDon());
         setTitle("HÓA ĐƠN BÁN VÉ TÀU HỎA");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1000);
@@ -230,6 +268,19 @@ public class LapHoaDonGUI extends JFrame {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         new LapHoaDonGUI().setVisible(true);
     }
+    
+    private void inHoaDon() {
+        // Logic in ấn tương tự như trong HomeInventoryManager (Sử dụng Printable interface) [5, 6]
+        JOptionPane.showMessageDialog(this, "Chức năng In hóa đơn đang được phát triển...", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }
+
