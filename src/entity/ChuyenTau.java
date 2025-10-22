@@ -27,6 +27,7 @@ public class ChuyenTau {
         setTrangThai(trangThai);
         setGiaChuyen(giaChuyen);
     }
+
     public String getTrangThai() {
 		return trangThai;
 	}
@@ -36,6 +37,13 @@ public class ChuyenTau {
             throw new IllegalArgumentException("Trạng thái chuyến tàu không được rỗng!");
         this.trangThai = trangThai;
     }
+
+    public ChuyenTau(String ChuyenTau) {
+		// TODO Auto-generated constructor stub
+    	setMaChuyenTau(ChuyenTau);
+	}
+
+
 	public String getMaChuyenTau() {
         return maChuyenTau;
     }

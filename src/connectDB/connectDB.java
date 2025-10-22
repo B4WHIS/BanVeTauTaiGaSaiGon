@@ -21,9 +21,9 @@ public class connectDB {
 
 
                 connection = DriverManager.getConnection(url, user, password);
-                System.out.println("Kết nối CSDL QuanLyBanVeTau thành công!");
+//                System.out.println("Kết nối CSDL QuanLyBanVeTau thành công!");
             } catch (SQLException e) {
-                System.err.println(" Lỗi kết nối CSDL: " + e.getMessage());
+//                System.err.println(" Lỗi kết nối CSDL: " + e.getMessage());
                 throw new RuntimeException("Không thể kết nối đến cơ sở dữ liệu QuanLyBanVeTau", e);
             }
         }
@@ -36,9 +36,9 @@ public class connectDB {
             try {
                 connection.close();
                 connection = null;
-                System.out.println("Đã đóng kết nối CSDL.");
+//                System.out.println("Đã đóng kết nối CSDL.");
             } catch (SQLException e) {
-                System.err.println("Lỗi khi đóng kết nối: " + e.getMessage());
+//                System.err.println("Lỗi khi đóng kết nối: " + e.getMessage());
             }
         }
     }

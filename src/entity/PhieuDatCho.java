@@ -25,6 +25,13 @@ public class PhieuDatCho {
 
 
 
+	public PhieuDatCho(String maPhieuDatCho) {
+		// TODO Auto-generated constructor stub
+		setMaPhieuDatCho(maPhieuDatCho);
+	}
+
+
+
 	public String getMaPhieuDatCho() {
 		return maPhieuDatCho;
 	}

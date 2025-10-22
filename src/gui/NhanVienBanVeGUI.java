@@ -12,7 +12,6 @@ import java.io.IOException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 	private JButton btnDatVe;
@@ -25,12 +24,21 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		super();
 		pnlChucNang = taoPanelMenuChinh();
 		pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
+
+
+
 	}
 
 	public JPanel taoPanelMenuChinh() {
 		pnlChucNang = new JPanel();
 		pnlChucNang.setLayout(new GridLayout(0,2,0,10));
 		pnlChucNang.setBackground(new Color(221, 218, 208));
+		
+		Color mauDatVe = new Color(74, 140, 103); 
+		Color mauHuyVe = new Color(229, 115, 115); 
+		Color mauDoiVe = new Color(93, 156, 236); 
+		Color mauTimChuyen = new Color(155, 93, 224); 
+		Color mauDangXuat = Color.orange; 
 		
 		btnDatVe = new JButton("ĐẶT VÉ");
 		btnDatVe.setBackground(Color.white);
@@ -75,7 +83,16 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		pnlChucNang.add(btnTimChuyenTau);
 		pnlChucNang.add(btnDangXuat);
 		pnlChucNang.setPreferredSize(new Dimension(350, 70));
+		
+		addHoverEffect(btnDatVe, mauDatVe);
+		addHoverEffect(btnHuyVe, mauHuyVe);
+		addHoverEffect(btnDoiVe, mauDoiVe);
+		addHoverEffect(btnTimChuyenTau, mauTimChuyen);
+		addHoverEffect(btnDangXuat, mauDangXuat);
+		
 		return pnlChucNang;
+		
+		
 	}
 	
 	@Override
@@ -84,9 +101,6 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		
 	}
 	
-	public static void main(String[] args) throws IOException {
-		NhanVienBanVeGUI mh_nvbv = new NhanVienBanVeGUI();
-		mh_nvbv.setVisible(true);
-	}
+	
 }
 
