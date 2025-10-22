@@ -1,12 +1,36 @@
 package dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+
+
 import connectDB.connectDB;
 import entity.HanhKhach;
 import entity.NhanVien;
 import entity.PhieuDatCho;
 
 public class PhieuDatChoDAO {
+	
+	public ArrayList<PhieuDatCho> getAllPhieuDatCho() {
+	    ArrayList<PhieuDatCho> ds = new ArrayList<>();
+	    Connection conn = connectDB.getConnection();
+	    String sql = "SELECT * FROM PhieuDatCho";
+	    try (Statement st = conn.createStatement();
+	         ResultSet rs = st.executeQuery(sql)) {
+	        while (rs.next()) {
+	            ds.add(new PhieuDatCho(
+	                rs.getString("maPhieuDatCho"),
+	                rs.getTimestamp("ngayDat").toLocalDateTime(),
+	                rs.getString("trangThai"),
+	                new HanhKhach(rs.getString("maHanhKhach")),
+	                new NhanVien(rs.getString("maNhanVien"))
+	            ));
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return ds;
+	}
 
 
     //  Thêm phiếu đặt chỗ mới
