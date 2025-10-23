@@ -54,33 +54,47 @@ public class ChuyenTauDAO {
         return null;
     }
 
-    // Phương thức lấy chuyến tàu theo ngày khởi hành và ga đi/đến (tìm theo lịch trình)
     public List<ChuyenTau> getChuyenTauTheoNgayVaGa(LocalDate ngayKhoiHanh, String maGaDi, String maGaDen) {
         List<ChuyenTau> listChuyenTau = new ArrayList<>();
-        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, ct.maLichTrinh, ct.trangThai, ct.giaChuyen " +
-                     "FROM ChuyenTau ct " +
-                     "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh " +
-                     "WHERE CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +
-                     "AND lt.gaDi = ? AND lt.gaDen = ? " +
-                     "AND ct.trangThai = 'Chưa khởi hành' " +  // Chỉ lấy chuyến chưa khởi hành
-                     "ORDER BY ct.thoiGianKhoiHanh";
+        
+        // Đảm bảo SELECT tất cả các cột cần thiết cho taoChuyenTauTuResultSet
+        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, "
+                     + "ct.maLichTrinh, ct.trangThai, ct.giaChuyen " // [5]
+                     + "FROM ChuyenTau ct "
+                     + "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh "
+                     // Lọc theo khoảng thời gian 24h
+                     + "WHERE ct.thoiGianKhoiHanh >= ? AND ct.thoiGianKhoiHanh < ? " 
+                     + "AND lt.gaDi = ? AND lt.gaDen = ? "
+                     + "AND ct.trangThai = N'Chưa khởi hành' " // Lọc trạng thái [8]
+                     + "ORDER BY ct.thoiGianKhoiHanh";
+
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, java.sql.Date.valueOf(ngayKhoiHanh));
-            pstmt.setString(2, maGaDi);
-            pstmt.setString(3, maGaDen);
+
+            // Tham số 1: Thời gian bắt đầu ngày đó (00:00:00)
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(ngayKhoiHanh.atStartOfDay())); 
+            // Tham số 2: Thời gian bắt đầu ngày hôm sau (24:00:00)
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(ngayKhoiHanh.plusDays(1).atStartOfDay())); 
+            pstmt.setString(3, maGaDi); 
+            pstmt.setString(4, maGaDen); 
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    ChuyenTau ct = taoChuyenTauTuResultSet(rs);
+                    // SỬ DỤNG HELPER để ánh xạ TẤT CẢ các trường (kể cả thoiGianDen)
+                    ChuyenTau ct = taoChuyenTauTuResultSet(rs); 
                     listChuyenTau.add(ct);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); 
         }
         return listChuyenTau;
     }
 
+
+    
+    
+    
     // Phương thức thêm chuyến tàu mới (maChuyenTau tự động tạo bởi DB)
     public boolean addChuyenTau(ChuyenTau ct) {
         // Kiểm tra FK: maTau tồn tại

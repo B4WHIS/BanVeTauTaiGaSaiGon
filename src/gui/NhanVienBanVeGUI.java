@@ -142,7 +142,9 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
             ex.printStackTrace();
         }
     }
-	
+	public static void main(String[] args) throws IOException {
+		new NhanVienBanVeGUI().setVisible(true);
+	}
 	
 }
 

@@ -1,13 +1,17 @@
 package dao;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import entity.ToaTau;
-import entity.Tau;
 import connectDB.connectDB;
+import entity.Tau;
+import entity.ToaTau;
 
 public class ToaTauDAO {
 
@@ -61,6 +65,39 @@ public class ToaTauDAO {
             e.printStackTrace();
         }
         return null;
+    }
+    public List<ToaTau> getToaTauByMaTau(String maTau) {
+        List<ToaTau> listToaTau = new ArrayList<>();
+        String sql = "SELECT tt.maToa, tt.soThuTu, tt.soLuongCho, tt.heSoGia, tt.maTau, t.tenTau, " +
+                     "t.soLuongToa " +
+                     "FROM ToaTau tt " +
+                     "JOIN Tau t ON tt.maTau = t.maTau " +
+                     "WHERE tt.maTau = ?"; // Lọc theo Mã Tàu (maTau)
+
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, maTau);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Xây dựng đối tượng Tau trước [2]
+                    Tau tau = new Tau(rs.getString("maTau"), rs.getString("tenTau"), rs.getInt("soLuongToa")); 
+                    
+                    // Xây dựng đối tượng ToaTau [3]
+                    ToaTau toaTau = new ToaTau();
+                    toaTau.setMaToa(rs.getString("maToa"));
+                    toaTau.setSoThuTu(rs.getInt("soThuTu"));
+                    toaTau.setSoLuongCho(rs.getInt("soLuongCho"));
+                    toaTau.setHeSoGia(rs.getBigDecimal("heSoGia"));
+                    toaTau.setTau(tau);
+                    listToaTau.add(toaTau);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi truy vấn Toa Tàu theo Mã Tàu: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return listToaTau;
     }
 
     // Phương thức thêm toa tàu mới (maToa sẽ được tự động tạo bởi DB)
