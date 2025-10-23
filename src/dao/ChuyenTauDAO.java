@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,33 +55,47 @@ public class ChuyenTauDAO {
         return null;
     }
 
-    // Phương thức lấy chuyến tàu theo ngày khởi hành và ga đi/đến (tìm theo lịch trình)
     public List<ChuyenTau> getChuyenTauTheoNgayVaGa(LocalDate ngayKhoiHanh, String maGaDi, String maGaDen) {
         List<ChuyenTau> listChuyenTau = new ArrayList<>();
-        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, ct.maLichTrinh, ct.trangThai, ct.giaChuyen " +
-                     "FROM ChuyenTau ct " +
-                     "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh " +
-                     "WHERE CAST(ct.thoiGianKhoiHanh AS DATE) = ? " +
-                     "AND lt.gaDi = ? AND lt.gaDen = ? " +
-                     "AND ct.trangThai = 'Chưa khởi hành' " +  // Chỉ lấy chuyến chưa khởi hành
-                     "ORDER BY ct.thoiGianKhoiHanh";
+        
+        // Đảm bảo SELECT tất cả các cột cần thiết cho taoChuyenTauTuResultSet
+        String sql = "SELECT ct.maChuyenTau, ct.thoiGianKhoiHanh, ct.thoiGianDen, ct.maTau, "
+                     + "ct.maLichTrinh, ct.trangThai, ct.giaChuyen " // [5]
+                     + "FROM ChuyenTau ct "
+                     + "JOIN LichTrinh lt ON ct.maLichTrinh = lt.maLichTrinh "
+                     // Lọc theo khoảng thời gian 24h
+                     + "WHERE ct.thoiGianKhoiHanh >= ? AND ct.thoiGianKhoiHanh < ? " 
+                     + "AND lt.gaDi = ? AND lt.gaDen = ? "
+                     + "AND ct.trangThai = N'Chưa khởi hành' " // Lọc trạng thái [8]
+                     + "ORDER BY ct.thoiGianKhoiHanh";
+
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, java.sql.Date.valueOf(ngayKhoiHanh));
-            pstmt.setString(2, maGaDi);
-            pstmt.setString(3, maGaDen);
+
+            // Tham số 1: Thời gian bắt đầu ngày đó (00:00:00)
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(ngayKhoiHanh.atStartOfDay())); 
+            // Tham số 2: Thời gian bắt đầu ngày hôm sau (24:00:00)
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(ngayKhoiHanh.plusDays(1).atStartOfDay())); 
+            pstmt.setString(3, maGaDi); 
+            pstmt.setString(4, maGaDen); 
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    ChuyenTau ct = taoChuyenTauTuResultSet(rs);
+                    // SỬ DỤNG HELPER để ánh xạ TẤT CẢ các trường (kể cả thoiGianDen)
+                    ChuyenTau ct = taoChuyenTauTuResultSet(rs); 
                     listChuyenTau.add(ct);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); 
         }
         return listChuyenTau;
     }
 
+
+    
+    
+    
     // Phương thức thêm chuyến tàu mới (maChuyenTau tự động tạo bởi DB)
     public boolean addChuyenTau(ChuyenTau ct) {
         // Kiểm tra FK: maTau tồn tại
@@ -374,5 +389,61 @@ public class ChuyenTauDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // Method tự động cập nhật trạng thái dựa trên thời gian thực (gọi định kỳ)
+    public void updateTrangThaiTuThoiGian() {
+        LocalDateTime now = LocalDateTime.now();
+        String sql = "UPDATE ChuyenTau SET trangThai = CASE " +
+                     "WHEN thoiGianKhoiHanh > ? THEN N'Chưa khởi hành' " +  // Dùng N'' cho nvarchar
+                     "WHEN thoiGianKhoiHanh <= ? AND thoiGianDen > ? THEN N'Đang khởi hành' " +
+                     "WHEN thoiGianDen <= ? THEN N'Đã hoàn thành' " +
+                     "ELSE N'Chưa khởi hành' END " +  // FIX: ELSE set mặc định hợp lệ thay vì giữ nguyên
+                     "WHERE trangThai != N'Đã hủy'";  // Dùng N'' cho nvarchar
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(now));
+            pstmt.setTimestamp(2, Timestamp.valueOf(now));
+            pstmt.setTimestamp(3, Timestamp.valueOf(now));
+            pstmt.setTimestamp(4, Timestamp.valueOf(now));
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("DAO auto-update trạng thái: Cập nhật " + rowsAffected + " chuyến.");
+        } catch (SQLException e) {
+            System.out.println("Lỗi auto-update trạng thái: " + e.getMessage());
+            e.printStackTrace();
+            // Có thể thêm log chi tiết hoặc thông báo GUI nếu cần
+        }
+    }
+
+    // Method update trạng thái cho 1 chuyến cụ thể (nếu cần)
+    public boolean updateTrangThaiMotChuyen(String maChuyenTau) {
+        ChuyenTau ct = getChuyenTauByMaChuyenTau(maChuyenTau);
+        if (ct == null) return false;
+        
+        LocalDateTime now = LocalDateTime.now();
+        String trangThaiMoi;
+        if (now.isBefore(ct.getThoiGianKhoiHanh())) {
+            trangThaiMoi = "Chưa khởi hành";
+        } else if (now.isBefore(ct.getThoiGianDen())) {
+            trangThaiMoi = "Đang khởi hành";
+        } else {
+            trangThaiMoi = "Đã hoàn thành";
+        }
+        
+        if (trangThaiMoi.equals(ct.getTrangThai())) return true;  // Không thay đổi
+        
+        String sql = "UPDATE ChuyenTau SET trangThai = ? WHERE maChuyenTau = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, trangThaiMoi);
+            pstmt.setString(2, maChuyenTau);
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("DAO update trạng thái chuyến " + maChuyenTau + ": " + trangThaiMoi + " (affected: " + rowsAffected + ")");
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi update trạng thái chuyến: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }
