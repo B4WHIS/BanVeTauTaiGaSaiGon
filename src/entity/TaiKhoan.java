@@ -3,7 +3,7 @@ package entity;
 public class TaiKhoan {
     private String tenDangNhap;
     private String matKhau;
-    private NhanVien nhanVien;
+    private NhanVien manhanVien;
 //	DONE
     public TaiKhoan() {}
 
@@ -34,7 +34,7 @@ public class TaiKhoan {
     }
 
     public NhanVien getNhanVien() {
-        return nhanVien;
+        return manhanVien;
     }
 
     public void setNhanVien(NhanVien nhanVien) {
@@ -42,14 +42,14 @@ public class TaiKhoan {
             throw new IllegalArgumentException("Nhân viên không được rỗng!");
 
         this.tenDangNhap = nhanVien.getSoDienThoai();
-        this.nhanVien = nhanVien;
+        this.manhanVien = nhanVien;
     }
 
     @Override
     public String toString() {
         return "TaiKhoan [" +
                 "tenDangNhap='" + tenDangNhap + '\'' +
-                ", nhanVien=" + (nhanVien != null ? nhanVien.getMaNhanVien() : "null") +
+                ", nhanVien=" + (manhanVien != null ? manhanVien.getMaNhanVien() : "null") +
                 ']';
     }
 }

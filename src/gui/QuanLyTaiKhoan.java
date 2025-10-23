@@ -3,6 +3,7 @@ package gui;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 import control.QuanLyTaiKhoanController;
@@ -310,4 +311,10 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
         LookAndFeelManager.setNimbusLookAndFeel();
         new QuanLyTaiKhoan().setVisible(true);
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

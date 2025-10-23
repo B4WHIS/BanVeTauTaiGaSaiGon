@@ -96,7 +96,68 @@ public class HanhKhachDAO {
         }
 		return hk;
     }
+    public HanhKhach layHanhKhachTheoCMND(String cmndCccd) throws SQLException {
+        String sql = "SELECT * FROM HanhKhach WHERE cmndCccd = ?";
+        HanhKhach hk = null;
+        
+        try (
+            Connection con = connectDB.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, cmndCccd);
 
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    hk = layHanhKhachTuResultSet(rs); 
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();;
+        }
+        return hk;
+    }
+    
+    public HanhKhach layHanhKhachTheoSDT(String soDT) throws SQLException {
+        String sql = "SELECT * FROM HanhKhach WHERE soDienThoai = ?";
+        HanhKhach hk = null;
+        
+        try (
+            Connection con = connectDB.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, soDT);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    hk = layHanhKhachTuResultSet(rs);
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("Lỗi tìm kiếm hành khách theo SĐT: " + ex.getMessage());
+            throw ex;
+        }
+        return hk;
+    }
+    public List<HanhKhach> timHanhKhachTheoHoTen(String hoTen) throws SQLException {
+        List<HanhKhach> danhSachHK = new ArrayList<>();
+        String sql = "SELECT * FROM HanhKhach WHERE hoTen LIKE ?"; 
+        try (
+            Connection con = connectDB.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, "%" + hoTen + "%"); 
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    danhSachHK.add(layHanhKhachTuResultSet(rs));
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("Lỗi tìm kiếm hành khách theo Họ tên: " + ex.getMessage());
+            throw ex;
+        }
+        return danhSachHK;
+    }
 //  cap nhat
     public boolean capNhatHanhKhach(HanhKhach hk) throws SQLException {
         String sql = "UPDATE HanhKhach SET hoTen = ?, cmndCccd = ?, soDienThoai = ?, ngaySinh = ?, maUuDai = ? WHERE maHanhKhach = ?";
@@ -135,4 +196,5 @@ public class HanhKhachDAO {
         	return false;
         }
     }
+    
 }

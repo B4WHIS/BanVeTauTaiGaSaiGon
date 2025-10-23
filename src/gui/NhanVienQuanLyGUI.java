@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 public class NhanVienQuanLyGUI extends GiaoDienChinh{
 	public NhanVienQuanLyGUI() {
@@ -68,8 +68,16 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh{
 		pnlChucNang.setPreferredSize(new Dimension(350, 70));
 		return pnlChucNang;
 	}
+
 	public static void main(String[] args) {
 		new NhanVienQuanLyGUI().setVisible(true);
 	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 
 }

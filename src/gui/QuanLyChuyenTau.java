@@ -424,4 +424,10 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
             new QuanLyChuyenTau().setVisible(true);
       
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

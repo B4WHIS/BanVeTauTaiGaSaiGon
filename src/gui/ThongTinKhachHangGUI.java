@@ -1,12 +1,49 @@
 package gui;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
-public class ThongTinKhachHangGUI extends JFrame {
+import control.QuanLyVeControl;
+import entity.ChoNgoi;
+import entity.ChuyenTau;
+import entity.NhanVien;
+import entity.Ve;
+
+public class ThongTinKhachHangGUI extends JFrame implements ActionListener{
+    // THÊM CÁC TRƯỜNG MỚI
+    private ChuyenTau chuyenTauDuocChon;
+    private List<ChoNgoi> danhSachChoNgoi; // Chỗ ngồi đã chọn
+    private NhanVien nvLap;
+    private List<Ve> danhSachVeDaDat = new ArrayList<>(); // Lưu trữ kết quả đặt vé
+    private QuanLyVeControl veControl = new QuanLyVeControl();
+
+    
     private JPanel header;
     private JLabel lblTieuDe;
     private JPanel pnlCenter;
@@ -35,12 +72,21 @@ public class ThongTinKhachHangGUI extends JFrame {
     private JPanel footer;
     private JButton btnQuayLai;
 
-    public ThongTinKhachHangGUI() {
+    public ThongTinKhachHangGUI(ChuyenTau ct, List<ChoNgoi> seats, NhanVien nv) {
+    	
+        this.chuyenTauDuocChon = ct;
+        this.danhSachChoNgoi = seats;
+        this.nvLap = nv;
+        
+        // ...
+        btnXacNhan.addActionListener(this); // Gắn sự kiện cho nút Xác Nhận
+        
         setTitle("Thông Tin Khách Hàng");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1000);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         // ========================== HEADER ==========================
         header = new JPanel(new BorderLayout());
@@ -247,7 +293,12 @@ public class ThongTinKhachHangGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-    	LookAndFeelManager.setNimbusLookAndFeel();
-         new ThongTinKhachHangGUI().setVisible(true);
+
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

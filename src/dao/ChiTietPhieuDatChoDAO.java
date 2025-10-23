@@ -1,8 +1,11 @@
 package dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 import connectDB.connectDB;
 import entity.ChiTietPDC;
@@ -15,8 +18,8 @@ public class ChiTietPhieuDatChoDAO {
 	//thêm chi tiết phiếu đặt chỗ
     public boolean themChiTietPDC(ChiTietPDC chiTiet) throws SQLException {
         if (chiTiet == null) {
-        	return false;
-        	}
+            return false;
+        }
         Connection con = connectDB.getConnection();
         PreparedStatement stmt = null;
         String sql = "INSERT INTO ChiTietPhieuDatCho(maPhieuDatCho, maChoNgoi, maChuyenTau) VALUES (?, ?, ?)";
@@ -70,7 +73,7 @@ public class ChiTietPhieuDatChoDAO {
     }
 
     // Lấy chi tiết theo mã phiếu đặt chỗ
-    public ArrayList<ChiTietPDC> LaydsChiTietTheoMaPDC(String maPDC) throws SQLException {
+    public ArrayList<ChiTietPDC> LayChiTietTheoMaPDC(String maPDC) throws SQLException {
         ArrayList<ChiTietPDC> ds = new ArrayList<>();
         Connection con = connectDB.getConnection();
         PreparedStatement stmt = null;
@@ -80,6 +83,90 @@ public class ChiTietPhieuDatChoDAO {
         try {
             stmt = con.prepareStatement(sql);
             stmt.setString(1, maPDC);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                PhieuDatCho pdc = new PhieuDatCho(rs.getString("maPhieuDatCho"));
+                ChoNgoi choNgoi = new ChoNgoi(rs.getString("maChoNgoi"));
+                ChuyenTau chuyenTau = new ChuyenTau(rs.getString("maChuyenTau"));
+                ChiTietPDC chiTiet = new ChiTietPDC(pdc, choNgoi, chuyenTau);
+                ds.add(chiTiet);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return ds;
+    }
+
+
+    // Xóa chi tiết theo mã phiếu và mã chỗ ngồi
+    public boolean XoaChiTietPDC(String maPDC, String maChoNgoi) {
+        Connection con = connectDB.getConnection();
+        PreparedStatement stmt = null;
+        String sql = "DELETE FROM ChiTietPhieuDatCho WHERE maPhieuDatCho = ? AND maChoNgoi = ?";
+        try {
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, maPDC);
+            stmt.setString(2, maChoNgoi);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+   
+
+    // Kiểm tra chi tiết PDC có tồn tại hay không
+    public boolean KiemTraTonTai(String maPDC, String maChoNgoi) {
+        Connection con = connectDB.getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT COUNT(*) FROM ChiTietPhieuDatCho WHERE maPhieuDatCho = ? AND maChoNgoi = ?";
+        try {
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, maPDC);
+            stmt.setString(2, maChoNgoi);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    // ds chi tiết PDC theo mã chuyến tàu
+    public ArrayList<ChiTietPDC> TimKiemctPDCTheoMaChuyenTau(String maChuyenTau) {
+        ArrayList<ChiTietPDC> ds = new ArrayList<>();
+        Connection con = connectDB.getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT maPhieuDatCho, maChoNgoi, maChuyenTau FROM ChiTietPhieuDatCho WHERE maChuyenTau = ?";
+        try {
+            stmt = con.prepareStatement(sql);
+            stmt.setString(1, maChuyenTau);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 PhieuDatCho pdc = new PhieuDatCho(rs.getString("maPhieuDatCho"));
