@@ -1,32 +1,11 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
+import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
 
 import control.QuanLyVeControl;
@@ -35,270 +14,244 @@ import entity.ChuyenTau;
 import entity.NhanVien;
 import entity.Ve;
 
-public class ThongTinKhachHangGUI extends JFrame implements ActionListener{
-    // THÊM CÁC TRƯỜNG MỚI
+public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
+
+    // ======= CÁC THUỘC TÍNH QUAN TRỌNG =======
     private ChuyenTau chuyenTauDuocChon;
-    private List<ChoNgoi> danhSachChoNgoi; // Chỗ ngồi đã chọn
+    private List<ChoNgoi> danhSachChoNgoi;
     private NhanVien nvLap;
-    private List<Ve> danhSachVeDaDat = new ArrayList<>(); // Lưu trữ kết quả đặt vé
+    private List<Ve> danhSachVeDaDat = new ArrayList<>();
     private QuanLyVeControl veControl = new QuanLyVeControl();
 
-    
-    private JPanel header;
-    private JLabel lblTieuDe;
-    private JPanel pnlCenter;
-    private JPanel pnlTrai;
-    private JLabel lblFormTitle;
-    private JPanel pnlNhap;
-    private GridBagConstraints gbc;
-    private JLabel lblHoTen;
-    private JTextField txtHoTen;
-    private JLabel lblNgaySinh;
-    private JTextField txtNgaySinh;
-    private JLabel lblSDT;
-    private JTextField txtSDT;
-    private JLabel lblCMND;
-    private JTextField txtCMND;
-    private JLabel lblLoai;
+    // ======= THÀNH PHẦN GIAO DIỆN =======
+    private JTextField txtHoTen, txtNgaySinh, txtSDT, txtCMND;
     private JComboBox<String> cboLoaiHK;
-    private JPanel pnlButton;
-    private JButton btnLamMoi;
-    private JButton btnXacNhan;
-    private JPanel pnlPhai;
-    private JLabel lblTableTitle;
+    private JButton btnLamMoi, btnXacNhan, btnQuayLai;
     private JTable table;
     private DefaultTableModel model;
-    private JScrollPane scrollPane;
-    private JPanel footer;
-    private JButton btnQuayLai;
 
+    // ======= CONSTRUCTOR CHÍNH =======
     public ThongTinKhachHangGUI(ChuyenTau ct, List<ChoNgoi> seats, NhanVien nv) {
-    	
         this.chuyenTauDuocChon = ct;
         this.danhSachChoNgoi = seats;
         this.nvLap = nv;
-        
-        // ...
-        btnXacNhan.addActionListener(this); // Gắn sự kiện cho nút Xác Nhận
-        
+
         setTitle("Thông Tin Khách Hàng");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1500, 1000);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        // ========================== HEADER ==========================
-        header = new JPanel(new BorderLayout());
-        header.setPreferredSize(new Dimension(100, 100));
+        // ========== HEADER ==========
+        JPanel header = new JPanel(new BorderLayout());
+        header.setPreferredSize(new Dimension(100, 90));
         header.setBackground(new Color(103, 192, 144));
         header.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        lblTieuDe = new JLabel("Thông Tin Khách Hàng", SwingConstants.CENTER);
+        JLabel lblTieuDe = new JLabel("THÔNG TIN KHÁCH HÀNG", SwingConstants.CENTER);
         lblTieuDe.setFont(new Font("Segoe UI", Font.BOLD, 32));
         lblTieuDe.setForeground(Color.WHITE);
-        //icon
-        ImageIcon iconthongtin = new ImageIcon("src/img/boss.png");
-        Image imagethongtin = iconthongtin.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-        lblTieuDe.setIcon(new ImageIcon(imagethongtin));
+        ImageIcon icon = new ImageIcon("src/img/boss.png");
+        Image img = icon.getImage().getScaledInstance(55, 55, Image.SCALE_SMOOTH);
+        lblTieuDe.setIcon(new ImageIcon(img));
         lblTieuDe.setHorizontalTextPosition(SwingConstants.RIGHT);
         lblTieuDe.setIconTextGap(10);
-
-
         header.add(lblTieuDe, BorderLayout.CENTER);
         add(header, BorderLayout.NORTH);
 
-        // panel giữa
-        pnlCenter = new JPanel(new BorderLayout());
+        // ========== CENTER ==========
+        JPanel pnlCenter = new JPanel(new BorderLayout(20, 10));
+        pnlCenter.setBackground(new Color(245, 247, 250));
+        pnlCenter.setBorder(new EmptyBorder(20, 20, 20, 20));
         add(pnlCenter, BorderLayout.CENTER);
 
-        // trái
-        pnlTrai = new JPanel(new BorderLayout(10, 10));
-        pnlTrai.setPreferredSize(new Dimension(450, 0));
+        // === FORM BÊN TRÁI ===
+        JPanel pnlTrai = new JPanel(new BorderLayout(10, 10));
+        pnlTrai.setPreferredSize(new Dimension(420, 0));
         pnlTrai.setBackground(Color.WHITE);
         pnlTrai.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(225, 242, 232), 2, true),
+                new LineBorder(new Color(200, 220, 210), 2, true),
                 new EmptyBorder(20, 20, 20, 20)
         ));
-        pnlCenter.add(pnlTrai, BorderLayout.WEST);
 
-        lblFormTitle = new JLabel("Thông Tin Khách Hàng", SwingConstants.CENTER);
+        JLabel lblFormTitle = new JLabel("Nhập thông tin khách hàng", SwingConstants.CENTER);
         lblFormTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblFormTitle.setForeground(new Color(103, 192, 144));
         pnlTrai.add(lblFormTitle, BorderLayout.NORTH);
 
-        pnlNhap = new JPanel(new GridBagLayout());
+        JPanel pnlNhap = new JPanel(new GridBagLayout());
         pnlNhap.setBackground(Color.WHITE);
-        gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 15, 15, 15);
-        gbc.anchor = GridBagConstraints.WEST;
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        Font lblFont = new Font("Segoe UI", Font.BOLD, 12);
+        Font lblFont = new Font("Segoe UI", Font.BOLD, 14);
+        Font txtFont = new Font("Segoe UI", Font.PLAIN, 14);
 
-        // tên
-        gbc.gridx = 0; gbc.gridy = 0;
-        lblHoTen = new JLabel("Họ tên:");
-        lblHoTen.setFont(lblFont);
-        pnlNhap.add(lblHoTen, gbc);
+        String[] lblTexts = {"Họ tên:", "Ngày sinh:", "Số điện thoại:", "CMND/CCCD:", "Loại KH:"};
+        JLabel[] labels = new JLabel[lblTexts.length];
+        JTextField[] textFields = new JTextField[4];
 
-        gbc.gridx = 1; gbc.gridy = 0;
-        txtHoTen = new JTextField(15);
-        txtHoTen.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtHoTen.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-        pnlNhap.add(txtHoTen, gbc);
+        for (int i = 0; i < lblTexts.length; i++) {
+            gbc.gridx = 0;
+            gbc.gridy = i;
+            labels[i] = new JLabel(lblTexts[i]);
+            labels[i].setFont(lblFont);
+            pnlNhap.add(labels[i], gbc);
 
-        // date
-        gbc.gridx = 0; gbc.gridy = 1;
-        lblNgaySinh = new JLabel("Ngày sinh:");
-        lblNgaySinh.setFont(lblFont);
-        pnlNhap.add(lblNgaySinh, gbc);
+            gbc.gridx = 1;
+            if (i < 4) {
+                textFields[i] = new JTextField(15);
+                textFields[i].setFont(txtFont);
+                textFields[i].setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(180, 180, 180)),
+                        new EmptyBorder(5, 8, 5, 8)
+                ));
+                pnlNhap.add(textFields[i], gbc);
+            } else {
+                cboLoaiHK = new JComboBox<>(new String[]{"Người lớn", "Trẻ em", "Sinh viên", "Người cao tuổi"});
+                cboLoaiHK.setFont(txtFont);
+                pnlNhap.add(cboLoaiHK, gbc);
+            }
+        }
 
-        gbc.gridx = 1; gbc.gridy = 1;
-        txtNgaySinh = new JTextField(15);
-        txtNgaySinh.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtNgaySinh.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-        pnlNhap.add(txtNgaySinh, gbc);
+        txtHoTen = textFields[0];
+        txtNgaySinh = textFields[1];
+        txtSDT = textFields[2];
+        txtCMND = textFields[3];
 
-        // sdt
-        gbc.gridx = 0; gbc.gridy = 2;
-        lblSDT = new JLabel("SĐT:");
-        lblSDT.setFont(lblFont);
-        pnlNhap.add(lblSDT, gbc);
-
-        gbc.gridx = 1; gbc.gridy = 2;
-        txtSDT = new JTextField(15);
-        txtSDT.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtSDT.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-        pnlNhap.add(txtSDT, gbc);
-
-        // cccd
-        gbc.gridx = 0; gbc.gridy = 3;
-        lblCMND = new JLabel("CMND:");
-        lblCMND.setFont(lblFont);
-        pnlNhap.add(lblCMND, gbc);
-
-        gbc.gridx = 1; gbc.gridy = 3;
-        txtCMND = new JTextField(15);
-        txtCMND.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtCMND.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-        pnlNhap.add(txtCMND, gbc);
-
-        //loại hành khách
-        gbc.gridx = 0; gbc.gridy = 4;
-        lblLoai = new JLabel("Loại KH:");
-        lblLoai.setFont(lblFont);
-        pnlNhap.add(lblLoai, gbc);
-
-        gbc.gridx = 1; gbc.gridy = 4;
-        String[] loaiHK = {"Người lớn", "Trẻ em", "Sinh viên", "Người cao tuổi"};
-        cboLoaiHK = new JComboBox<>(loaiHK);
-        cboLoaiHK.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        pnlNhap.add(cboLoaiHK, gbc);
-
-        //button
-        gbc.gridx = 0; gbc.gridy = 5;
+        // === BUTTONS ===
+        gbc.gridx = 0;
+        gbc.gridy = lblTexts.length;
         gbc.gridwidth = 2;
-        pnlButton = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5));
         pnlButton.setBackground(Color.WHITE);
 
-        btnLamMoi = new JButton("Làm Mới");
-        btnLamMoi.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btnLamMoi.setForeground(Color.WHITE);
-        btnLamMoi.setBackground(new Color(93, 156, 236));
-        btnLamMoi.setPreferredSize(new Dimension(120,40));
-        btnLamMoi.setBorder(new EmptyBorder(10, 20, 10, 20));
+        btnLamMoi = taoButton("Làm mới", new Color(93, 156, 236), "src/img/undo.png");
+        btnXacNhan = taoButton("Xác nhận", new Color(103, 192, 144), "src/img/mark.png");
 
-        ImageIcon iconlammoi = new ImageIcon("src/img/undo.png");
-        Image imagelammoi = iconlammoi.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        btnLamMoi.setIcon(new ImageIcon(imagelammoi));
-        btnLamMoi.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnLamMoi.setIconTextGap(10);
         pnlButton.add(btnLamMoi);
-        
-        
-
-        btnXacNhan = new JButton("Xác Nhận");
-        btnXacNhan.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btnXacNhan.setForeground(Color.WHITE);
-        btnXacNhan.setBackground(new Color(103, 192, 144));
-        btnXacNhan.setPreferredSize(new Dimension(120,40));
-        btnXacNhan.setBorder(new EmptyBorder(10, 20, 10, 20));
-
-        ImageIcon iconxacnhan = new ImageIcon("src/img/mark.png");
-        Image imagexacnhan = iconxacnhan.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-        btnXacNhan.setIcon(new ImageIcon(imagexacnhan));
-        btnXacNhan.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnXacNhan.setIconTextGap(10);
         pnlButton.add(btnXacNhan);
-
         pnlNhap.add(pnlButton, gbc);
-        pnlTrai.add(pnlNhap, BorderLayout.CENTER);
 
-        // phải
-        pnlPhai = new JPanel(new BorderLayout());
+        pnlTrai.add(pnlNhap, BorderLayout.CENTER);
+        pnlCenter.add(pnlTrai, BorderLayout.WEST);
+
+        // === BẢNG BÊN PHẢI ===
+        JPanel pnlPhai = new JPanel(new BorderLayout(10, 10));
         pnlPhai.setBackground(Color.WHITE);
         pnlPhai.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(225, 242, 232), 2, true),
+                new LineBorder(new Color(200, 220, 210), 2, true),
                 new EmptyBorder(20, 20, 20, 20)
         ));
-        pnlCenter.add(pnlPhai, BorderLayout.CENTER);
 
-        lblTableTitle = new JLabel("Danh Sách Khách Hàng", SwingConstants.CENTER);
+        JLabel lblTableTitle = new JLabel("Danh sách khách hàng", SwingConstants.CENTER);
         lblTableTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTableTitle.setForeground(new Color(103, 192, 144));
         pnlPhai.add(lblTableTitle, BorderLayout.NORTH);
 
-        String[] columns = {"STT", "Họ tên", "Ngày sinh", "SĐT", "CMND", "Loại KH"};
+        String[] columns = {"STT", "Họ tên", "Ngày sinh", "SĐT", "CMND/CCCD", "Loại KH"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        table.setRowHeight(40);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        table.getTableHeader().setBackground(Color.WHITE);
+        table.setRowHeight(32);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(240, 240, 240));
+        table.setGridColor(new Color(220, 220, 220));
 
-
-        scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(900, 600));
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(225, 242, 232)));
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
         pnlPhai.add(scrollPane, BorderLayout.CENTER);
 
-        // footer
-        footer = new JPanel(new BorderLayout());
-        footer.setBackground(new Color(103, 192, 144));
-        footer.setPreferredSize(new Dimension(0, 60));
-        footer.setBorder(new EmptyBorder(10, 20, 10, 20));
+        pnlCenter.add(pnlPhai, BorderLayout.CENTER);
 
-        btnQuayLai = new JButton("Quay Lại");
-        btnQuayLai.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnQuayLai.setForeground(Color.WHITE);
-        btnQuayLai.setBackground(Color.lightGray);
-        btnQuayLai.setBorder(new EmptyBorder(10, 0, 10, 0));
-        btnQuayLai.setPreferredSize(new Dimension(100,40));
-        footer.add(btnQuayLai,BorderLayout.WEST);
+        // ========== FOOTER ==========
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(new Color(103, 192, 144));
+        footer.setBorder(new EmptyBorder(10, 20, 10, 20));
+        footer.setPreferredSize(new Dimension(0, 60));
+
+        btnQuayLai = taoButton("Quay lại", new Color(41, 128, 185), "src/img/undo.png");
+        btnQuayLai.setPreferredSize(new Dimension(120, 40));
+        footer.add(btnQuayLai, BorderLayout.WEST);
 
         add(footer, BorderLayout.SOUTH);
+
+        // ===== SỰ KIỆN =====
+        btnLamMoi.addActionListener(this);
+        btnXacNhan.addActionListener(this);
+        btnQuayLai.addActionListener(this);
+    }
+
+    // === Constructor mặc định để chạy thử GUI ===
+    public ThongTinKhachHangGUI() {
+        this(null, new ArrayList<>(), null);
+    }
+
+    // === Hàm tạo nút có style ===
+    private JButton taoButton(String text, Color bg, String iconPath) {
+        JButton btn = new JButton(text);
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setBorder(new EmptyBorder(10, 15, 10, 15));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        ImageIcon icon = new ImageIcon(iconPath);
+        Image img = icon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        btn.setIcon(new ImageIcon(img));
+        btn.setHorizontalTextPosition(SwingConstants.RIGHT);
+        btn.setIconTextGap(8);
+
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+        });
+        return btn;
+    }
+
+    // === Xử lý sự kiện ===
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object src = e.getSource();
+
+        if (src == btnLamMoi) {
+            txtHoTen.setText("");
+            txtNgaySinh.setText("");
+            txtSDT.setText("");
+            txtCMND.setText("");
+            cboLoaiHK.setSelectedIndex(0);
+            txtHoTen.requestFocus();
+        }
+        else if (src == btnXacNhan) {
+            String hoTen = txtHoTen.getText().trim();
+            String ngaySinh = txtNgaySinh.getText().trim();
+            String sdt = txtSDT.getText().trim();
+            String cmnd = txtCMND.getText().trim();
+            String loai = (String) cboLoaiHK.getSelectedItem();
+
+            if (hoTen.isEmpty() || sdt.isEmpty() || cmnd.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Thiếu dữ liệu", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Thêm vào bảng
+            model.addRow(new Object[]{model.getRowCount() + 1, hoTen, ngaySinh, sdt, cmnd, loai});
+
+            // Giả lập tạo vé (sau này có thể kết nối QuanLyVeControl)
+            Ve ve = new Ve(); 
+            danhSachVeDaDat.add(ve);
+
+            JOptionPane.showMessageDialog(this, "Thêm khách hàng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            btnLamMoi.doClick();
+        }
+        else if (src == btnQuayLai) {
+            dispose();
+        }
     }
 
     public static void main(String[] args) {
-
+        SwingUtilities.invokeLater(() -> new ThongTinKhachHangGUI().setVisible(true));
     }
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 }

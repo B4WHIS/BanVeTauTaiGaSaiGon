@@ -43,15 +43,6 @@ public class KhuyenMai {
         this.tenKhuyenMai = tenKhuyenMai;
     }
 
-//    public int getMucGiamGia() {
-//        return mucGiamGia;
-//    }
-//
-//    public void setMucGiamGia(int mucGiamGia) {
-//        if (mucGiamGia < 0 || mucGiamGia > 100)
-//            throw new IllegalArgumentException("Mức giảm giá phải từ 0 đến 100%");
-//        this.mucGiamGia = mucGiamGia;
-//    }
 
     public BigDecimal getMucGiamGia() {
         return mucGiamGia;
@@ -77,10 +68,11 @@ public class KhuyenMai {
     }
 
     public void setNgayKetThuc(LocalDate ngayKetThuc) {
-        if (ngayKetThuc == null || ngayKetThuc.isBefore(ngayBatDau) || ngayKetThuc.isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("Ngày kết thúc không hợp lệ!");
+        if (ngayKetThuc == null || ngayKetThuc.isBefore(ngayBatDau))
+            throw new IllegalArgumentException("Ngày kết thúc phải sau ngày bắt đầu!");
         this.ngayKetThuc = ngayKetThuc;
     }
+
 
     public String getDieuKien() {
         return dieuKien;
