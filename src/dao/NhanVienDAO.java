@@ -9,6 +9,7 @@ import connectDB.connectDB;
 import entity.NhanVien;
 
 public class NhanVienDAO {
+	private NhanVienDAO nhanVienDAO = new NhanVienDAO();
 
     // Lấy toàn bộ danh sách nhân viên
     public List<NhanVien> getAllNhanVien() {
@@ -112,5 +113,27 @@ public class NhanVienDAO {
             System.err.println("Lỗi tìm nhân viên theo CMND/CCCD: " + e.getMessage());
         }
         return null;
+    }
+    public List<Object[]> getDanhSachLoaiChucVu() {
+        List<Object[]> ds = new ArrayList<>();
+        String sql = """
+            SELECT DISTINCT lcv.IDloaiChucVu, lcv.tenLoaiCV
+            FROM NhanVien nv
+            JOIN LoaiChucVu lcv ON nv.IDloaiChucVu = lcv.IDloaiChucVu
+        """;
+        try (Connection con = connectDB.getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                ds.add(new Object[] {
+                    rs.getInt("IDloaiChucVu"),
+                    rs.getString("tenLoaiCV")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ds;
     }
 }

@@ -101,6 +101,11 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
 		
 	}
 	
+	protected void addHoverEffect(JButton btnDatVe2, Color mauDatVe) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
