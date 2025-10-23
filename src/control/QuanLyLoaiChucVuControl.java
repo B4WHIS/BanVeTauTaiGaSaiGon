@@ -22,16 +22,16 @@ public class QuanLyLoaiChucVuControl {
             }
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "❌ Lỗi khi tải dữ liệu: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Lỗi khi tải dữ liệu: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     // ==== THÊM DỮ LIỆU (TỰ ĐỘNG TẠO ID) ====
     public boolean themLoaiChucVu(String tenLoai) {
-        // ✅ KIỂM TRA TRÙNG TÊN TRƯỚC KHI THÊM
+     
         if (kiemTraTrungTen(tenLoai)) {
-            JOptionPane.showMessageDialog(null, "❌ Tên loại chức vụ đã tồn tại!", "Lỗi trùng lặp", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Tên loại chức vụ đã tồn tại!", "Lỗi trùng lặp", JOptionPane.WARNING_MESSAGE);
             return false;
         }
 
@@ -50,9 +50,9 @@ public class QuanLyLoaiChucVuControl {
 
     // ==== CẬP NHẬT DỮ LIỆU ====
     public boolean suaLoaiChucVu(int id, String tenLoai) {
-        // ✅ KIỂM TRA TRÙNG TÊN (TRỪ BẢN GHI ĐANG SỬA)
+      
         if (kiemTraTrungTen(tenLoai, id)) {
-            JOptionPane.showMessageDialog(null, "❌ Tên loại chức vụ đã tồn tại!", "Lỗi trùng lặp", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Tên loại chức vụ đã tồn tại!", "Lỗi trùng lặp", JOptionPane.WARNING_MESSAGE);
             return false;
         }
 
@@ -65,7 +65,7 @@ public class QuanLyLoaiChucVuControl {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "❌ Lỗi khi cập nhật loại chức vụ: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Lỗi khi cập nhật loại chức vụ: " + e.getMessage());
             return false;
         }
     }
@@ -80,12 +80,11 @@ public class QuanLyLoaiChucVuControl {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "❌ Lỗi khi xóa loại chức vụ: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Lỗi khi xóa loại chức vụ: " + e.getMessage());
             return false;
         }
     }
 
-    // ==== ✅ METHOD MỚI: LẤY ID TIẾP THEO (TỰ ĐỘNG +1) ====
     public int layMaLoaiCVTiepTheo() {
         String sql = "SELECT COALESCE(MAX(IDloaiCV), 0) + 1 AS IDMoi FROM LoaiChucVu";
         try (Connection con = connectDB.getConnection();
@@ -96,18 +95,18 @@ public class QuanLyLoaiChucVuControl {
                 return rs.getInt("IDMoi");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "❌ Lỗi khi lấy ID tiếp theo: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Lỗi khi lấy ID tiếp theo: " + e.getMessage());
             e.printStackTrace();
         }
-        return 1; // Nếu bảng rỗng, bắt đầu từ 1
+        return 1; 
     }
 
-    // ==== KIỂM TRA TÊN TRÙNG (CẢI TIẾN) ====
+    // ==== KIỂM TRA TÊN TRÙNG  ====
     public boolean kiemTraTrungTen(String tenLoai) {
-        return kiemTraTrungTen(tenLoai, -1); // -1 = không loại trừ ID nào
+        return kiemTraTrungTen(tenLoai, -1);
     }
 
-    // ✅ OVERLOAD: KIỂM TRA TRÙNG TÊN (LOẠI TRỪ ID ĐANG SỬA)
+    // KIỂM TRA TRÙNG TÊN (LOẠI TRỪ ID ĐANG SỬA)
     public boolean kiemTraTrungTen(String tenLoai, int idLoaiTru) {
         String sql = "SELECT COUNT(*) FROM LoaiChucVu WHERE tenLoai = ? AND IDloaiCV != ?";
         if (idLoaiTru == -1) {
@@ -126,7 +125,7 @@ public class QuanLyLoaiChucVuControl {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "❌ Lỗi khi kiểm tra trùng tên: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Lỗi khi kiểm tra trùng tên: " + e.getMessage());
         }
         return false;
     }

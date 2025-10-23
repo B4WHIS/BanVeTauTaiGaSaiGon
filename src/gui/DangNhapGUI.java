@@ -55,7 +55,7 @@ public class DangNhapGUI extends JFrame {
 
     public DangNhapGUI() throws IOException {
         setTitle("Đăng nhập");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(1400, 950);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -95,77 +95,108 @@ public class DangNhapGUI extends JFrame {
         pnlGop.add(Box.createVerticalGlue());
         pnlTrai.add(pnlGop);
 
-        // Panel Phải (Form Đăng nhập)
+        // Panel Phải
         pnlPhai.setLayout(new BorderLayout(10, 10));
         pnlForm = new JPanel(new GridBagLayout());
         pnlForm.setBackground(COLOR_BG_LIGHT);
+        
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20);
+        gbc.insets = new Insets(20, 45, 10, 45); 
+        gbc.anchor = GridBagConstraints.WEST;
 
         // Tiêu đề
         lblDn = new JLabel("ĐĂNG NHẬP");
         lblDn.setFont(new Font("Segoe UI", Font.BOLD, 55));
         lblDn.setForeground(COLOR_PRIMARY);
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        gbc.gridx = 0; 
+        gbc.gridy = 0; 
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         pnlForm.add(lblDn, gbc);
 
-        // Label Tên đăng nhập
+       
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.WEST;
+        pnlForm.add(Box.createVerticalStrut(50), gbc);
+
+       
         lblTenDN = new JLabel("Tên đăng nhập:");
-        lblTenDN.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblTenDN.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTenDN.setForeground(new Color(66, 66, 66));
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
+        gbc.gridx = 0; 
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.LINE_END;
         pnlForm.add(lblTenDN, gbc);
 
-        // TextField Tên đăng nhập 
-        txtTenDN = new JTextField(25);
-        txtTenDN.setFont(new Font("Segoe UI", Font.PLAIN, 22));
-        txtTenDN.setPreferredSize(new Dimension(400, 50));
-        gbc.gridx = 1; gbc.gridy = 1;
+        
+        txtTenDN = new JTextField(20); 
+        txtTenDN.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+        txtTenDN.setPreferredSize(new Dimension(350, 45)); 
+        txtTenDN.setMinimumSize(new Dimension(350, 45));
+        txtTenDN.setMaximumSize(new Dimension(350, 45));
+        gbc.gridx = 1; 
+        gbc.gridy = 2;
+        gbc.weightx = 1.0; 
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.LINE_START;
         pnlForm.add(txtTenDN, gbc);
 
-        // Label Mật khẩu
+        
         lblMatKhau = new JLabel("Mật khẩu:");
-        lblMatKhau.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblMatKhau.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblMatKhau.setForeground(new Color(66, 66, 66));
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; 
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.LINE_END;
         pnlForm.add(lblMatKhau, gbc);
 
-        // TextField Mật khẩu 
-        txtMatKhau = new JPasswordField(25);
-        txtMatKhau.setFont(new Font("Segoe UI", Font.PLAIN, 22));
-        txtMatKhau.setPreferredSize(new Dimension(400, 50));
-        gbc.gridx = 1; gbc.gridy = 2;
+     
+        txtMatKhau = new JPasswordField(20);
+        txtMatKhau.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+        txtMatKhau.setPreferredSize(new Dimension(350, 45)); // CÙNG KÍCH THƯỚC VỚI txtTenDN
+        txtMatKhau.setMinimumSize(new Dimension(350, 45));
+        txtMatKhau.setMaximumSize(new Dimension(350, 45));
+        gbc.gridx = 1; 
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.LINE_START;
         pnlForm.add(txtMatKhau, gbc);
 
-        // Panel nút bấm
+        // **KHOẢNG CÁCH TRƯỚC NÚT**
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        pnlForm.add(Box.createVerticalStrut(40), gbc);
+
+        // === PANEL NÚT BẤM ===
         pnlNutBam = new JPanel(new GridLayout(1, 2, 30, 0));
         pnlNutBam.setBackground(COLOR_BG_LIGHT);
-        pnlNutBam.setPreferredSize(new Dimension(400, 60));
+        pnlNutBam.setPreferredSize(new Dimension(420, 55));
 
         // Nút Thoát
         btnThoat = new JButton("Thoát");
-        btnThoat.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btnThoat.setFont(new Font("Segoe UI", Font.BOLD, 18));
         btnThoat.setBackground(COLOR_EXIT_BUTTON);
         btnThoat.setForeground(Color.WHITE);
-        ImageIcon iconThoat = GiaoDienChinh.chinhKichThuoc("/img/thoaticon.png", 30, 30);
+        ImageIcon iconThoat = GiaoDienChinh.chinhKichThuoc("/img/thoaticon.png", 25, 25);
         btnThoat.setIcon(iconThoat);
         pnlNutBam.add(btnThoat);
 
         // Nút Đăng nhập
         btnDn = new JButton("Đăng nhập");
-        btnDn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btnDn.setFont(new Font("Segoe UI", Font.BOLD, 18));
         btnDn.setBackground(COLOR_LOGIN_BUTTON);
         btnDn.setForeground(Color.WHITE);
-        ImageIcon iconDN = GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 30, 30);
+        ImageIcon iconDN = GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 25, 25);
         btnDn.setIcon(iconDN);
         pnlNutBam.add(btnDn);
 
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        gbc.gridx = 0; 
+        gbc.gridy = 5; 
+        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.CENTER;
         pnlForm.add(pnlNutBam, gbc);

@@ -13,14 +13,15 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 import connectDB.connectDB;
+import entity.NhanVien;
 import gui.DangNhapGUI;
 import gui.NhanVienBanVeGUI;
 import gui.NhanVienQuanLyGUI;
 
 public class DangNhapController implements ActionListener, MouseListener {
     
-    private DangNhapGUI view;  // Tham chiếu đến View để cập nhật UI nếu cần
-    
+    private DangNhapGUI view;
+
     public DangNhapController(DangNhapGUI view) {
         this.view = view;
     }
@@ -29,7 +30,6 @@ public class DangNhapController implements ActionListener, MouseListener {
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
         
-        // 1. Xử lý Enter (chuyển focus hoặc trigger đăng nhập)
         if (src == view.getTxtTenDN()) {
             view.getTxtMatKhau().requestFocus();
             return;
@@ -38,7 +38,6 @@ public class DangNhapController implements ActionListener, MouseListener {
             return;
         }
         
-        // 2. Xử lý nút bấm
         if (src == view.getBtnThoat()) {
             xuLyThoat();
         } else if (src == view.getBtnDn()) {
@@ -50,7 +49,6 @@ public class DangNhapController implements ActionListener, MouseListener {
         String tenDangNhap = view.getTxtTenDN().getText().trim();
         String matKhau = new String(view.getTxtMatKhau().getPassword()).trim();
         
-        // Kiểm tra input rỗng
         if (tenDangNhap.isEmpty() || matKhau.isEmpty()) {
             JOptionPane.showMessageDialog(view, "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
@@ -61,7 +59,8 @@ public class DangNhapController implements ActionListener, MouseListener {
         ResultSet rs = null;
         try {
             conn = connectDB.getConnection();
-            String sql = "SELECT lc.tenLoai " +
+           
+            String sql = "SELECT lc.tenLoai, nv.hoTen " +
                          "FROM TaiKhoan tk " +
                          "JOIN NhanVien nv ON tk.maNhanVien = nv.maNhanVien " +
                          "JOIN LoaiChucVu lc ON nv.IDloaiChucVu = lc.IDloaiCV " +
@@ -75,25 +74,30 @@ public class DangNhapController implements ActionListener, MouseListener {
             
             if (rs.next()) {
                 String loaiChucVu = rs.getString("tenLoai");
+                String hoTen = rs.getString("hoTen");
+              
+                NhanVien nhanVien = new NhanVien();
+                nhanVien.setHoTen(hoTen);
+                nhanVien.setIDloaiChucVu(getIDFromChucVu(loaiChucVu));
                 
-                // Đóng form đăng nhập
+               
                 view.dispose();
                 
-                // Phân quyền và mở form tương ứng
+                
                 if ("Nhân viên bán vé".equals(loaiChucVu)) {
                     try {
-                        new NhanVienBanVeGUI().setVisible(true);
+                        new NhanVienBanVeGUI(nhanVien).setVisible(true);
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, "Lỗi khi mở giao diện bán vé: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
                 } else if ("Nhân viên quản lý".equals(loaiChucVu)) {
-                    new NhanVienQuanLyGUI().setVisible(true);
+                    new NhanVienQuanLyGUI(nhanVien).setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(null, "Loại chức vụ không được hỗ trợ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 JOptionPane.showMessageDialog(view, "Tên đăng nhập hoặc mật khẩu không đúng!", "Đăng nhập thất bại", JOptionPane.ERROR_MESSAGE);
-                view.getTxtMatKhau().setText(""); // Xóa mật khẩu
+                view.getTxtMatKhau().setText("");
                 view.getTxtTenDN().requestFocus();
             }
         } catch (SQLException ex) {
@@ -102,10 +106,18 @@ public class DangNhapController implements ActionListener, MouseListener {
             try {
                 if (rs != null) rs.close();
                 if (pstmt != null) pstmt.close();
-                // Không đóng connection ở đây vì singleton
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+    
+  
+    private int getIDFromChucVu(String chucVu) {
+        switch (chucVu) {
+            case "Nhân viên bán vé": return 1;
+            case "Nhân viên quản lý": return 2;
+            default: return 0;
         }
     }
     
@@ -126,13 +138,10 @@ public class DangNhapController implements ActionListener, MouseListener {
         }
     }
 
-    // MouseListener methods (giữ nguyên cho hover effect)
-    @Override
-    public void mouseClicked(MouseEvent e) { } 
-    @Override
-    public void mousePressed(MouseEvent e) { } 
-    @Override
-    public void mouseReleased(MouseEvent e) { } 
+  
+    @Override public void mouseClicked(MouseEvent e) {} 
+    @Override public void mousePressed(MouseEvent e) {} 
+    @Override public void mouseReleased(MouseEvent e) {} 
 
     @Override
     public void mouseEntered(MouseEvent e) {
