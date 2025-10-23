@@ -1,6 +1,5 @@
 package gui;
 
-import control.DangNhapController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -13,6 +12,7 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -22,6 +22,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import control.DangNhapController;
 
 public class DangNhapGUI extends JFrame {
     

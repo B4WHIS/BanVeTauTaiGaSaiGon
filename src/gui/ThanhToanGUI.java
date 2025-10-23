@@ -34,7 +34,6 @@ import entity.Ve;
 
 public class ThanhToanGUI extends JFrame implements ActionListener {
 
-    // màu sắc
     private final Color mauChinh = new Color(74, 140, 103);
     private final Color mauPhu = new Color(229, 115, 115);
     private final Color mauXanhDuong = new Color(93, 156, 236);
@@ -48,22 +47,18 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     private JPanel khungChinh; 
     private JLabel lblTieuDeChinh;
 
-    // Panel trái
     private JPanel pnlThongTinThanhToan;
     private JTextField txtMaGiaoDich;
     private JTextField txtTenKhachHang;
 
-    // Thông tin tài chính
     private JTextField txtTongTienVeGoc;
     private JTextField txtThueVAT;
     private JTextField txtTongThanhToanCuoi;
 
-    // Mã giảm giá
     private JTextField txtMaGiamGia;
     private JButton nutApDungMa;
     private JTextField txtGiaTriGiamKM;
 
-    // Phương thức thanh toán
     private JRadioButton radTienMat;
     private JRadioButton radChuyenKhoan;
     private ButtonGroup nhomPhuongThuc;
@@ -88,7 +83,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // ======== Tiêu đề =========
+        //tieu de
         lblTieuDeChinh = new JLabel("TIẾN HÀNH THANH TOÁN", SwingConstants.CENTER);
         lblTieuDeChinh.setFont(new Font("Segoe UI", Font.BOLD, 40));
         lblTieuDeChinh.setForeground(mauChinh);
@@ -99,7 +94,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
         pnlTieuDe.add(lblTieuDeChinh, BorderLayout.CENTER);
         this.getContentPane().add(pnlTieuDe, BorderLayout.NORTH);
 
-        // ======== Panel thông tin thanh toán bên trái =========
+        // pnl trai
         pnlThongTinThanhToan = new JPanel(new BorderLayout());
         JPanel pnlNhapLieu = new JPanel(new GridBagLayout());
         pnlNhapLieu.setBackground(Color.WHITE);
