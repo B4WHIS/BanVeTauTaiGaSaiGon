@@ -33,7 +33,7 @@ public class NhanVien {
     }
 
     public void setMaNhanVien(String maNhanVien) {
-        if (maNhanVien == null || !maNhanVien.matches("^NV\\d{3}$"))
+        if (maNhanVien == null || !maNhanVien.matches("^NV-\\d{3}$"))
             throw new IllegalArgumentException("Mã nhân viên phải có dạng NVXXX");
         this.maNhanVien = maNhanVien;
     }

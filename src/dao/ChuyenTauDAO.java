@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -388,5 +389,61 @@ public class ChuyenTauDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // Method tự động cập nhật trạng thái dựa trên thời gian thực (gọi định kỳ)
+    public void updateTrangThaiTuThoiGian() {
+        LocalDateTime now = LocalDateTime.now();
+        String sql = "UPDATE ChuyenTau SET trangThai = CASE " +
+                     "WHEN thoiGianKhoiHanh > ? THEN N'Chưa khởi hành' " +  // Dùng N'' cho nvarchar
+                     "WHEN thoiGianKhoiHanh <= ? AND thoiGianDen > ? THEN N'Đang khởi hành' " +
+                     "WHEN thoiGianDen <= ? THEN N'Đã hoàn thành' " +
+                     "ELSE N'Chưa khởi hành' END " +  // FIX: ELSE set mặc định hợp lệ thay vì giữ nguyên
+                     "WHERE trangThai != N'Đã hủy'";  // Dùng N'' cho nvarchar
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(now));
+            pstmt.setTimestamp(2, Timestamp.valueOf(now));
+            pstmt.setTimestamp(3, Timestamp.valueOf(now));
+            pstmt.setTimestamp(4, Timestamp.valueOf(now));
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("DAO auto-update trạng thái: Cập nhật " + rowsAffected + " chuyến.");
+        } catch (SQLException e) {
+            System.out.println("Lỗi auto-update trạng thái: " + e.getMessage());
+            e.printStackTrace();
+            // Có thể thêm log chi tiết hoặc thông báo GUI nếu cần
+        }
+    }
+
+    // Method update trạng thái cho 1 chuyến cụ thể (nếu cần)
+    public boolean updateTrangThaiMotChuyen(String maChuyenTau) {
+        ChuyenTau ct = getChuyenTauByMaChuyenTau(maChuyenTau);
+        if (ct == null) return false;
+        
+        LocalDateTime now = LocalDateTime.now();
+        String trangThaiMoi;
+        if (now.isBefore(ct.getThoiGianKhoiHanh())) {
+            trangThaiMoi = "Chưa khởi hành";
+        } else if (now.isBefore(ct.getThoiGianDen())) {
+            trangThaiMoi = "Đang khởi hành";
+        } else {
+            trangThaiMoi = "Đã hoàn thành";
+        }
+        
+        if (trangThaiMoi.equals(ct.getTrangThai())) return true;  // Không thay đổi
+        
+        String sql = "UPDATE ChuyenTau SET trangThai = ? WHERE maChuyenTau = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, trangThaiMoi);
+            pstmt.setString(2, maChuyenTau);
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("DAO update trạng thái chuyến " + maChuyenTau + ": " + trangThaiMoi + " (affected: " + rowsAffected + ")");
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi update trạng thái chuyến: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

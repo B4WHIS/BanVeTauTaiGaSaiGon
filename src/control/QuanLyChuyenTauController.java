@@ -1,6 +1,6 @@
 package control;
 
-import gui.DanhSachChuyenTau;
+import gui.QuanLyChuyenTau;
 import dao.ChuyenTauDAO;
 import entity.ChuyenTau;
 
@@ -11,10 +11,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
 public class QuanLyChuyenTauController implements ActionListener {
-    private DanhSachChuyenTau view;
+    private QuanLyChuyenTau view;
     private ChuyenTauDAO dao;
     private boolean isAddMode = false;  // Mode: true = add, false = edit
     private ChuyenTau selectedChuyenTau;  // Lưu chuyến được select để edit
@@ -22,7 +21,7 @@ public class QuanLyChuyenTauController implements ActionListener {
     // DateTimeFormatter giống view
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public QuanLyChuyenTauController(DanhSachChuyenTau view) {
+    public QuanLyChuyenTauController(QuanLyChuyenTau view) {
         this.view = view;
         this.dao = new ChuyenTauDAO();
         System.out.println("Controller khởi tạo thành công.");
@@ -55,7 +54,10 @@ public class QuanLyChuyenTauController implements ActionListener {
         if (maChuyenTau != null) {
             selectedChuyenTau = dao.getChuyenTauByMaChuyenTau(maChuyenTau);
             if (selectedChuyenTau != null) {
-                loadFormData(selectedChuyenTau);
+            	dao.updateTrangThaiMotChuyen(maChuyenTau);  // Update trạng thái chuyến được select
+                selectedChuyenTau = dao.getChuyenTauByMaChuyenTau(maChuyenTau);  // Reload
+                view.loadFormData(selectedChuyenTau);
+                view.loadFormData(selectedChuyenTau);  // SỬA: Gọi method của view (xử lý JDateChooser)
                 isAddMode = false;
                 view.getBtnSua().setEnabled(true);
                 view.getBtnXoa().setEnabled(true);
@@ -72,30 +74,6 @@ public class QuanLyChuyenTauController implements ActionListener {
             view.getBtnLuu().setEnabled(false);
             System.out.println("Bỏ chọn row.");
         }
-    }
-
-    // Chỉ load data vào form, không enable btnLuu hay fields (gọi từ handleTableSelection hoặc handleSua)
-    private void loadFormData(ChuyenTau ct) {
-        view.getTxtMaChuyenTau().setText(ct.getMaChuyenTau());
-        // Set tên tàu và lịch trình vào combo (sử dụng stream để tìm reverse mapping)
-        List<String> tenTauList = dao.getAllTenTau();
-        String tenTau = tenTauList.stream()
-                .filter(t -> dao.getMaTauByTenTau(t) != null && dao.getMaTauByTenTau(t).equals(ct.getMaTau()))
-                .findFirst()
-                .orElse(ct.getMaTau());  // Fallback
-        view.getCbTenTau().setSelectedItem(tenTau);
-
-        List<String> tenLichTrinhList = dao.getAllTenLichTrinh();
-        String tenLichTrinh = tenLichTrinhList.stream()
-                .filter(lt -> dao.getMaLichTrinhByTenLichTrinh(lt) != null && dao.getMaLichTrinhByTenLichTrinh(lt).equals(ct.getMaLichTrinh()))
-                .findFirst()
-                .orElse(ct.getMaLichTrinh());  // Fallback
-        view.getCbTenLichTrinh().setSelectedItem(tenLichTrinh);
-
-        view.getTxtThoiGianKhoiHanh().setText(ct.getThoiGianKhoiHanh().format(dateTimeFormatter));
-        view.getTxtThoiGianDen().setText(ct.getThoiGianDen().format(dateTimeFormatter));
-        view.getTxtGiaChuyen().setText(ct.getGiaChuyen().toString());
-        view.getCbTrangThai().setSelectedItem(ct.getTrangThai());
     }
 
     // Xử lý Thêm: Reset form, enable fields và btnLuu
@@ -127,7 +105,7 @@ public class QuanLyChuyenTauController implements ActionListener {
             return;
         }
         isAddMode = false;
-        loadFormData(selectedChuyenTau);
+        view.loadFormData(selectedChuyenTau);  // SỬA: Gọi method của view (xử lý JDateChooser)
         view.enableFormFields(true);  // Enable fields cho edit
         view.getBtnLuu().setEnabled(true);
         view.showMessage("Chế độ sửa. Sửa thông tin và nhấn Lưu.", "Sửa chuyến tàu", JOptionPane.INFORMATION_MESSAGE);
@@ -246,7 +224,7 @@ public class QuanLyChuyenTauController implements ActionListener {
         }
     }
 
-    // Validate form data
+    // Validate form data - SỬA: Sử dụng getter trả String trực tiếp (không .getText())
     private boolean validateForm() {
         System.out.println("Bắt đầu validate:");
         if (view.getCbTenTau().getSelectedIndex() < 0) {
@@ -260,8 +238,8 @@ public class QuanLyChuyenTauController implements ActionListener {
             return false;
         }
         try {
-            LocalDateTime.parse(view.getTxtThoiGianKhoiHanh().getText(), dateTimeFormatter);
-            LocalDateTime.parse(view.getTxtThoiGianDen().getText(), dateTimeFormatter);
+            LocalDateTime.parse(view.getTxtThoiGianKhoiHanh(), dateTimeFormatter);  // SỬA: Không .getText(), getter trả String
+            LocalDateTime.parse(view.getTxtThoiGianDen(), dateTimeFormatter);
             System.out.println("Validate thời gian OK.");
         } catch (DateTimeParseException ex) {
             System.out.println("Validate FAIL: Thời gian sai format - " + ex.getMessage());
@@ -283,7 +261,7 @@ public class QuanLyChuyenTauController implements ActionListener {
         return true;
     }
 
-    // Tạo ChuyenTau từ form data - SỬA: Thêm log text giá từ form
+    // Tạo ChuyenTau từ form data - SỬA: Thêm log text giá từ form và sử dụng getter String trực tiếp
     private ChuyenTau createChuyenTauFromForm() {
         System.out.println("Tạo entity từ form:");
         ChuyenTau ct = new ChuyenTau();
@@ -311,14 +289,14 @@ public class QuanLyChuyenTauController implements ActionListener {
         ct.setMaLichTrinh(maLichTrinh);
         System.out.println("Set mã lịch trình: " + maLichTrinh + " (từ tên: " + tenLichTrinh + ")");
 
-        // Thời gian
-        LocalDateTime thoiGianKH = LocalDateTime.parse(view.getTxtThoiGianKhoiHanh().getText(), dateTimeFormatter);
+        // Thời gian - SỬA: Sử dụng getter trả String trực tiếp
+        LocalDateTime thoiGianKH = LocalDateTime.parse(view.getTxtThoiGianKhoiHanh(), dateTimeFormatter);
         ct.setThoiGianKhoiHanh(thoiGianKH);
-        LocalDateTime thoiGianDen = LocalDateTime.parse(view.getTxtThoiGianDen().getText(), dateTimeFormatter);
+        LocalDateTime thoiGianDen = LocalDateTime.parse(view.getTxtThoiGianDen(), dateTimeFormatter);
         ct.setThoiGianDen(thoiGianDen);
         System.out.println("Set thời gian KH: " + thoiGianKH + " - Đến: " + thoiGianDen);
 
-        // SỬA: Log text giá từ form trước parse
+        // Giá - SỬA: Log text giá từ form trước parse
         String giaText = view.getTxtGiaChuyen().getText();
         System.out.println("Text giá từ form: '" + giaText + "'");
         ct.setGiaChuyen(new BigDecimal(giaText));
