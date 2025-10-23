@@ -90,7 +90,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
-        // ===== LEFT PANEL =====
+        // ===== LEFT PANEL ====
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
         pnlLeft.setPreferredSize(new Dimension(450, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
@@ -259,7 +259,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         });
         autoUpdateTimer.start();  // Bắt đầu timer
     }
-    public JButton taoButton(String text, Color bg, String iconPath) {
+    public JButton taoButton2(String text, Color bg, String iconPath) {
         JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
         btn.setBackground(bg);
         btn.setForeground(Color.WHITE);

@@ -250,7 +250,23 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		String today = now.format(dinhDangNgay);	
 		return today;
 	}
-	public JButton taoButton(String text, Color bg, String iconPath) {
+	public JButton taoButton2(String text, Color bg, String iconPath) {
+        ImageIcon icon = chinhKichThuoc(iconPath, 24, 24);
+        JButton btn = new JButton(text, icon != null ? icon : null);
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+        });
+        return btn;
+    }
+
+	public static JButton taoButton(String text, Color bg, String iconPath) {
 	        ImageIcon icon = chinhKichThuoc(iconPath, 24, 24);
 	        JButton btn = new JButton(text, icon != null ? icon : null);
 	        btn.setBackground(bg);
