@@ -27,14 +27,14 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     private JButton btnDangXuat;
     private JButton btnDoiVe;
 
-    // **CONSTRUCTOR MỚI: NHẬN NHÂN VIÊN**
+   
     public NhanVienBanVeGUI(NhanVien nhanVien) throws IOException {
         super(nhanVien); // TRUYỀN NHÂN VIÊN CHO GIAO DIỂN CHÍNH
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
     }
 
-    // **CONSTRUCTOR CŨ (KEEP COMPATIBILITY)**
+  
     public NhanVienBanVeGUI() throws IOException {
         this(null);
     }
@@ -115,9 +115,7 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
         return pnlChucNang;
     }
 
-    /** 
-     * **SỬA: THỰC HIỆN HOVER EFFECT**
-     */
+    
     @Override
     protected void addHoverEffect(JButton btn, Color mainColor) {
         btn.setFocusPainted(false);

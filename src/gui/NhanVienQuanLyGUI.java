@@ -26,13 +26,13 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
     private JButton btnTimChuyenTau;
     private JButton btnDangXuat;
 
-    // **CONSTRUCTOR MỚI: NHẬN NHÂN VIÊN**
+   
     public NhanVienQuanLyGUI(NhanVien nhanVien) {
         super(nhanVien); // TRUYỀN NHÂN VIÊN CHO GIAO DIỂN CHÍNH
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
 
-        // Gắn sự kiện cho các nút
+       
         btnDatVe.addActionListener(this);
         btnHuyVe.addActionListener(this);
         btnDoiVe.addActionListener(this);
@@ -40,7 +40,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         btnDangXuat.addActionListener(this);
     }
 
-    // **CONSTRUCTOR CŨ (KEEP COMPATIBILITY)**
+   
     public NhanVienQuanLyGUI() {
         this(null);
     }
@@ -101,9 +101,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         return pnlChucNang;
     }
 
-    /** 
-     * **SỬA: THỰC HIỆN HOVER EFFECT**
-     */
+    
     private void themHieuUngHover(JButton btn, Color color) {
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));

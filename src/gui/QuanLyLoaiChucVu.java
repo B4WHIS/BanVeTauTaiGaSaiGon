@@ -131,9 +131,9 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         modelCV = new DefaultTableModel(colHeader, 0);
         tblLoaiCV = new JTable(modelCV);
 
-        // ✅ LOAD DATA VÀ HIỂN THỊ MÃ TIẾP THEO
+        //LOAD DATA VÀ HIỂN THỊ MÃ TIẾP THEO
         control.loadData(modelCV);
-        hienThiMaTiepTheo();  // ✅ TỰ ĐỘNG HIỂN THỊ MÃ (+1)
+        hienThiMaTiepTheo();  
 
         tblLoaiCV.addMouseListener(new MouseAdapter() {
             @Override
@@ -170,7 +170,7 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         add(pnlMain);
     }
 
-    // ✅ METHOD TỰ ĐỘNG HIỂN THỊ MÃ TIẾP THEO
+    // METHOD TỰ ĐỘNG HIỂN THỊ MÃ TIẾP THEO
     private void hienThiMaTiepTheo() {
         int maTiepTheo = control.layMaLoaiCVTiepTheo();
         txtMaLoaiCV.setText(String.valueOf(maTiepTheo));
@@ -247,19 +247,19 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         Object src = e.getSource();
 
         if (src == btnThem) {
-            // ✅ CHỈ KIỂM TRA TÊN (MÃ TỰ ĐỘNG)
+            //  CHỈ KIỂM TRA TÊN (MÃ TỰ ĐỘNG)
             String ten = txtTenLoaiCV.getText().trim();
             if (ten.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập Tên loại chức vụ!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // ✅ CHỈ TRUYỀN TÊN - CONTROL TỰ TẠO MÃ
+            
             if (control.themLoaiChucVu(ten)) {
                 JOptionPane.showMessageDialog(this, "Thêm thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                 resetForm();
             }
-            // ✅ KHÔNG CẦN TRY-CATCH NỮA
+   
 
         } else if (src == btnSua) {
             int r = tblLoaiCV.getSelectedRow();
@@ -308,13 +308,13 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         }
     }
     
-    // ✅ RESET FORM CẢI TIẾN
+   
     private void resetForm() {
         txtMaLoaiCV.setText("");
         txtTenLoaiCV.setText("");
         tblLoaiCV.clearSelection();
         control.loadData(modelCV);
-        hienThiMaTiepTheo();  // ✅ TỰ ĐỘNG HIỂN THỊ MÃ MỚI
+        hienThiMaTiepTheo();  
     }
 
     public static void main(String[] args) {

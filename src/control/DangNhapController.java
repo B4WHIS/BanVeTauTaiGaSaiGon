@@ -59,7 +59,7 @@ public class DangNhapController implements ActionListener, MouseListener {
         ResultSet rs = null;
         try {
             conn = connectDB.getConnection();
-            // **SỬA QUERY: LẤY THÊM TÊN NHÂN VIÊN**
+           
             String sql = "SELECT lc.tenLoai, nv.hoTen " +
                          "FROM TaiKhoan tk " +
                          "JOIN NhanVien nv ON tk.maNhanVien = nv.maNhanVien " +
@@ -75,16 +75,15 @@ public class DangNhapController implements ActionListener, MouseListener {
             if (rs.next()) {
                 String loaiChucVu = rs.getString("tenLoai");
                 String hoTen = rs.getString("hoTen");
-                
-                // **TẠO OBJECT NHÂN VIÊN**
+              
                 NhanVien nhanVien = new NhanVien();
                 nhanVien.setHoTen(hoTen);
                 nhanVien.setIDloaiChucVu(getIDFromChucVu(loaiChucVu));
                 
-                // Đóng form đăng nhập
+               
                 view.dispose();
                 
-                // **PHÂN QUYỀN VÀ TRUYỀN NHÂN VIÊN**
+                
                 if ("Nhân viên bán vé".equals(loaiChucVu)) {
                     try {
                         new NhanVienBanVeGUI(nhanVien).setVisible(true);
@@ -113,7 +112,7 @@ public class DangNhapController implements ActionListener, MouseListener {
         }
     }
     
-    // **METHOD GIÚP ĐỔI CHỨC VỤ THÀNH ID**
+  
     private int getIDFromChucVu(String chucVu) {
         switch (chucVu) {
             case "Nhân viên bán vé": return 1;
@@ -139,7 +138,7 @@ public class DangNhapController implements ActionListener, MouseListener {
         }
     }
 
-    // MouseListener methods
+  
     @Override public void mouseClicked(MouseEvent e) {} 
     @Override public void mousePressed(MouseEvent e) {} 
     @Override public void mouseReleased(MouseEvent e) {} 

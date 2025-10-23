@@ -33,7 +33,7 @@ import entity.NhanVien;
 
 public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     
-    // **THÊM BIẾN NHÂN VIÊN**
+  
     protected NhanVien nhanVien;
     
     protected JLabel lblGioThuc;
@@ -54,13 +54,13 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     protected JLabel lblGio;
     protected JLabel lblNgayHienTai;
     
-    // **CONSTRUCTOR MỚI: NHẬN NHÂN VIÊN**
+
     public GiaoDienChinh(NhanVien nhanVien) {
         this.nhanVien = nhanVien;
         initUI();
     }
     
-    // **CONSTRUCTOR CŨ (KEEP CHO COMPATIBILITY)**
+   
     public GiaoDienChinh() {
         this(null);
     }
@@ -77,21 +77,19 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
         pnlChinh.add(pnlNorth, BorderLayout.NORTH);
         add(pnlChinh);
         
-        // **CẬP NHẬT THÔNG TIN NHÂN VIÊN**
+      
         if (nhanVien != null) {
             capNhatThongTinNhanVien();
         }
     }
     
-    /** 
-     * **METHOD CHÍNH: CẬP NHẬT TÊN + CHỨC VỤ**
-     */
+    
     protected void capNhatThongTinNhanVien() {
-        // **1. CẬP NHẬT lblTenND**
+        
         String chucVu = getTenChucVu(nhanVien.getIDloaiChucVu());
         lblTenND.setText(chucVu + " - " + nhanVien.getHoTen());
         
-        // **2. CẬP NHẬT lblXinChao TRONG MENU**
+        
         for (int i = 0; i < menuBar.getComponentCount(); i++) {
             if (menuBar.getComponent(i) instanceof JLabel) {
                 JLabel lbl = (JLabel) menuBar.getComponent(i);
@@ -278,8 +276,8 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
 	    URL iconUrl = GiaoDienChinh.class.getResource(duongDan);
 	    if (iconUrl == null) {
-	        System.err.println("Không tìm thấy icon tại đường dẫn: " + duongDan);  // Log để debug
-	        return null;  // Trả về null thay vì crash, caller có thể handle
+	        System.err.println("Không tìm thấy icon tại đường dẫn: " + duongDan); 
+	        return null; 
 	    }
 	    ImageIcon iicGoc = new ImageIcon(iconUrl);
 	    Image anhGoc = iicGoc.getImage();
@@ -345,18 +343,18 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 	}
 	protected void addHoverEffect(JButton btn, Color mainColor) {
 	    btn.setFocusPainted(false); 
-	    // Thiết lập viền mặc định mỏng, không màu
+	    
 	    btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1)); 
 	    btn.addMouseListener(new MouseAdapter() {
 	        @Override
 	        public void mouseEntered(MouseEvent e) {
-	            btn.setBackground(new Color(240, 240, 240)); // Nền xám nhạt khi hover
-	            // Dùng màu chủ đạo làm viền đậm khi hover
+	            btn.setBackground(new Color(240, 240, 240)); 
+	           
 	            btn.setBorder(BorderFactory.createLineBorder(mainColor, 3));
 	        }
 	        @Override
 	        public void mouseExited(MouseEvent e) {
-	            btn.setBackground(Color.white); // Trở lại nền trắng [10]
+	            btn.setBackground(Color.white);
 	            btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 	        }
 	    });
