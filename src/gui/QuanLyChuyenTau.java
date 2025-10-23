@@ -1,24 +1,44 @@
 package gui;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+
+import com.toedter.calendar.JDateChooser;  // THÊM: Import JDateChooser từ thư viện toedter (cần add JAR: jcalendar-1.4.jar)
 
 import control.QuanLyChuyenTauController;
 import dao.ChuyenTauDAO;
 import dao.LichTrinhDAO;
 import dao.TauDAO;
 import entity.ChuyenTau;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import com.toedter.calendar.JDateChooser;  // THÊM: Import JDateChooser từ thư viện toedter (cần add JAR: jcalendar-1.4.jar)
 
 public class QuanLyChuyenTau extends GiaoDienChinh {
     // Components
@@ -239,7 +259,20 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         });
         autoUpdateTimer.start();  // Bắt đầu timer
     }
-
+    public JButton taoButton(String text, Color bg, String iconPath) {
+        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+        });
+        return btn;
+    }
     // Load combo boxes từ DB - Hiển thị tên
     private void loadCombosFromDB() {
         // Load cbTenTau với tên tàu

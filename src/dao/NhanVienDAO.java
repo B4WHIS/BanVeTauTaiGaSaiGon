@@ -1,13 +1,18 @@
 package dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import entity.NhanVien;
 import connectDB.connectDB;
+import entity.NhanVien;
 
 public class NhanVienDAO {
+	private NhanVienDAO nhanVienDAO = new NhanVienDAO();
 
     // Phương thức lấy tất cả tên nhân viên (cho ComboBox) - Chỉ hoTen
     public List<String> getAllTenNhanVien() {
@@ -41,6 +46,43 @@ public class NhanVienDAO {
         }
         return null;
     }
+    public List<Object[]> getDanhSachLoaiChucVu() {
+        // Danh sách chứa kết quả trả về
+        List<Object[]> dsLoaiChucVu = new ArrayList<>();
+        
+        // Comment: Truy vấn lấy tất cả Loại Chức Vụ đang được gán cho Nhân Viên
+        String sql = """
+            SELECT DISTINCT lcv.IDloaiCV, lcv.tenLoai
+            FROM NhanVien nv
+            JOIN LoaiChucVu lcv ON nv.IDloaiChucVu = lcv.IDloaiCV 
+        """;
+        
+        // Sử dụng try-with-resources để tự động đóng Connection và Statement
+        try (Connection ketNoi = connectDB.getConnection();
+             Statement lenhSQL = ketNoi.createStatement();
+             ResultSet ketQua = lenhSQL.executeQuery(sql)) {
+
+            // Lặp qua các dòng kết quả
+            while (ketQua.next()) {
+                dsLoaiChucVu.add(new Object[] {
+                    // Sửa tên cột để khớp với schema thực tế (IDloaiCV, tenLoai) [5]
+                    ketQua.getInt("IDloaiCV"),
+                    ketQua.getString("tenLoai")
+                });
+            }
+        
+        // Xử lý lỗi SQL nếu có
+        } catch (SQLException e) {
+            // Comment: Bắt lỗi khi truy vấn CSDL
+            System.err.println("Lỗi truy vấn danh sách Loại Chức Vụ: " + e.getMessage());
+            e.printStackTrace(); 
+        }
+        
+        // Trả về danh sách kết quả (có thể là danh sách rỗng nếu xảy ra lỗi)
+        return dsLoaiChucVu;
+    }
+
+    
 
     // Phương thức lấy tên nhân viên theo mã
     public String getTenNhanVienByMa(String maNhanVien) {
@@ -58,6 +100,8 @@ public class NhanVienDAO {
         }
         return null;
     }
+
+   
 
     // Phương thức lấy nhân viên theo mã
     public NhanVien getNhanVienByMa(String maNhanVien) {

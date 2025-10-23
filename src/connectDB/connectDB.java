@@ -28,21 +28,21 @@ public class connectDB {
        
     }
 
-    // Phương thức đóng kết nối
-//    public static void closeConnection() {
+//    // Phương thức đóng kết nối
+//   public static void closeConnection() {
 //        if (connection != null) {
 //            try {
 //                connection.close();
 //                connection = null;
 //                System.out.println("Đã đóng kết nối CSDL.");
 //            } catch (SQLException e) {
-//                System.err.println("Lỗi khi đóng kết nối: " + e.getMessage());
+//               System.err.println("Lỗi khi đóng kết nối: " + e.getMessage());
 //            }
 //        }
 //    }
-
-    // Test nhanh kết nối
-//    public static void main(String[] args) {
+//
+//    // Test nhanh kết nối
+//   public static void main(String[] args) {
 //        getConnection();
 //        closeConnection();
 //    }
