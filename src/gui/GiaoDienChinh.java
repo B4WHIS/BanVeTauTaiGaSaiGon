@@ -29,89 +29,133 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import entity.NhanVien;
+
 public abstract class GiaoDienChinh extends JFrame implements ActionListener{
-	
-	protected JLabel lblGioThuc;
-	protected JMenuBar menuBar;
-	protected JButton btnDatVe;
-	protected JButton btnHuyVe;
-	protected JButton btnTimChuyenTau;
-	protected JButton btnDangXuat;
-	protected JButton btnDoiVe;
-	protected JPanel pnlChinh;
-	protected JPanel pnlChucNang;
-	protected JLabel lblNguoiDung;
-	protected JPanel pnlNorth;
-	protected JLabel lblTenND;
-	protected JPanel pnlThongTin;
-	protected JPanel pnlDate;
-	protected JLabel lblNgay;
-	protected JLabel lblGio;
-	protected JLabel lblNgayHienTai;
-	
-	public GiaoDienChinh() {
-		setTitle("Ứng dụng bán vé tàu");
-		setExtendedState(JFrame.MAXIMIZED_BOTH);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
-		
-		setJMenuBar(taoMenuBar());
-		pnlChinh = new JPanel(new BorderLayout());
-		  
-		pnlThongTin = taoPanelThongTin();
-
-		pnlChinh.add(pnlNorth,BorderLayout.NORTH);
-//		pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
-		
-		add(pnlChinh);
-	}
-	
-	protected JPanel taoPanelThongTin() {
-
-		pnlNorth = new JPanel(new GridLayout(2,1,10,10));
-		pnlNorth.setBackground(new Color(225, 242, 232));
-		pnlNorth.setPreferredSize(new Dimension(0, 100));
-		pnlNorth.setBorder(BorderFactory.createEtchedBorder());
-		
-		pnlThongTin = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		pnlThongTin.setBackground(new Color(225, 242, 232));
-		lblNguoiDung = new JLabel("Người dùng: ");
-		lblNguoiDung.setFont(new Font("Segoe UI", Font.BOLD, 25));
-		lblTenND = new JLabel("[CHỨC VỤ] - [TÊN NHÂN VIÊN]");
-		lblTenND.setFont(new Font("Segoe UI", Font.PLAIN, 25));
-		pnlThongTin.add(lblNguoiDung);
-		pnlThongTin.add(lblTenND);
-		
-		pnlDate = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		pnlDate.setBackground(new Color(225, 242, 232));
-		
-		String ngay = ngayHienTai();
-		
-		lblNgay = new JLabel("Ngày: ");
-		lblNgayHienTai = new JLabel(ngay);
-		lblNgay.setFont(new Font("Segoe UI", Font.BOLD, 25));
-		lblNgayHienTai.setFont(new Font("Segoe UI", Font.BOLD, 25));
-		lblNgayHienTai.setForeground(new Color(229, 115, 115));
-		
-		lblGio = new JLabel(" Giờ hệ thống: ");
-		lblGio.setFont(new Font("Segoe UI", Font.BOLD, 25));
-		
-		lblGioThuc = new JLabel();
-		lblGioThuc.setFont(new Font("Segoe UI", Font.BOLD, 25));
-		lblGioThuc.setForeground(new Color(229, 115, 115));
-		
-		pnlDate.add(lblNgay);
-		pnlDate.add(lblNgayHienTai);
-		pnlDate.add(lblGio);
-		pnlDate.add(lblGioThuc);
-		thoiGianThuc();
-		
-		pnlNorth.add(pnlThongTin);
-		pnlNorth.add(pnlDate);
-		return pnlNorth;
-	}
-	
-	public JMenuBar taoMenuBar() {
+    
+    // **THÊM BIẾN NHÂN VIÊN**
+    protected NhanVien nhanVien;
+    
+    protected JLabel lblGioThuc;
+    protected JMenuBar menuBar;
+    protected JButton btnDatVe;
+    protected JButton btnHuyVe;
+    protected JButton btnTimChuyenTau;
+    protected JButton btnDangXuat;
+    protected JButton btnDoiVe;
+    protected JPanel pnlChinh;
+    protected JPanel pnlChucNang;
+    protected JLabel lblNguoiDung;
+    protected JPanel pnlNorth;
+    protected JLabel lblTenND;
+    protected JPanel pnlThongTin;
+    protected JPanel pnlDate;
+    protected JLabel lblNgay;
+    protected JLabel lblGio;
+    protected JLabel lblNgayHienTai;
+    
+    // **CONSTRUCTOR MỚI: NHẬN NHÂN VIÊN**
+    public GiaoDienChinh(NhanVien nhanVien) {
+        this.nhanVien = nhanVien;
+        initUI();
+    }
+    
+    // **CONSTRUCTOR CŨ (KEEP CHO COMPATIBILITY)**
+    public GiaoDienChinh() {
+        this(null);
+    }
+    
+    private void initUI() {
+        setTitle("Ứng dụng bán vé tàu");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        setJMenuBar(taoMenuBar());
+        pnlChinh = new JPanel(new BorderLayout());
+        pnlThongTin = taoPanelThongTin();
+        pnlChinh.add(pnlNorth, BorderLayout.NORTH);
+        add(pnlChinh);
+        
+        // **CẬP NHẬT THÔNG TIN NHÂN VIÊN**
+        if (nhanVien != null) {
+            capNhatThongTinNhanVien();
+        }
+    }
+    
+    /** 
+     * **METHOD CHÍNH: CẬP NHẬT TÊN + CHỨC VỤ**
+     */
+    protected void capNhatThongTinNhanVien() {
+        // **1. CẬP NHẬT lblTenND**
+        String chucVu = getTenChucVu(nhanVien.getIDloaiChucVu());
+        lblTenND.setText(chucVu + " - " + nhanVien.getHoTen());
+        
+        // **2. CẬP NHẬT lblXinChao TRONG MENU**
+        for (int i = 0; i < menuBar.getComponentCount(); i++) {
+            if (menuBar.getComponent(i) instanceof JLabel) {
+                JLabel lbl = (JLabel) menuBar.getComponent(i);
+                if (lbl.getText().contains("Xin Chào")) {
+                    lbl.setText("Xin Chào, " + nhanVien.getHoTen());
+                    break;
+                }
+            }
+        }
+    }
+    
+    // **METHOD ĐỔI ID → TÊN CHỨC VỤ**
+    private String getTenChucVu(int id) {
+        switch (id) {
+            case 1: return "Nhân viên bán vé";
+            case 2: return "Nhân viên quản lý";
+            default: return "Không xác định";
+        }
+    }
+    
+    protected JPanel taoPanelThongTin() {
+        pnlNorth = new JPanel(new GridLayout(2,1,10,10));
+        pnlNorth.setBackground(new Color(225, 242, 232));
+        pnlNorth.setPreferredSize(new Dimension(0, 100));
+        pnlNorth.setBorder(BorderFactory.createEtchedBorder());
+        
+        pnlThongTin = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pnlThongTin.setBackground(new Color(225, 242, 232));
+        lblNguoiDung = new JLabel("Người dùng: ");
+        lblNguoiDung.setFont(new Font("Segoe UI", Font.BOLD, 25));
+        lblTenND = new JLabel("[CHỨC VỤ] - [TÊN NHÂN VIÊN]");
+        lblTenND.setFont(new Font("Segoe UI", Font.PLAIN, 25));
+        pnlThongTin.add(lblNguoiDung);
+        pnlThongTin.add(lblTenND);
+        
+        pnlDate = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pnlDate.setBackground(new Color(225, 242, 232));
+        
+        String ngay = ngayHienTai();
+        lblNgay = new JLabel("Ngày: ");
+        lblNgayHienTai = new JLabel(ngay);
+        lblNgay.setFont(new Font("Segoe UI", Font.BOLD, 25));
+        lblNgayHienTai.setFont(new Font("Segoe UI", Font.BOLD, 25));
+        lblNgayHienTai.setForeground(new Color(229, 115, 115));
+        
+        lblGio = new JLabel(" Giờ hệ thống: ");
+        lblGio.setFont(new Font("Segoe UI", Font.BOLD, 25));
+        
+        lblGioThuc = new JLabel();
+        lblGioThuc.setFont(new Font("Segoe UI", Font.BOLD, 25));
+        lblGioThuc.setForeground(new Color(229, 115, 115));
+        
+        pnlDate.add(lblNgay);
+        pnlDate.add(lblNgayHienTai);
+        pnlDate.add(lblGio);
+        pnlDate.add(lblGioThuc);
+        thoiGianThuc();
+        
+        pnlNorth.add(pnlThongTin);
+        pnlNorth.add(pnlDate);
+        return pnlNorth;
+    }
+    
+    public JMenuBar taoMenuBar() {
 		menuBar = new JMenuBar();
 		menuBar.setBorder(BorderFactory.createEmptyBorder(8,0,8,0));
 		menuBar.setBackground(new Color(220, 220, 220));
@@ -231,7 +275,7 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		return menuBar;
 		
 	}
-	public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
+    public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
 	    URL iconUrl = GiaoDienChinh.class.getResource(duongDan);
 	    if (iconUrl == null) {
 	        System.err.println("Không tìm thấy icon tại đường dẫn: " + duongDan);  // Log để debug
@@ -243,8 +287,8 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 	    ImageIcon iicMoi = new ImageIcon(anhDaDoi);
 	    return iicMoi;
 	}
-
-	public String ngayHienTai() {
+    
+    public String ngayHienTai() {
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter dinhDangNgay = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String today = now.format(dinhDangNgay);	
@@ -317,5 +361,4 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 	        }
 	    });
 	}
-	
-}
+	}

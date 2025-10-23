@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -10,16 +11,26 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import entity.NhanVien;
+
 public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
 
-    public NhanVienQuanLyGUI() {
-        super();
+    private JButton btnDatVe;
+    private JButton btnHuyVe;
+    private JButton btnDoiVe;
+    private JButton btnTimChuyenTau;
+    private JButton btnDangXuat;
+
+    // **CONSTRUCTOR MỚI: NHẬN NHÂN VIÊN**
+    public NhanVienQuanLyGUI(NhanVien nhanVien) {
+        super(nhanVien); // TRUYỀN NHÂN VIÊN CHO GIAO DIỂN CHÍNH
         pnlChucNang = taoPanelMenuChinh();
-        pnlChinh.add(pnlChucNang);
+        pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
 
         // Gắn sự kiện cho các nút
         btnDatVe.addActionListener(this);
@@ -27,6 +38,11 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         btnDoiVe.addActionListener(this);
         btnTimChuyenTau.addActionListener(this);
         btnDangXuat.addActionListener(this);
+    }
+
+    // **CONSTRUCTOR CŨ (KEEP COMPATIBILITY)**
+    public NhanVienQuanLyGUI() {
+        this(null);
     }
 
     public JPanel taoPanelMenuChinh() {
@@ -74,6 +90,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         btnDangXuat.setIcon(chinhKichThuoc("/img/export.png", 55, 55));
         themHieuUngHover(btnDangXuat, Color.orange);
 
+        // **THÊM NÚT VÀO PANEL**
         pnlChucNang.add(btnDatVe);
         pnlChucNang.add(btnHuyVe);
         pnlChucNang.add(btnDoiVe);
@@ -85,20 +102,21 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
     }
 
     /** 
-     * Thêm hiệu ứng hover đổi nền nhẹ 
+     * **SỬA: THỰC HIỆN HOVER EFFECT**
      */
     private void themHieuUngHover(JButton btn, Color color) {
         btn.setFocusPainted(false);
-        btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(color.brighter());
+                btn.setBorder(BorderFactory.createLineBorder(color, 3));
             }
-
             @Override
             public void mouseExited(MouseEvent e) {
                 btn.setBackground(Color.white);
+                btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
             }
         });
     }
@@ -130,14 +148,12 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
                 "Xác nhận đăng xuất",
                 JOptionPane.YES_NO_OPTION
             );
-
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-					new DangNhapGUI().setVisible(true);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+                    new DangNhapGUI().setVisible(true);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 this.dispose();
             }
         }
