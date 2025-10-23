@@ -372,4 +372,59 @@ public class ChuyenTauDAO {
         }
         return false;
     }
+
+    // Method tự động cập nhật trạng thái dựa trên thời gian thực (gọi định kỳ)
+    public void updateTrangThaiTuThoiGian() {
+        LocalDateTime now = LocalDateTime.now();
+        String sql = "UPDATE ChuyenTau SET trangThai = CASE " +
+                     "WHEN thoiGianKhoiHanh > ? THEN 'Chưa khởi hành' " +
+                     "WHEN thoiGianKhoiHanh <= ? AND thoiGianDen > ? THEN 'Đang khởi hành' " +
+                     "WHEN thoiGianDen <= ? THEN 'Đã hoàn thành' " +
+                     "ELSE trangThai END " +  // Giữ nguyên nếu "Đã hủy" hoặc khác
+                     "WHERE trangThai != 'Đã hủy'";  // Không update nếu đã hủy thủ công
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(now));
+            pstmt.setTimestamp(2, Timestamp.valueOf(now));
+            pstmt.setTimestamp(3, Timestamp.valueOf(now));
+            pstmt.setTimestamp(4, Timestamp.valueOf(now));
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("DAO auto-update trạng thái: Cập nhật " + rowsAffected + " chuyến.");
+        } catch (SQLException e) {
+            System.out.println("Lỗi auto-update trạng thái: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Method update trạng thái cho 1 chuyến cụ thể (nếu cần)
+    public boolean updateTrangThaiMotChuyen(String maChuyenTau) {
+        ChuyenTau ct = getChuyenTauByMaChuyenTau(maChuyenTau);
+        if (ct == null) return false;
+        
+        LocalDateTime now = LocalDateTime.now();
+        String trangThaiMoi;
+        if (now.isBefore(ct.getThoiGianKhoiHanh())) {
+            trangThaiMoi = "Chưa khởi hành";
+        } else if (now.isBefore(ct.getThoiGianDen())) {
+            trangThaiMoi = "Đang khởi hành";
+        } else {
+            trangThaiMoi = "Đã hoàn thành";
+        }
+        
+        if (trangThaiMoi.equals(ct.getTrangThai())) return true;  // Không thay đổi
+        
+        String sql = "UPDATE ChuyenTau SET trangThai = ? WHERE maChuyenTau = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, trangThaiMoi);
+            pstmt.setString(2, maChuyenTau);
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("DAO update trạng thái chuyến " + maChuyenTau + ": " + trangThaiMoi + " (affected: " + rowsAffected + ")");
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi update trạng thái chuyến: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

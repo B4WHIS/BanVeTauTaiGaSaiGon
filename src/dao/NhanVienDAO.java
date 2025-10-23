@@ -1,116 +1,92 @@
 package dao;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import connectDB.connectDB;
 import entity.NhanVien;
+import connectDB.connectDB;
 
 public class NhanVienDAO {
 
-    // Lấy toàn bộ danh sách nhân viên
-    public List<NhanVien> getAllNhanVien() {
-        List<NhanVien> dsNV = new ArrayList<>();
-        String sql = "SELECT * FROM NhanVien";
-        try (Connection con = connectDB.getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
+    // Phương thức lấy tất cả tên nhân viên (cho ComboBox) - Chỉ hoTen
+    public List<String> getAllTenNhanVien() {
+        List<String> listTenNV = new ArrayList<>();
+        String sql = "SELECT hoTen FROM NhanVien ORDER BY hoTen";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                NhanVien nv = new NhanVien(
-                    rs.getString("maNhanVien"),
-                    rs.getString("hoTen"),
-                    rs.getDate("ngaySinh").toLocalDate(),
-                    rs.getString("soDienThoai"),
-                    rs.getString("cmndCccd"),
-                    rs.getInt("IDloaiChucVu")
-                );
-                dsNV.add(nv);
+                listTenNV.add(rs.getString("hoTen"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return dsNV;
+        return listTenNV;
     }
 
-    // Thêm nhân viên mới
-    public boolean insertNhanVien(NhanVien nv) {
-        String sql = "INSERT INTO NhanVien (maNhanVien, hoTen, ngaySinh, soDienThoai, cmndCccd, IDloaiChucVu) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, nv.getMaNhanVien());
-            stmt.setString(2, nv.getHoTen());
-            stmt.setDate(3, Date.valueOf(nv.getNgaySinh()));
-            stmt.setString(4, nv.getSoDienThoai());
-            stmt.setString(5, nv.getCmndCccd());
-            stmt.setInt(6, nv.getIDloaiChucVu());
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("❌ Lỗi thêm nhân viên: " + e.getMessage());
-        }
-        return false;
-    }
-
-    // Cập nhật thông tin nhân viên
-    public boolean updateNhanVien(NhanVien nv) {
-        String sql = "UPDATE NhanVien SET hoTen=?, ngaySinh=?, soDienThoai=?, cmndCccd=?, IDloaiChucVu=? WHERE maNhanVien=?";
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, nv.getHoTen());
-            stmt.setDate(2, Date.valueOf(nv.getNgaySinh()));
-            stmt.setString(3, nv.getSoDienThoai());
-            stmt.setString(4, nv.getCmndCccd());
-            stmt.setInt(5, nv.getIDloaiChucVu());
-            stmt.setString(6, nv.getMaNhanVien());
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Lỗi cập nhật nhân viên: " + e.getMessage());
-        }
-        return false;
-    }
-
-    // Xóa nhân viên theo mã
-    public boolean deleteNhanVien(String maNV) {
-        String sql = "DELETE FROM NhanVien WHERE maNhanVien=?";
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, maNV);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println(" Lỗi xóa nhân viên: " + e.getMessage());
-        }
-        return false;
-    }
-
-    // Tìm nhân viên theo CMND/CCCD
-    public NhanVien findByCMND(String cmndCccd) {
-        String sql = "SELECT * FROM NhanVien WHERE cmndCccd = ?";
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, cmndCccd);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                return new NhanVien(
-                    rs.getString("maNhanVien"),
-                    rs.getString("hoTen"),
-                    rs.getDate("ngaySinh").toLocalDate(),
-                    rs.getString("soDienThoai"),
-                    rs.getString("cmndCccd"),
-                    rs.getInt("IDloaiChucVu")
-                );
+    // Phương thức lấy nhân viên theo tên (hoTen)
+    public NhanVien getNhanVienByTen(String hoTen) {
+        String sql = "SELECT * FROM NhanVien WHERE hoTen = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, hoTen);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return taoNhanVienTuResultSet(rs);
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi tìm nhân viên theo CMND/CCCD: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
+    }
+
+    // Phương thức lấy tên nhân viên theo mã
+    public String getTenNhanVienByMa(String maNhanVien) {
+        String sql = "SELECT hoTen FROM NhanVien WHERE maNhanVien = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maNhanVien);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("hoTen");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Phương thức lấy nhân viên theo mã
+    public NhanVien getNhanVienByMa(String maNhanVien) {
+        String sql = "SELECT * FROM NhanVien WHERE maNhanVien = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maNhanVien);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return taoNhanVienTuResultSet(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Helper: Tạo NhanVien từ ResultSet - Cập nhật để load IDloaiChucVu
+    private NhanVien taoNhanVienTuResultSet(ResultSet rs) throws SQLException {
+        NhanVien nv = new NhanVien();
+        nv.setMaNhanVien(rs.getString("maNhanVien"));
+        nv.setHoTen(rs.getString("hoTen"));
+        nv.setNgaySinh(rs.getDate("ngaySinh").toLocalDate());
+        nv.setSoDienThoai(rs.getString("soDienThoai"));
+        if (rs.getString("cmndCccd") != null) {
+            nv.setCmndCccd(rs.getString("cmndCccd"));
+        }
+        nv.setIDloaiChucVu(rs.getInt("IDloaiChucVu"));  // Load IDloaiChucVu
+        return nv;
     }
 }

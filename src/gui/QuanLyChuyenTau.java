@@ -15,27 +15,37 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import com.toedter.calendar.JDateChooser;  // THÊM: Import JDateChooser từ thư viện toedter (cần add JAR: jcalendar-1.4.jar)
 
-public class DanhSachChuyenTau extends GiaoDienChinh {
+public class QuanLyChuyenTau extends GiaoDienChinh {
     // Components
     private JTable tblChuyenTau;
     private DefaultTableModel modelCT;
-    private JTextField txtMaChuyenTau, txtThoiGianKhoiHanh, txtThoiGianDen, txtGiaChuyen;
+    private JTextField txtMaChuyenTau, txtGiaChuyen;
     private JComboBox<String> cbTenTau, cbTenLichTrinh, cbTrangThai;  // Đổi tên để rõ ràng: hiển thị tên
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
     private JButton btnLuu;  // Nút Lưu (cho add/update)
+    
+    // SỬA: Thay JTextField thời gian bằng JDateChooser (date + time qua format)
+    private JDateChooser dcThoiGianKhoiHanh, dcThoiGianDen;
 
     // Date formatter for display
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");  // THÊM: Để format Date từ JDateChooser
 
     // Controller
     private QuanLyChuyenTauController controller;
     private ChuyenTauDAO dao;  // DAO để load data
     private LichTrinhDAO lichTrinhDAO;
     private TauDAO tauDAO;
+    
+    // THÊM: Timer để tự động update trạng thái mỗi 1 phút (60000 ms)
+    private Timer autoUpdateTimer;
 
-    public DanhSachChuyenTau() {
+    public QuanLyChuyenTau() {
         super();  // Gọi constructor cha
         dao = new ChuyenTauDAO();
         lichTrinhDAO= new LichTrinhDAO();
@@ -99,15 +109,26 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
         txtMaChuyenTau.setEditable(false);
         cbTenTau = new JComboBox<>();  // Hiển thị tên tàu
         cbTenLichTrinh = new JComboBox<>();  // Hiển thị tên lịch trình
-        txtThoiGianKhoiHanh = new JTextField("yyyy-MM-dd HH:mm");
-        txtThoiGianDen = new JTextField("yyyy-MM-dd HH:mm");
+        
+        // SỬA: Khởi tạo JDateChooser với format datetime (date + time spinner)
+        dcThoiGianKhoiHanh = new JDateChooser();
+        dcThoiGianKhoiHanh.setDateFormatString("yyyy-MM-dd HH:mm");
+        dcThoiGianKhoiHanh.setFont(txtFont);
+        dcThoiGianKhoiHanh.setPreferredSize(new Dimension(200, 30));
+        
+        dcThoiGianDen = new JDateChooser();
+        dcThoiGianDen.setDateFormatString("yyyy-MM-dd HH:mm");
+        dcThoiGianDen.setFont(txtFont);
+        dcThoiGianDen.setPreferredSize(new Dimension(200, 30));
+        
         txtGiaChuyen = new JTextField();
         cbTrangThai = new JComboBox<>(new String[]{
                 "Chưa khởi hành", "Đang khởi hành", "Đã hoàn thành", "Đã hủy"
         });
         cbTrangThai.setSelectedIndex(0);  // Mặc định "Chưa khởi hành"
         
-        Component[] inputFields = {txtMaChuyenTau, cbTenTau, cbTenLichTrinh, txtThoiGianKhoiHanh, txtThoiGianDen, txtGiaChuyen, cbTrangThai};
+        // SỬA: Cập nhật inputFields để bao gồm JDateChooser
+        Component[] inputFields = {txtMaChuyenTau, cbTenTau, cbTenLichTrinh, dcThoiGianKhoiHanh, dcThoiGianDen, txtGiaChuyen, cbTrangThai};
         for (Component comp : inputFields) {
             if (comp instanceof JTextField) {
                 JTextField txt = (JTextField) comp;
@@ -116,13 +137,12 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
                         BorderFactory.createLineBorder(new Color(150, 150, 150)),
                         BorderFactory.createEmptyBorder(5, 8, 5, 8)
                 ));
-                if (txt == txtThoiGianKhoiHanh || txt == txtThoiGianDen) {
-                    txt.setEditable(true);  // Cho phép nhập thời gian
-                }
             } else if (comp instanceof JComboBox) {
                 JComboBox<?> cb = (JComboBox<?>) comp;
                 cb.setFont(txtFont);
                 cb.setPreferredSize(new Dimension(200, 30));
+            } else if (comp instanceof JDateChooser) {
+                // JDateChooser đã set font và size ở trên
             }
         }
 
@@ -210,6 +230,14 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
         // Load combos và data từ DB
         loadCombosFromDB();
         loadDataFromDB();
+        
+        // THÊM: Khởi tạo Timer tự động update trạng thái
+        autoUpdateTimer = new Timer(60000, e -> {
+            dao.updateTrangThaiTuThoiGian();  // Update DB
+            loadDataFromDB();  // Refresh table
+            System.out.println("Auto-update trạng thái lúc: " + LocalDateTime.now());
+        });
+        autoUpdateTimer.start();  // Bắt đầu timer
     }
 
     // Load combo boxes từ DB - Hiển thị tên
@@ -286,8 +314,20 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
     public JTextField getTxtMaChuyenTau() { return txtMaChuyenTau; }
     public JComboBox<String> getCbTenTau() { return cbTenTau; }
     public JComboBox<String> getCbTenLichTrinh() { return cbTenLichTrinh; }
-    public JTextField getTxtThoiGianKhoiHanh() { return txtThoiGianKhoiHanh; }
-    public JTextField getTxtThoiGianDen() { return txtThoiGianDen; }
+    
+    // SỬA: Getter cho JDateChooser - Trả về string formatted cho controller
+    public String getTxtThoiGianKhoiHanh() {
+        Date date = dcThoiGianKhoiHanh.getDate();
+        if (date == null) return "yyyy-MM-dd HH:mm";
+        return dateFormat.format(date);
+    }
+    
+    public String getTxtThoiGianDen() {
+        Date date = dcThoiGianDen.getDate();
+        if (date == null) return "yyyy-MM-dd HH:mm";
+        return dateFormat.format(date);
+    }
+    
     public JTextField getTxtGiaChuyen() { return txtGiaChuyen; }
     public JComboBox<String> getCbTrangThai() { return cbTrangThai; }
 
@@ -300,8 +340,17 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
             if (tenTau != null) cbTenTau.setSelectedItem(tenTau);
             String tenLichTrinh = lichTrinhDAO.getTenLichTrinhByMaLichTrinh(ct.getMaLichTrinh());
             if (tenLichTrinh != null) cbTenLichTrinh.setSelectedItem(tenLichTrinh);
-            txtThoiGianKhoiHanh.setText(ct.getThoiGianKhoiHanh().format(dateTimeFormatter));
-            txtThoiGianDen.setText(ct.getThoiGianDen().format(dateTimeFormatter));
+            
+            // SỬA: Set date cho JDateChooser từ LocalDateTime
+            try {
+                Date khDate = Date.from(ct.getThoiGianKhoiHanh().atZone(java.time.ZoneId.systemDefault()).toInstant());
+                dcThoiGianKhoiHanh.setDate(khDate);
+                Date denDate = Date.from(ct.getThoiGianDen().atZone(java.time.ZoneId.systemDefault()).toInstant());
+                dcThoiGianDen.setDate(denDate);
+            } catch (Exception ex) {
+                System.out.println("Lỗi set date cho JDateChooser: " + ex.getMessage());
+            }
+            
             txtGiaChuyen.setText(ct.getGiaChuyen().toString());
             cbTrangThai.setSelectedItem(ct.getTrangThai());
             // KHÔNG enable btnLuu hay fields ở đây
@@ -319,8 +368,8 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
         txtMaChuyenTau.setText("");
         cbTenTau.setSelectedIndex(0);
         cbTenLichTrinh.setSelectedIndex(0);
-        txtThoiGianKhoiHanh.setText("yyyy-MM-dd HH:mm");  // SỬA: Set placeholder rõ ràng
-        txtThoiGianDen.setText("yyyy-MM-dd HH:mm");
+        dcThoiGianKhoiHanh.setDate(null);  // SỬA: Clear JDateChooser
+        dcThoiGianDen.setDate(null);
         txtGiaChuyen.setText("");
         cbTrangThai.setSelectedIndex(0);
         btnLuu.setEnabled(false);
@@ -333,15 +382,16 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
     public void enableFormFields(boolean enable) {
         cbTenTau.setEnabled(enable);
         cbTenLichTrinh.setEnabled(enable);
-        txtThoiGianKhoiHanh.setEnabled(enable);
-        txtThoiGianDen.setEnabled(enable);
+        dcThoiGianKhoiHanh.setEnabled(enable);  // SỬA: Enable JDateChooser
+        dcThoiGianDen.setEnabled(enable);
         txtGiaChuyen.setEnabled(enable);
         cbTrangThai.setEnabled(enable);
     }
 
-    // Method để refresh data
+    // Method để refresh data - THÊM: Update trạng thái trước refresh
     public void refreshData() {
-        loadDataFromDB();
+        dao.updateTrangThaiTuThoiGian();  // Update DB trước
+        loadDataFromDB();  // Refresh table
         resetForm();
     }
 
@@ -359,10 +409,19 @@ public class DanhSachChuyenTau extends GiaoDienChinh {
         JOptionPane.showMessageDialog(this, message, title, type);
     }
 
+    // THÊM: Override dispose để stop timer khi đóng form
+    @Override
+    public void dispose() {
+        if (autoUpdateTimer != null) {
+            autoUpdateTimer.stop();
+        }
+        super.dispose();
+    }
+
     // Main method để chạy ứng dụng
     public static void main(String[] args) {
         	LookAndFeelManager.setNimbusLookAndFeel();
-            new DanhSachChuyenTau().setVisible(true);
+            new QuanLyChuyenTau().setVisible(true);
       
     }
 }

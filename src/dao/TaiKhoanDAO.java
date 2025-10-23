@@ -1,161 +1,116 @@
 package dao;
 
-import connectDB.connectDB;
-import entity.NhanVien;
-import entity.TaiKhoan;
-
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import entity.TaiKhoan;
+import entity.NhanVien;
+import connectDB.connectDB;
+
 public class TaiKhoanDAO {
 
-    // Lấy tất cả tài khoản
+    // Phương thức lấy tất cả tài khoản
     public List<TaiKhoan> getAllTaiKhoan() {
-        List<TaiKhoan> dsTK = new ArrayList<>();
-        String sql = "SELECT tk.tenDangNhap, tk.matKhau, nv.* " +
-                     "FROM TaiKhoan tk JOIN NhanVien nv ON tk.tenDangNhap = nv.soDienThoai";
-
-        try (Connection con = connectDB.getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
+        List<TaiKhoan> listTaiKhoan = new ArrayList<>();
+        String sql = "SELECT tk.tenDangNhap, tk.matKhau, tk.maNhanVien FROM TaiKhoan tk ORDER BY tk.tenDangNhap";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                NhanVien nv = new NhanVien(
-                        rs.getString("maNhanVien"),
-                        rs.getString("hoTen"),
-                        rs.getDate("ngaySinh").toLocalDate(),
-                        rs.getString("soDienThoai"),
-                        rs.getString("cmndCccd"),
-                        rs.getInt("IDloaiChucVu")
-                );
-
-                TaiKhoan tk = new TaiKhoan(
-                        rs.getString("matKhau"),
-                        nv
-                );
-
-                dsTK.add(tk);
+                TaiKhoan tk = taoTaiKhoanTuResultSet(rs);
+                listTaiKhoan.add(tk);
             }
         } catch (SQLException e) {
-            System.err.println(" Lỗi lấy danh sách tài khoản: " + e.getMessage());
+            e.printStackTrace();
         }
-        return dsTK;
+        return listTaiKhoan;
     }
 
-    // Thêm tài khoản
-    public boolean insertTaiKhoan(TaiKhoan tk) {
+    // Phương thức lấy tài khoản theo tên đăng nhập
+    public TaiKhoan getTaiKhoanByTenDangNhap(String tenDangNhap) {
+        String sql = "SELECT tk.tenDangNhap, tk.matKhau, tk.maNhanVien FROM TaiKhoan tk WHERE tk.tenDangNhap = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tenDangNhap);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return taoTaiKhoanTuResultSet(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Phương thức thêm tài khoản mới
+    public boolean addTaiKhoan(TaiKhoan tk) {
+        // Kiểm tra tồn tại
+        if (getTaiKhoanByTenDangNhap(tk.getTenDangNhap()) != null) {
+            throw new IllegalArgumentException("Tài khoản đã tồn tại!");
+        }
+        // Validate NV qua entity (sẽ throw nếu không hợp lệ)
+        tk.getNhanVien();  // Gọi để trigger validation nếu cần
         String sql = "INSERT INTO TaiKhoan (tenDangNhap, matKhau, maNhanVien) VALUES (?, ?, ?)";
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, tk.getTenDangNhap());
-            stmt.setString(2, tk.getMatKhau());
-            stmt.setString(3, tk.getNhanVien().getMaNhanVien());
-
-            return stmt.executeUpdate() > 0;
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tk.getTenDangNhap());
+            pstmt.setString(2, tk.getMatKhau());
+            pstmt.setString(3, tk.getNhanVien().getMaNhanVien());
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println(" Lỗi thêm tài khoản: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
 
-    // Cập nhật mật khẩu
-    public boolean updateMatKhau(String tenDangNhap, String matKhauMoi) {
-        String sql = "UPDATE TaiKhoan SET matKhau=? WHERE tenDangNhap=?";
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, matKhauMoi);
-            stmt.setString(2, tenDangNhap);
-            return stmt.executeUpdate() > 0;
-
+    // Phương thức cập nhật tài khoản (chỉ mật khẩu, vì tenDangNhap là key)
+    public boolean updateTaiKhoan(TaiKhoan tk) {
+        TaiKhoan tkCu = getTaiKhoanByTenDangNhap(tk.getTenDangNhap());
+        if (tkCu == null) {
+            throw new IllegalArgumentException("Tài khoản không tồn tại!");
+        }
+        String sql = "UPDATE TaiKhoan SET matKhau = ? WHERE tenDangNhap = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tk.getMatKhau());
+            pstmt.setString(2, tk.getTenDangNhap());
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println("Lỗi cập nhật mật khẩu: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
 
-    // Xóa tài khoản
+    // Phương thức xóa tài khoản theo tên đăng nhập
     public boolean deleteTaiKhoan(String tenDangNhap) {
-        String sql = "DELETE FROM TaiKhoan WHERE tenDangNhap=?";
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, tenDangNhap);
-            return stmt.executeUpdate() > 0;
-
+        String sql = "DELETE FROM TaiKhoan WHERE tenDangNhap = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, tenDangNhap);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            System.err.println("Lỗi xóa tài khoản: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
 
-    // Tìm tài khoản theo tên đăng nhập
-    public TaiKhoan findByTenDangNhap(String tenDangNhap) {
-        String sql = "SELECT tk.tenDangNhap, tk.matKhau, nv.* " +
-                     "FROM TaiKhoan tk JOIN NhanVien nv ON tk.tenDangNhap = nv.soDienThoai " +
-                     "WHERE tk.tenDangNhap = ?";
-
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, tenDangNhap);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                NhanVien nv = new NhanVien(
-                        rs.getString("maNhanVien"),
-                        rs.getString("hoTen"),
-                        rs.getDate("ngaySinh").toLocalDate(),
-                        rs.getString("soDienThoai"),
-                        rs.getString("cmndCccd"),
-                        rs.getInt("IDloaiChucVu")
-                );
-
-                return new TaiKhoan(
-                        rs.getString("matKhau"),
-                        nv
-                );
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi tìm tài khoản: " + e.getMessage());
+    // Helper: Tạo TaiKhoan từ ResultSet (load NhanVien đầy đủ với IDloaiChucVu)
+    private TaiKhoan taoTaiKhoanTuResultSet(ResultSet rs) throws SQLException {
+        TaiKhoan tk = new TaiKhoan();
+        tk.setTenDangNhap(rs.getString("tenDangNhap"));
+        tk.setMatKhau(rs.getString("matKhau"));
+        String maNV = rs.getString("maNhanVien");
+        NhanVien nv = new NhanVienDAO().getNhanVienByMa(maNV);  // Load NV đầy đủ
+        if (nv != null) {
+            tk.setNhanVien(nv);  // Entity sẽ validate và set tenDangNhap nếu cần
+        } else {
+            throw new SQLException("Không load được nhân viên cho tài khoản: " + maNV);
         }
-        return null;
-    }
-
-    // Xác thực đăng nhập
-    public TaiKhoan authenticate(String tenDangNhap, String matKhau) {
-        String sql = "SELECT tk.tenDangNhap, tk.matKhau, nv.* " +
-                     "FROM TaiKhoan tk JOIN NhanVien nv ON tk.tenDangNhap = nv.soDienThoai " +
-                     "WHERE tk.tenDangNhap = ? AND tk.matKhau = ?";
-
-        try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-            stmt.setString(1, tenDangNhap);
-            stmt.setString(2, matKhau);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                NhanVien nv = new NhanVien(
-                        rs.getString("maNhanVien"),
-                        rs.getString("hoTen"),
-                        rs.getDate("ngaySinh").toLocalDate(),
-                        rs.getString("soDienThoai"),
-                        rs.getString("cmndCccd"),
-                        rs.getInt("IDloaiChucVu")
-                );
-
-                return new TaiKhoan(
-                        rs.getString("matKhau"),
-                        nv
-                );
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi xác thực đăng nhập: " + e.getMessage());
-        }
-        return null;
+        return tk;
     }
 }
