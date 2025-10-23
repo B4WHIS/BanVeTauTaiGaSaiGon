@@ -114,7 +114,7 @@ public class NhanVienBanVeGUI  extends GiaoDienChinh implements ActionListener{
             } else if (command.equals("Đổi vé") || e.getSource() == btnDoiVe) {
                 new TraCuuVeTauGUI().setVisible(true);
             } else if (command.equals("Lập hóa đơn")) {
-                new LapHoaDonGUI(command).setVisible(true); 
+//                new LapHoaDonGUI(command).setVisible(true); 
         
             } 
 
