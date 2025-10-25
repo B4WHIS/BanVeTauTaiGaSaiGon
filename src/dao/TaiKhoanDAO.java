@@ -29,10 +29,13 @@ public class TaiKhoanDAO {
 
     // Phương thức lấy tài khoản theo tên đăng nhập
     public TaiKhoan getTaiKhoanByTenDangNhap(String tenDangNhap) {
+        if (tenDangNhap == null || tenDangNhap.trim().isEmpty()) {
+            return null;
+        }
         String sql = "SELECT tk.tenDangNhap, tk.matKhau, tk.maNhanVien FROM TaiKhoan tk WHERE tk.tenDangNhap = ?";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, tenDangNhap);
+            pstmt.setString(1, tenDangNhap.trim());
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return taoTaiKhoanTuResultSet(rs);
@@ -46,16 +49,10 @@ public class TaiKhoanDAO {
 
     // Phương thức thêm tài khoản mới
     public boolean addTaiKhoan(TaiKhoan tk) {
-        // Kiểm tra tồn tại
-        if (getTaiKhoanByTenDangNhap(tk.getTenDangNhap()) != null) {
-            throw new IllegalArgumentException("Tài khoản đã tồn tại!");
-        }
-        // Validate NV qua entity (sẽ throw nếu không hợp lệ)
-        tk.getNhanVien();  // Gọi để trigger validation nếu cần
         String sql = "INSERT INTO TaiKhoan (tenDangNhap, matKhau, maNhanVien) VALUES (?, ?, ?)";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, tk.getTenDangNhap());
+            pstmt.setString(1, tk.getTenDangNhap().trim());
             pstmt.setString(2, tk.getMatKhau());
             pstmt.setString(3, tk.getNhanVien().getMaNhanVien());
             int rowsAffected = pstmt.executeUpdate();
@@ -68,15 +65,11 @@ public class TaiKhoanDAO {
 
     // Phương thức cập nhật tài khoản (chỉ mật khẩu, vì tenDangNhap là key)
     public boolean updateTaiKhoan(TaiKhoan tk) {
-        TaiKhoan tkCu = getTaiKhoanByTenDangNhap(tk.getTenDangNhap());
-        if (tkCu == null) {
-            throw new IllegalArgumentException("Tài khoản không tồn tại!");
-        }
         String sql = "UPDATE TaiKhoan SET matKhau = ? WHERE tenDangNhap = ?";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, tk.getMatKhau());
-            pstmt.setString(2, tk.getTenDangNhap());
+            pstmt.setString(2, tk.getTenDangNhap().trim());
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -90,7 +83,7 @@ public class TaiKhoanDAO {
         String sql = "DELETE FROM TaiKhoan WHERE tenDangNhap = ?";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, tenDangNhap);
+            pstmt.setString(1, tenDangNhap.trim());
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

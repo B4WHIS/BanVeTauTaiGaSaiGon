@@ -12,7 +12,7 @@ import connectDB.connectDB;
 import entity.NhanVien;
 
 public class NhanVienDAO {
-	private NhanVienDAO nhanVienDAO = new NhanVienDAO();
+	
 
     // Phương thức lấy tất cả tên nhân viên (cho ComboBox) - Chỉ hoTen
     public List<String> getAllTenNhanVien() {
@@ -46,6 +46,24 @@ public class NhanVienDAO {
         }
         return null;
     }
+
+    // Method mới: Lấy tất cả nhân viên chưa có tài khoản
+    public List<NhanVien> getAllNhanVienWithoutTaiKhoan() {
+        List<NhanVien> list = new ArrayList<>();
+        String sql = "SELECT * FROM NhanVien nv WHERE NOT EXISTS (SELECT 1 FROM TaiKhoan tk WHERE tk.maNhanVien = nv.maNhanVien) ORDER BY hoTen";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(taoNhanVienTuResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Phương thức lấy danh sách loại chức vụ
     public List<Object[]> getDanhSachLoaiChucVu() {
         // Danh sách chứa kết quả trả về
         List<Object[]> dsLoaiChucVu = new ArrayList<>();
@@ -118,6 +136,26 @@ public class NhanVienDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // === LẤY TẤT CẢ NHÂN VIÊN ===
+    public List<NhanVien> getAllNhanVien() {
+        List<NhanVien> list = new ArrayList<>();
+        String sql = "SELECT * FROM NhanVien ORDER BY hoTen";
+
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                NhanVien nv = taoNhanVienTuResultSet(rs);
+                list.add(nv);
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy danh sách nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
     }
 
     // Helper: Tạo NhanVien từ ResultSet - Cập nhật để load IDloaiChucVu

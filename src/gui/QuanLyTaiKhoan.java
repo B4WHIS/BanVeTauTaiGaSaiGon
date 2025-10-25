@@ -18,9 +18,9 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
     private DefaultTableModel modelTK;
     private JTextField txtTenDangNhap;
     private JPasswordField txtMatKhau;
-    private JComboBox<String> cbNhanVien;  // Hiển thị hoTen từ DB
+    private JComboBox<NhanVien> cbNhanVien;  
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
-    private JButton btnLuu;  // Nút Lưu (cho add/update)
+    private JButton btnLuu;  
 
     // Controller và DAO
     private QuanLyTaiKhoanController controller;
@@ -82,10 +82,10 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
             lbl.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        txtTenDangNhap = new JTextField();  // Read-only, tự động từ soDienThoai NV
+        txtTenDangNhap = new JTextField();  
         txtTenDangNhap.setEditable(false);
         txtMatKhau = new JPasswordField();
-        cbNhanVien = new JComboBox<>();  // Hiển thị hoTen
+        cbNhanVien = new JComboBox<>();  
 
         Component[] inputFields = {txtTenDangNhap, txtMatKhau, cbNhanVien};
         for (Component comp : inputFields) {
@@ -118,16 +118,11 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
             pnlForm.add(inputFields[i], gbc);
         }
 
-        // Listener cho cbNhanVien: Tự động set txtTenDangNhap từ soDienThoai của NV
+        
         cbNhanVien.addActionListener(e -> {
-            String hoTen = (String) cbNhanVien.getSelectedItem();
-            if (hoTen != null && !hoTen.isEmpty()) {
-                NhanVien nv = nhanVienDAO.getNhanVienByTen(hoTen);
-                if (nv != null) {
-                    txtTenDangNhap.setText(nv.getSoDienThoai());  // Dùng getSoDienThoai từ entity (validated)
-                } else {
-                    txtTenDangNhap.setText("");
-                }
+            NhanVien nv = (NhanVien) cbNhanVien.getSelectedItem();
+            if (nv != null) {
+                txtTenDangNhap.setText(nv.getSoDienThoai());  
             } else {
                 txtTenDangNhap.setText("");
             }
@@ -144,7 +139,7 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
         btnLuu.setForeground(Color.WHITE);
         btnLuu.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnLuu.setPreferredSize(new Dimension(100, 35));
-        btnLuu.setEnabled(false);  // Ban đầu disable
+        btnLuu.setEnabled(false); 
 
         JPanel pnlButtons = new JPanel(new GridLayout(2, 3, 10, 10));
         pnlButtons.setBackground(new Color(245, 247, 250));
@@ -163,7 +158,7 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
         pnlRight.setBackground(new Color(245, 247, 250));
 
-        // Header: Tên đăng nhập, Mật khẩu (ẩn), Tên nhân viên
+        // Header
         String[] colHeader = {"Tên đăng nhập", "Mật khẩu", "Tên nhân viên"};
         modelTK = new DefaultTableModel(colHeader, 0);
         tblTaiKhoan = new JTable(modelTK);
@@ -191,22 +186,48 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
         pnlMain.add(pnlFooter, BorderLayout.SOUTH);
         add(pnlMain);
 
-        // Attach listeners
+      
         attachListeners();
         
-        // Load combos và data từ DB
+       
         loadCombosFromDB();
         loadDataFromDB();
+
+        
+        resetForm();
     }
 
-    // Load combo boxes từ DB - Hiển thị hoTen
+ // Load combo boxes từ DB - HIỂN THỊ TẤT CẢ NHÂN VIÊN
     private void loadCombosFromDB() {
         cbNhanVien.removeAllItems();
-        List<String> tenNhanVienList = nhanVienDAO.getAllTenNhanVien();
-        for (String tenNV : tenNhanVienList) {
-            cbNhanVien.addItem(tenNV);
+
+        // DÙNG getAllNhanVien() → TẤT CẢ NHÂN VIÊN
+        List<NhanVien> nhanVienList = nhanVienDAO.getAllNhanVien();
+
+        for (NhanVien nv : nhanVienList) {
+            cbNhanVien.addItem(nv);
         }
-        if (!tenNhanVienList.isEmpty()) cbNhanVien.setSelectedIndex(0);
+
+        cbNhanVien.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasCellFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasCellFocus);
+                if (value instanceof NhanVien) {
+                    setText(((NhanVien) value).getHoTen());
+                }
+                return this;
+            }
+        });
+
+        if (cbNhanVien.getItemCount() > 0) {
+            cbNhanVien.setSelectedIndex(0);
+            NhanVien selected = (NhanVien) cbNhanVien.getSelectedItem();
+            if (selected != null) {
+                txtTenDangNhap.setText(selected.getSoDienThoai());
+            }
+        } else {
+            txtTenDangNhap.setText("");
+        }
     }
 
     // Load data từ DB - Hiển thị hoTen, mật khẩu ẩn
@@ -258,45 +279,52 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
     public DefaultTableModel getModelTK() { return modelTK; }
     public JTextField getTxtTenDangNhap() { return txtTenDangNhap; }
     public JPasswordField getTxtMatKhau() { return txtMatKhau; }
-    public JComboBox<String> getCbNhanVien() { return cbNhanVien; }
+    public JComboBox<NhanVien> getCbNhanVien() { return cbNhanVien; }
 
     // Method để load data vào form
     public void loadFormData(TaiKhoan tk) {
         if (tk != null) {
             txtTenDangNhap.setText(tk.getTenDangNhap());
             txtMatKhau.setText(tk.getMatKhau().toString());  // Load rõ cho edit
-            String tenNV = nhanVienDAO.getTenNhanVienByMa(tk.getNhanVien().getMaNhanVien());
-            if (tenNV != null) cbNhanVien.setSelectedItem(tenNV);
+            cbNhanVien.setSelectedItem(tk.getNhanVien());  // Chọn object NhanVien tương ứng
         }
     }
-
-    // Method để reset form
+ // Method để reset form
     public void resetForm() {
         txtTenDangNhap.setText("");
         txtMatKhau.setText("");
-        cbNhanVien.setSelectedIndex(0);
+
+        if (cbNhanVien.getItemCount() > 0) {
+            cbNhanVien.setSelectedIndex(0);
+            NhanVien nv = (NhanVien) cbNhanVien.getSelectedItem();
+            if (nv != null) {
+                txtTenDangNhap.setText(nv.getSoDienThoai());
+            }
+        } else {
+            txtTenDangNhap.setText("");
+        }
+
         btnLuu.setEnabled(false);
         tblTaiKhoan.clearSelection();
         enableFormFields(false);
     }
-
     // Method để enable/disable form fields
     public void enableFormFields(boolean enable) {
         cbNhanVien.setEnabled(enable);
         txtMatKhau.setEnabled(enable);
     }
 
-    // Method để refresh data
+ // refreshData: reload cả bảng + combo
     public void refreshData() {
         loadDataFromDB();
+        loadCombosFromDB();  
         resetForm();
     }
-
     // Method để lấy selected tenDangNhap từ table
     public String getSelectedTenDangNhap() {
         int selectedRow = tblTaiKhoan.getSelectedRow();
         if (selectedRow >= 0) {
-            return (String) modelTK.getValueAt(selectedRow, 0);  // Cột 0: Tên đăng nhập
+            return (String) modelTK.getValueAt(selectedRow, 0);  
         }
         return null;
     }
