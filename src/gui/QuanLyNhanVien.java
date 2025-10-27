@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
-
+//check
 public class QuanLyNhanVien extends JFrame {
     private JTable tblNhanVien;
     private DefaultTableModel modelNV;
