@@ -1,34 +1,11 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.table.*;
+import java.awt.event.*;
+import java.util.Vector;
 
 public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
 
@@ -36,11 +13,9 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
     private JPanel pnlChinh, pnlTitle, pnlTraCuu, pnlKetQua;
     private JLabel lblTieuDe;
     private JTextField txtHoTen, txtCMND, txtSDT;
-    private JButton btnTim, btnLamMoi, btnTroVe, btnInVe;
+    private JButton btnTim, btnLamMoi, btnTroVe, btnInVe, btnDoiVe;
     private JTable tblKetQua;
-    private DefaultTableModel modelKetQua = new DefaultTableModel();
-    private JEditorPane editorPane;
-    private JScrollPane scpKetQua;
+    private DefaultTableModel modelKetQua;
 
     // Màu sắc & Font
     private final Color COLOR_PRIMARY = new Color(74, 140, 103);
@@ -50,6 +25,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
     private final Font FONT_SECTION = new Font("Segoe UI", Font.BOLD, 20);
     private final Font FONT_LABEL = new Font("Segoe UI", Font.BOLD, 14);
     private final Font FONT_INPUT = new Font("Segoe UI", Font.PLAIN, 14);
+    private final Font FONT_TABLE = new Font("Segoe UI", Font.PLAIN, 13);
 
     public TraCuuVeTauGUI() {
         setTitle("Tra cứu vé tàu");
@@ -104,9 +80,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         btnTim.addActionListener(this);
         btnLamMoi.addActionListener(this);
         btnInVe.addActionListener(this);
-
-        // Dữ liệu mẫu để test
-        themDuLieuMau();
+        btnDoiVe.addActionListener(this);
     }
 
     private void setupFormTraCuu() {
@@ -174,190 +148,108 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.EAST;
         pnlTraCuu.add(btnInVe, gbc);
+
+        // Nút đổi vé
+        btnDoiVe = new JButton("Đổi vé", GiaoDienChinh.chinhKichThuoc("/img/swap.png", 20, 20));
+        btnDoiVe.setBackground(new Color(255, 193, 7));
+        btnDoiVe.setForeground(Color.BLACK);
+        btnDoiVe.setFont(FONT_LABEL);
+        gbc.gridx = 1; gbc.gridy = row++;
+        gbc.anchor = GridBagConstraints.EAST;
+        pnlTraCuu.add(btnDoiVe, gbc);
     }
 
-    // === BẢNG KẾT QUẢ - 1 BẢNG DUY NHẤT, TIÊU ĐỀ NHÓM TRẢI DÀI ===
     private void setupTableKetQua() {
-        editorPane = new JEditorPane();
-        editorPane.setContentType("text/html");
-        editorPane.setEditable(false);
-        editorPane.setBackground(Color.WHITE);
+        // Tạo model với 7 cột
+        String[] cols = {"#", "Họ tên", "Thông tin vé", "Thành tiền (VNĐ)", "Loại vé", "Trạng thái vé", "Chọn"};
+        modelKetQua = new DefaultTableModel(cols, 0) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columnIndex == 6 ? Boolean.class : String.class;
+            }
 
-        // CSS để giống JTable
-        String css = """
-            <style>
-                body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-                table { width: 100%; border-collapse: collapse; font-size: 13px; }
-                th { background: #f5f5f5; padding: 12px 8px; text-align: left; font-weight: bold; border-bottom: 1px solid #ddd; }
-                td { padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
-                .group-row td { 
-                    background: #ADD8E6 !important; 
-                    font-weight: bold; 
-                    font-size: 14px; 
-                    padding: 10px 15px; 
-                    border-bottom: 1px solid #B0B0B0;
-                }
-                .even-row td { background: #f8fafc; }
-                .checkbox { text-align: center; }
-                input[type="checkbox"] { transform: scale(1.2); }
-            </style>
-            """;
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 6; // Chỉ checkbox được chọn
+            }
+        };
 
-        editorPane.setText(css + "<body><table>" +
-            "<tr><th>#</th><th>Họ tên</th><th>Thông tin vé</th><th>Thành tiền (VNĐ)</th>" +
-            "<th>Loại trả vé</th><th>Lệ phí trả vé</th><th>Tiền trả lại</th>" +
-            "<th>Thông tin trả vé</th><th class='checkbox'>Chọn</th></tr>" +
-            "</table></body>");
+        tblKetQua = new JTable(modelKetQua);
+        tblKetQua.setRowHeight(50);
+        tblKetQua.setFont(FONT_TABLE);
+        tblKetQua.getTableHeader().setFont(FONT_LABEL);
+        tblKetQua.getTableHeader().setBackground(new Color(245, 245, 245));
+        tblKetQua.getTableHeader().setReorderingAllowed(false);
 
-        JScrollPane scrollPane = new JScrollPane(editorPane);
+        // Renderer cho toàn bảng
+        tblKetQua.setDefaultRenderer(Object.class, new GroupRowRenderer());
+        tblKetQua.setDefaultRenderer(Boolean.class, new CheckBoxRenderer());
+
+        JScrollPane scrollPane = new JScrollPane(tblKetQua);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(225, 242, 232)));
         pnlKetQua.add(scrollPane, BorderLayout.CENTER);
-
-        // Footer
-        JPanel pnlFooter = new JPanel(new BorderLayout());
-        pnlFooter.setBorder(new EmptyBorder(8, 8, 8, 8));
-        JPanel pnlButtonsRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        pnlButtonsRight.setOpaque(false);
-
-      
-      
-        pnlKetQua.add(pnlFooter, BorderLayout.SOUTH);
     }
-    // === RENDERER HTML: TIÊU ĐỀ NHÓM TRẢI DÀI TOÀN BẢNG ===
- // === RENDERER HTML: VẼ TIÊU ĐỀ NHÓM TOÀN HÀNG ===
-    private class HTMLFullRowRenderer extends DefaultTableCellRenderer {
+
+    // Renderer cho hàng nhóm và dòng thường
+    private class GroupRowRenderer extends DefaultTableCellRenderer {
         private final Color GROUP_BG = new Color(173, 216, 230);
+        private final Color EVEN_BG = new Color(248, 250, 252);
+        private final Color ODD_BG = Color.WHITE;
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
 
-            // XỬ LÝ CHECKBOX
-            if (column == 8 && value instanceof Boolean) {
-                JCheckBox cb = new JCheckBox();
-                cb.setSelected((Boolean) value);
-                cb.setHorizontalAlignment(SwingConstants.CENTER);
-                cb.setBackground(row % 2 == 0 ? new Color(248, 250, 252) : Color.WHITE);
-                return cb;
-            }
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            JLabel label = (JLabel) c;
+            label.setBorder(new EmptyBorder(8, 8, 8, 8));
 
             String text = value != null ? value.toString() : "";
-            boolean isGroupRow = text.matches(".*(Hà Nội|Sài Gòn).*\\d{2}/\\d{2}/\\d{4}.*");
+            boolean isGroupRow = text.contains("Hà Nội") || text.contains("Sài Gòn");
 
-            if (isGroupRow && column == 0) {
-                // DÙNG HTML ĐỂ VẼ TOÀN HÀNG
-                String html = "<html><div style='"
-                        + "background-color: #ADD8E6; "
-                        + "color: black; "
-                        + "font-weight: bold; "
-                        + "font-size: 14px; "
-                        + "padding: 10px 15px; "
-                        + "border-bottom: 1px solid #B0B0B0; "
-                        + "width: 100%; "
-                        + "box-sizing: border-box;'>"
-                        + text + "</div></html>";
-                setText(html);
-                setHorizontalAlignment(SwingConstants.LEFT);
+            if (isGroupRow) {
+                label.setText("<html><b>" + text + "</b></html>");
+                label.setBackground(GROUP_BG);
+                label.setForeground(Color.BLACK);
+                label.setFont(FONT_TABLE.deriveFont(Font.BOLD, 14));
+                label.setHorizontalAlignment(SwingConstants.LEFT);
 
-                // QUAN TRỌNG: Set chiều cao và chiều rộng để vẽ toàn hàng
-                setPreferredSize(new Dimension(table.getWidth(), 48));
-                return this;
+                // Ẩn các cột khác trong hàng nhóm
+                if (column > 0) {
+                    label.setText("");
+                }
+            } else {
+                label.setBackground(row % 2 == 0 ? EVEN_BG : ODD_BG);
+                label.setForeground(Color.BLACK);
+                label.setFont(FONT_TABLE);
+                label.setHorizontalAlignment(column == 6 ? SwingConstants.CENTER : SwingConstants.LEFT);
             }
 
-            // ẨN CÁC Ô KHÁC TRONG HÀNG NHÓM
-            if (isGroupRow && column != 0) {
-                setText("");
-                setBackground(GROUP_BG);
-                return this;
-            }
+            return label;
+        }
+    }
 
-            // DÒNG BÌNH THƯỜNG
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    // Renderer cho checkbox
+    private class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
+        public CheckBoxRenderer() {
+            setHorizontalAlignment(SwingConstants.CENTER);
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            setSelected(value != null && (Boolean) value);
             setBackground(row % 2 == 0 ? new Color(248, 250, 252) : Color.WHITE);
-            setForeground(Color.BLACK);
-            setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            setHorizontalAlignment(column == 8 ? SwingConstants.CENTER : SwingConstants.LEFT);
-            setBorder(new EmptyBorder(8, 8, 8, 8));
             return this;
         }
     }
 
-    // === DỮ LIỆU MẪU ===
-    private void themDuLieuMau() {
-        StringBuilder html = new StringBuilder();
-        html.append("<table>");
-
-        // Header
-        html.append("<tr><th>#</th><th>Họ tên</th><th>Thông tin vé</th><th>Thành tiền (VNĐ)</th>")
-            .append("<th>Loại vé</th>")
-            .append("<th>Trạng thái vé</th><th class='checkbox'>Chọn</th></tr>");
-
-        int rowIndex = 0;
-
-        // Nhóm 1
-        html.append("<tr class='group-row'><td colspan='9'>Hà Nội - Sài Gòn 04/01/2021</td></tr>");
-        rowIndex++;
-
-        html.append(formatRow(++rowIndex, "1", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE7 04/01 21 06:00<br>Toa: 1 chỗ số: 24<br>Ngồi mềm điều hòa",
-            "1,014,000", "Bình thường", "", false));
-
-        html.append(formatRow(++rowIndex, "4", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE7 04/01 21 06:00<br>Toa: 1 chỗ số: 24<br>Ngồi mềm điều hòa",
-            "1,014,000", "Bình thường", "Vé đã trả lại.", false));
-
-        // Khoảng trống
-        html.append("<tr><td colspan='9' style='padding: 5px;'></td></tr>");
-
-        // Nhóm 2
-        html.append("<tr class='group-row'><td colspan='9'>Sài Gòn - Hà Nội 09/01/2021</td></tr>");
-        rowIndex++;
-
-        html.append(formatRow(++rowIndex, "1", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE8 09/01 21 06:00<br>Toa: 1 chỗ số: 44<br>Ngồi mềm điều hòa",
-            "823,000", "Bình thường", "Vé đã trả lại.", false));
-
-        html.append(formatRow(++rowIndex, "4", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE8 09/01 21 06:00<br>Toa: 1 chỗ số: 44<br>Ngồi mềm điều hòa",
-            "823,000", "Bình thường",
-            "[Khuyến mãi cuối tuần] trả từ [1 ngày] đến [3000 ngày] áp dụng 15%", false));
-
-        html.append("</table>");
-
-        // Cập nhật nội dung
-        String fullHtml = "<html><head><style>" +
-            "body {font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0;}" +
-            "table {width: 100%; border-collapse: collapse; font-size: 13px;}" +
-            "th {background: #f5f5f5; padding: 12px 8px; text-align: left; font-weight: bold; border-bottom: 1px solid #ddd;}" +
-            "td {padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: top;}" +
-            ".group-row td {background: #ADD8E6 !important; font-weight: bold; font-size: 14px; padding: 10px 15px; border-bottom: 1px solid #B0B0B0;}" +
-            ".even-row td {background: #f8fafc;}" +
-            ".checkbox {text-align: center;}" +
-            "input[type='checkbox'] {transform: scale(1.2);}" +
-            "</style></head><body>" + html.toString() + "</body></html>";
-
-        editorPane.setText(fullHtml);
-    }
-
-    // Hàm hỗ trợ tạo dòng
-    private String formatRow(int index, String no, String hoTen, String thongTinVe,
-                             String thanhTien, String loaiTraVe,
-                             String ghiChu, boolean checked) {
-        String rowClass = (index % 2 == 0) ? "even-row" : "";
-        String check = checked ? "checked" : "";
-        return String.format(
-            "<tr class='%s'>" +
-            "<td>%s</td><td>%s</td><td>%s</td><td>%s</td>" +
-            "<td>%s</td><td>%s</td>" +
-            "<td class='checkbox'><input type='checkbox' %s></td>" +
-            "</tr>", rowClass, no, hoTen, thongTinVe, thanhTien, loaiTraVe, ghiChu, check
-        );
-    }
+    
     // === XỬ LÝ SỰ KIỆN ===
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnTim) {
-            themDuLieuMau();
             JOptionPane.showMessageDialog(this, "Tìm thấy vé phù hợp!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
         }
         else if (e.getSource() == btnLamMoi) {
@@ -370,12 +262,15 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
             this.dispose();
         }
         else if (e.getSource() == btnInVe) {
-            JOptionPane.showMessageDialog(this, "Chức năng in vé đang phát triển...");
+            JOptionPane.showMessageDialog(this, "Chức năng in vé đang phát triển...", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        }
+        else if (e.getSource() == btnDoiVe) {
+            JOptionPane.showMessageDialog(this, "Chức năng đổi vé đang được phát triển...", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
         else {
             int count = 0;
             for (int i = 0; i < modelKetQua.getRowCount(); i++) {
-                Boolean checked = (Boolean) modelKetQua.getValueAt(i, 8);
+                Boolean checked = (Boolean) modelKetQua.getValueAt(i, 6);
                 if (checked != null && checked) count++;
             }
             if (count == 0) {
@@ -389,7 +284,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
     // === MAIN ===
     public static void main(String[] args) {
         try {
-            LookAndFeelManager.setNimbusLookAndFeel();
+            UIManager.setLookAndFeel(UIManager.getLookAndFeel());
         } catch (Exception ex) {}
         SwingUtilities.invokeLater(() -> new TraCuuVeTauGUI().setVisible(true));
     }
