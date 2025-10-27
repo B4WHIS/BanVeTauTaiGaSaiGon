@@ -20,7 +20,12 @@ public class Tau {
         setSoToa(soToa);
     }
 
-    public String getMaTau() {
+    public Tau(String maTau) {
+		// TODO Auto-generated constructor stub
+    	this.maTau = maTau;
+	}
+
+	public String getMaTau() {
         return maTau;
     }
 
@@ -31,7 +36,7 @@ public class Tau {
         if (maTau.length() > 6) { 
             throw new IllegalArgumentException("Mã tàu không được vượt quá 6 ký tự.");
         }
-        this.maTau = maTau;
+        this.maTau = maTau.trim();
     }
 
     public String getTenTau() {
@@ -42,10 +47,7 @@ public class Tau {
         if (tenTau == null || tenTau.trim().isEmpty()) {
             throw new IllegalArgumentException("Tên tàu không được để trống");
         }
-        if (tenTau.length() > 100) {
-            throw new IllegalArgumentException("Tên tàu không được vượt quá 100 ký tự");
-        }
-        this.tenTau = tenTau;
+        this.tenTau = tenTau.trim();
     }
 
     public Integer getSoToa() {

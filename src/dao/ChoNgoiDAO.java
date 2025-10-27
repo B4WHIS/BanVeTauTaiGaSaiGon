@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import connectDB.connectDB;
 import entity.ChoNgoi;
@@ -27,7 +29,18 @@ public class ChoNgoiDAO {
             return false;
         }
     }
+    
 
+    public boolean capNhatChoNgoi(ChoNgoi choNgoi) throws SQLException {
+        String sql = "UPDATE ChoNgoi SET trangThai = ? WHERE maChoNgoi = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, choNgoi.getTrangThai());
+            stmt.setString(2, choNgoi.getMaChoNgoi());
+            return stmt.executeUpdate() > 0;
+        }
+    }
+    
     //  Cập nhật thông tin chỗ ngồi
     public boolean updateChoNgoi(ChoNgoi cn) throws SQLException {
         Connection conn = connectDB.getConnection();
@@ -44,6 +57,34 @@ public class ChoNgoiDAO {
         }
     }
 
+    public List<ChoNgoi> getSeatsByMaToa(String maToa) throws SQLException {
+        List<ChoNgoi> danhSachCho = new ArrayList<>();
+        // Trong CSDL, cột maChoNgoi được sinh ra dựa trên ID và maToa [2]
+        String sql = "SELECT maChoNgoi, IDloaiGhe, trangThai, maToa FROM ChoNgoi WHERE maToa = ? ORDER BY maChoNgoi";
+        
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, maToa);
+            try (ResultSet rs = ps.executeQuery()) {
+                ToaTau toaTau = new ToaTau(maToa); 
+                while (rs.next()) {
+                    ChoNgoi cn = new ChoNgoi(
+                        rs.getString("maChoNgoi"),
+                        rs.getInt("IDloaiGhe"),
+                        rs.getString("trangThai"), // LẤY TRẠNG THÁI TỪ CSDL
+                        toaTau
+                    );
+                    danhSachCho.add(cn);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi CSDL khi tải chỗ ngồi theo toa: " + e.getMessage());
+            throw e;
+        }
+        return danhSachCho;
+    }
+    
     // Xóa chỗ ngồi theo mã
     public boolean deleteChoNgoi(String maChoNgoi) throws SQLException {
         Connection conn = connectDB.getConnection();

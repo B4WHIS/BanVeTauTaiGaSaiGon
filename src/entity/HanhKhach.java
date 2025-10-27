@@ -10,20 +10,37 @@ public class HanhKhach {
     private LocalDate ngaySinh;
     private String maUuDai;
 
-    public HanhKhach() {}
+    public HanhKhach(String hoTen, LocalDate ngaySinh, String soDT, String cmndCccd, String maUuDai) {
+        
+        this.hoTen = hoTen; 
+        this.ngaySinh = ngaySinh;
+        this.soDT = soDT;
+        this.cmndCccd = cmndCccd;
+        this.maUuDai = maUuDai;
+    }
+    public HanhKhach() {
 
+    }
     public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
-		super();
-		setMaKH(maKH);
-		setHoTen(hoTen);
-		setCmndCccd(cmndCccd);
-		setSoDT(soDT);
-		setNgaySinh(ngaySinh);
-		setMaUuDai(maUuDai);
-	}
+        super();
+        this.maKH = maKH; // Cho phép null tạm thời
+        setHoTen(hoTen);
+        setCmndCccd(cmndCccd);
+        setSoDT(soDT);
+        setNgaySinh(ngaySinh);
+        setMaUuDai(maUuDai);
+    }
+//    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
+//		super();
+//		setMaKH(maKH);
+//		setHoTen(hoTen);
+//		setCmndCccd(cmndCccd);
+//		setSoDT(soDT);
+//		setNgaySinh(ngaySinh);
+//		setMaUuDai(maUuDai);
+//	}
     
 	public HanhKhach(String maKH) {
-		// TODO Auto-generated constructor stub
 		setMaKH(maKH);
 	}
 
@@ -43,8 +60,11 @@ public class HanhKhach {
     }
 
     public void setMaKH(String maKH) {
-        if (maKH == null || !maKH.matches("^KH\\d{3}$"))
-            throw new IllegalArgumentException("Mã khách hàng phải có dạng KHXXX");
+        // Ràng buộc DB: HK-XXXXX (2 kí tự đầu cố định, 5 kí tự số) [1]
+        if (maKH == null || !maKH.matches("^HK-\\d{5}$")) 
+        {
+            throw new IllegalArgumentException("Mã khách hàng không hợp lệ! Phải có dạng HK-XXXXX.");
+        }
         this.maKH = maKH;
     }
 
@@ -53,8 +73,13 @@ public class HanhKhach {
     }
 
     public void setHoTen(String hoTen) {
-        if (hoTen == null || !hoTen.matches("^[A-ZÀ-Ỹ][a-zà-ỹ]*(\\s[A-ZÀ-Ỹ][a-zà-ỹ]*)*$"))
-            throw new IllegalArgumentException("Họ tên không hợp lệ! Phải viết hoa chữ cái đầu, không chứa số hoặc ký tự đặc biệt.");
+        if (hoTen == null || hoTen.trim().isEmpty()) {
+            throw new IllegalArgumentException("Họ tên không được để trống.");
+        }
+        // Biểu thức mới: Cho phép chữ cái tiếng Việt, mỗi từ bắt đầu bằng in hoa, không chứa số
+        if (!hoTen.matches("^[A-ZÀ-Ỹ][a-zà-ỹA-ZÀ-Ỹ]*(?:\\s[A-ZÀ-Ỹ][a-zà-ỹA-ZÀ-Ỹ]*)*$")) {
+            throw new IllegalArgumentException("Họ tên không hợp lệ! Phải viết hoa chữ cái đầu, không chứa số.");
+        }
         this.hoTen = hoTen;
     }
 
@@ -92,6 +117,7 @@ public class HanhKhach {
         this.ngaySinh = ngaySinh;
     }
 
+    
 	@Override
 	public String toString() {
 		return "HanhKhach [maKH=" + maKH + ", hoTen=" + hoTen + ", cmndCccd=" + cmndCccd + ", soDT=" + soDT
