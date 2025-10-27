@@ -23,193 +23,156 @@ import javax.swing.UIManager;
 
 import entity.NhanVien;
 
-public class NhanVienBanVeGUI extends JFrame implements ActionListener {
-    private JPanel pnlChucNang;
-    private JPanel pnlChinh; // Assumed to be initialized in constructor
+public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
+    
     private JButton btnDatVe;
     private JButton btnHuyVe;
-    private JButton btnDoiVe;
     private JButton btnTimChuyenTau;
     private JButton btnDangXuat;
-    private NhanVien nhanVienHienTai;
+    private JButton btnDoiVe;
 
+   
     public NhanVienBanVeGUI(NhanVien nhanVien) throws IOException {
-        this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");
-        initializeUI();
-        addListeners();
-    }
-
-    private void initializeUI() throws IOException {
-        setTitle("Menu Nhân Viên Bán Vé");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-
-        pnlChinh = new JPanel(new BorderLayout());
-        pnlChinh.setBackground(new Color(221, 218, 208));
-
-        // Title
-        JLabel lblTieuDe = new JLabel("HỆ THỐNG BÁN VÉ TÀU", SwingConstants.CENTER);
-        lblTieuDe.setFont(new Font("Segoe UI", Font.BOLD, 42));
-        lblTieuDe.setForeground(new Color(74, 140, 103));
-        lblTieuDe.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        pnlChinh.add(lblTieuDe, BorderLayout.NORTH);
-
-        // Function panel
+        super(nhanVien); // TRUYỀN NHÂN VIÊN CHO GIAO DIỂN CHÍNH
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
-
-        add(pnlChinh);
-
-        // Set Nimbus Look and Feel
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
-    private JPanel taoPanelMenuChinh() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 2, 20, 20));
-        panel.setBackground(new Color(221, 218, 208));
-        panel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+  
+    public NhanVienBanVeGUI() throws IOException {
+        this(null);
+    }
 
-        Color mauDatVe = new Color(74, 140, 103);
-        Color mauHuyVe = new Color(229, 115, 115);
-        Color mauDoiVe = new Color(93, 156, 236);
-        Color mauTimChuyen = new Color(155, 93, 224);
-        Color mauDangXuat = Color.ORANGE;
-
+    public JPanel taoPanelMenuChinh() {
+        pnlChucNang = new JPanel();
+        pnlChucNang.setLayout(new GridLayout(0, 2, 0, 10));
+        pnlChucNang.setBackground(new Color(221, 218, 208));
+        
+        Color mauDatVe = new Color(74, 140, 103); 
+        Color mauHuyVe = new Color(229, 115, 115); 
+        Color mauDoiVe = new Color(93, 156, 236); 
+        Color mauTimChuyen = new Color(155, 93, 224); 
+        Color mauDangXuat = Color.orange; 
+        
+        // **NÚT ĐẶT VÉ**
         btnDatVe = new JButton("ĐẶT VÉ");
-        btnDatVe.setBackground(Color.WHITE);
-        btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        btnDatVe.setForeground(mauDatVe);
-        try {
-            ImageIcon icDatVe = new ImageIcon(getClass().getResource("/img/tickets_icon.png"));
-            btnDatVe.setIcon(icDatVe);
-        } catch (Exception e) {
-            System.err.println("Không thể tải icon tickets_icon.png: " + e.getMessage());
-        }
-
+        btnDatVe.setBackground(Color.white);
+        btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnDatVe.setForeground(new Color(74, 140, 103));
+        ImageIcon icDatVe = chinhKichThuoc("/img/tickets_icon.png", 60, 60);
+        btnDatVe.setIcon(icDatVe);
+        
+        // **NÚT HỦY VÉ**
         btnHuyVe = new JButton("HỦY VÉ");
-        btnHuyVe.setBackground(Color.WHITE);
-        btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        btnHuyVe.setForeground(mauHuyVe);
-        try {
-            ImageIcon icHuyVe = new ImageIcon(getClass().getResource("/img/cancel2.png"));
-            btnHuyVe.setIcon(icHuyVe);
-        } catch (Exception e) {
-            System.err.println("Không thể tải icon cancel2.png: " + e.getMessage());
-        }
+        btnHuyVe.setBackground(Color.white);
+        btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnHuyVe.setForeground(new Color(229, 115, 115));
+        ImageIcon icHuyve = chinhKichThuoc("/img/cancel2.png", 55, 55);
+        btnHuyVe.setIcon(icHuyve);
 
+        // **NÚT ĐỔI VÉ**
         btnDoiVe = new JButton("ĐỔI VÉ");
-        btnDoiVe.setBackground(Color.WHITE);
-        btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        btnDoiVe.setForeground(mauDoiVe);
-        try {
-            ImageIcon icDoiVe = new ImageIcon(getClass().getResource("/img/exchange.png"));
-            btnDoiVe.setIcon(icDoiVe);
-        } catch (Exception e) {
-            System.err.println("Không thể tải icon exchange.png: " + e.getMessage());
-        }
-
-        btnTimChuyenTau = new JButton("TÌM CHUYẾN TÀU");
-        btnTimChuyenTau.setBackground(Color.WHITE);
-        btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        btnTimChuyenTau.setForeground(mauTimChuyen);
-        try {
-            ImageIcon icTimChuyen = new ImageIcon(getClass().getResource("/img/search.png"));
-            btnTimChuyenTau.setIcon(icTimChuyen);
-        } catch (Exception e) {
-            System.err.println("Không thể tải icon search.png: " + e.getMessage());
-        }
-
+        btnDoiVe.setBackground(Color.white);
+        btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnDoiVe.setForeground(new Color(93, 156, 236));
+        ImageIcon icDoiVe = chinhKichThuoc("/img/exchange.png", 55, 55);
+        btnDoiVe.setIcon(icDoiVe);
+        
+        // **NÚT TÌM CHUYẾN**
+        btnTimChuyenTau = new JButton("TÌM CHUYẾN");
+        btnTimChuyenTau.setBackground(Color.white);
+        btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnTimChuyenTau.setForeground(new Color(155, 93, 224));
+        ImageIcon icTimChuyen = chinhKichThuoc("/img/search.png", 65, 65);
+        btnTimChuyenTau.setIcon(icTimChuyen);
+        
+        // **NÚT ĐĂNG XUẤT**
         btnDangXuat = new JButton("ĐĂNG XUẤT");
-        btnDangXuat.setBackground(Color.WHITE);
+        btnDangXuat.setBackground(Color.white);
         btnDangXuat.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        btnDangXuat.setForeground(mauDangXuat);
-        try {
-            ImageIcon icDangXuat = new ImageIcon(getClass().getResource("/img/export.png"));
-            btnDangXuat.setIcon(icDangXuat);
-        } catch (Exception e) {
-            System.err.println("Không thể tải icon export.png: " + e.getMessage());
-        }
-
-        panel.add(btnDatVe);
-        panel.add(btnHuyVe);
-        panel.add(btnDoiVe);
-        panel.add(btnTimChuyenTau);
-        panel.add(new JPanel()); // Empty panel for layout balance
-        panel.add(btnDangXuat);
-
+        btnDangXuat.setForeground(Color.orange);
+        ImageIcon icDangXuat = chinhKichThuoc("/img/export.png", 55, 55);
+        btnDangXuat.setIcon(icDangXuat);
+        
+        // **THÊM NÚT VÀO PANEL**
+        pnlChucNang.add(btnDatVe);
+        pnlChucNang.add(btnHuyVe);
+        pnlChucNang.add(btnDoiVe);
+        pnlChucNang.add(btnTimChuyenTau);
+        pnlChucNang.add(btnDangXuat);
+        pnlChucNang.setPreferredSize(new Dimension(350, 70));
+        
+        // **THÊM HOVER EFFECT**
         addHoverEffect(btnDatVe, mauDatVe);
         addHoverEffect(btnHuyVe, mauHuyVe);
         addHoverEffect(btnDoiVe, mauDoiVe);
         addHoverEffect(btnTimChuyenTau, mauTimChuyen);
         addHoverEffect(btnDangXuat, mauDangXuat);
-
-        return panel;
-    }
-
-    private void addHoverEffect(JButton button, Color hoverColor) {
-        Color originalColor = button.getBackground();
-        button.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                button.setBackground(hoverColor);
-                button.setForeground(Color.WHITE);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                button.setBackground(originalColor);
-                button.setForeground(hoverColor);
-            }
-        });
-    }
-
-    private void addListeners() {
+        
+        // **GẮN SỰ KIỆN**
         btnDatVe.addActionListener(this);
         btnHuyVe.addActionListener(this);
         btnDoiVe.addActionListener(this);
         btnTimChuyenTau.addActionListener(this);
         btnDangXuat.addActionListener(this);
+        
+        return pnlChucNang;
+    }
+
+    
+    @Override
+    protected void addHoverEffect(JButton btn, Color mainColor) {
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(mainColor.brighter());
+                btn.setBorder(BorderFactory.createLineBorder(mainColor, 3));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(Color.white);
+                btn.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+            }
+        });
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand(); 
         try {
-            if (e.getSource() == btnDatVe || e.getSource() == btnTimChuyenTau) {
-                SwingUtilities.invokeLater(() -> {
-                    new TraCuuChuyenTauGUI(nhanVienHienTai).setVisible(true);
-                    dispose();
-                });
-            } else if (e.getSource() == btnHuyVe) {
-                SwingUtilities.invokeLater(() -> {
-                    new GiaoDienHuyVe().setVisible(true);
-                    dispose();
-                });
-            } else if (e.getSource() == btnDoiVe) {
-                SwingUtilities.invokeLater(() -> {
-                    new TraCuuVeTauGUI().setVisible(true);
-                    dispose();
-                });
-            } else if (e.getSource() == btnDangXuat) {
-                SwingUtilities.invokeLater(() -> {
+            if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
+                new TraCuuChuyenTauGUI().setVisible(true); 
+            } else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
+                new GiaoDienHuyVe().setVisible(true); 
+            } else if (command.equals("ĐỔI VÉ") || e.getSource() == btnDoiVe) {
+                new TraCuuVeTauGUI().setVisible(true);
+            } else if (command.equals("TÌM CHUYẾN") || e.getSource() == btnTimChuyenTau) {
+                new TraCuuChuyenTauGUI().setVisible(true); 
+            } else if (command.equals("ĐĂNG XUẤT") || e.getSource() == btnDangXuat) {
+                int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Bạn có chắc chắn muốn đăng xuất không?",
+                    "Xác nhận đăng xuất",
+                    JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
                     try {
-						new DangNhapGUI().setVisible(true);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-                    dispose();
-                });
+                        new DangNhapGUI().setVisible(true);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    this.dispose();
+                }
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Không thể mở giao diện: " + ex.getMessage(), "Lỗi Hệ thống", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        new NhanVienBanVeGUI().setVisible(true);
     }
 }
