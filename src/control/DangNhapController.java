@@ -82,7 +82,7 @@ public class DangNhapController implements ActionListener, MouseListener {
                 // Phân quyền và mở form tương ứng
                 if ("Nhân viên bán vé".equals(loaiChucVu)) {
                     try {
-                        new NhanVienBanVeGUI().setVisible(true);
+                        new NhanVienBanVeGUI(null).setVisible(true);
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, "Lỗi khi mở giao diện bán vé: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }

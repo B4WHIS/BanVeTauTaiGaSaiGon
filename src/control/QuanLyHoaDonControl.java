@@ -1,10 +1,15 @@
 package control;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import connectDB.connectDB;
 import dao.ChiTietHoaDonDAO;
+import dao.HanhKhachDAO;
 import dao.HoaDonDAO;
+import dao.VeDAO;
 import entity.ChiTietHoaDon;
 import entity.HanhKhach;
 import entity.HoaDon;
@@ -12,104 +17,64 @@ import entity.NhanVien;
 import entity.Ve;
 
 public class QuanLyHoaDonControl {
-    private HoaDonDAO hoaDonDAO;
-    private ChiTietHoaDonDAO chiTietHoaDonDAO;
 
-    public QuanLyHoaDonControl() {
-        hoaDonDAO = new HoaDonDAO();
-        chiTietHoaDonDAO = new ChiTietHoaDonDAO();
-    }
+    private final VeDAO veDAO = new VeDAO();
+    private final HoaDonDAO hoaDonDAO = new HoaDonDAO();
+    private final ChiTietHoaDonDAO chiTietDAO = new ChiTietHoaDonDAO();
+    private final HanhKhachDAO hanhKhachDAO = new HanhKhachDAO();
 
-    public boolean lapHoaDon(HanhKhach hanhKhach, NhanVien nhanVien, List<Ve> danhSachVe) {
-        if (hanhKhach == null || nhanVien == null || danhSachVe == null || danhSachVe.isEmpty()) {
-            System.err.println(" Dữ liệu lập hóa đơn không hợp lệ!");
-            return false;
-        }
+    private static final BigDecimal VAT = new BigDecimal("0.1");
+
+    public HoaDon lapHoaDon(HanhKhach hk, NhanVien nv, List<Ve> dsVe) throws Exception {
+        if (dsVe == null || dsVe.isEmpty())
+            throw new IllegalArgumentException("Danh sách vé rỗng!");
+        if (hk == null || nv == null)
+            throw new IllegalArgumentException("Thiếu thông tin!");
+
+        Connection conn = connectDB.getConnection();
+        conn.setAutoCommit(false);
 
         try {
-            //  Tạo hóa đơn
-            HoaDon hoaDon = new HoaDon();
-            hoaDon.setMaHoaDon(generateMaHoaDon());
-            hoaDon.setNgayLap(LocalDateTime.now());
-            hoaDon.setMaHanhKhach(hanhKhach);
-            hoaDon.setMaNhanVien(nhanVien);
-
-            // 2️⃣ Tạo chi tiết hóa đơn cho từng vé
-            for (Ve ve : danhSachVe) {
-                ChiTietHoaDon cthd = new ChiTietHoaDon(hoaDon, ve, ve.getGiaThanhToan().doubleValue());
-                hoaDon.getDanhSachChiTiet().add(cthd);
+            // 1. Thêm vé
+            for (Ve ve : dsVe) {
+                String maVe = veDAO.themVe(ve);
+                ve.setMaVe(maVe);
             }
 
-            // 3️⃣ Tính tổng tiền
-            double tongTien = hoaDon.tinhTongTien();
-            hoaDon.setTongTien(tongTien);
+            // 2. Tính tổng + VAT
+            BigDecimal tongTruocVAT = dsVe.stream()
+                    .map(Ve::getGiaThanhToan)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal tongSauVAT = tongTruocVAT.multiply(BigDecimal.ONE.add(VAT));
 
-            // 4️⃣ Ghi vào DB
-            boolean hoaDonInserted = hoaDonDAO.insertHoaDon(hoaDon);
-            if (!hoaDonInserted) {
-                System.err.println(" Lỗi khi thêm Hóa đơn!");
-                return false;
+            // 3. Tạo hóa đơn
+            HoaDon hd = new HoaDon();
+            hd.setMaHanhKhach(hk);
+            hd.setMaNhanVien(nv);
+            hd.setNgayLap(LocalDateTime.now());
+            hd.setTongTien(tongSauVAT); // DÙNG setTongTien
+
+            // 4. Thêm vào DB → SQL sinh maHoaDon
+            String maHoaDon = hoaDonDAO.insert(hd);
+
+            // 5. Thêm chi tiết
+            for (Ve ve : dsVe) {
+                ChiTietHoaDon cthd = new ChiTietHoaDon();
+                cthd.setHoaDon(hd);
+                cthd.setVe(ve);
+                cthd.setDonGia(ve.getGiaThanhToan());
+                chiTietDAO.insert(cthd);
             }
 
-            // 5️⃣ Thêm chi tiết hóa đơn
-            for (ChiTietHoaDon cthd : hoaDon.getDanhSachChiTiet()) {
-                boolean added = chiTietHoaDonDAO.insertChiTietHoaDon(cthd);
-                if (!added) {
-                    System.err.println(" Lỗi khi thêm Chi tiết hóa đơn cho vé: " + cthd.getVe().getMaVe());
-                    return false;
-                }
-            }
-
-            System.out.println(" Lập hóa đơn thành công! Tổng tiền: " + tongTien);
-            return true;
+            conn.commit();
+            return hd;
 
         } catch (Exception e) {
-            System.err.println("Lỗi khi lập hóa đơn: " + e.getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Sinh mã hóa đơn tự động (ví dụ: HD20251022001)
-     */
-    private String generateMaHoaDon() {
-        String prefix = "HD";
-        String datePart = LocalDateTime.now().toLocalDate().toString().replace("-", "");
-        int random = (int) (Math.random() * 900 + 100); // 3 số ngẫu nhiên
-        return prefix + datePart + random;
-    }
-
-    /**
-     * Lấy danh sách hóa đơn (hiển thị trong giao diện)
-     */
-    public List<HoaDon> getDanhSachHoaDon() {
-        return hoaDonDAO.getAllHoaDon();
-    }
-
-    /**
-     * Xem chi tiết một hóa đơn
-     */
-    public List<ChiTietHoaDon> getChiTietHoaDon(String maHoaDon) {
-        return chiTietHoaDonDAO.getChiTietByMaHoaDon(maHoaDon);
-    }
-
-    /**
-     * Xóa một hóa đơn (và toàn bộ chi tiết của nó)
-     */
-    public boolean xoaHoaDon(String maHoaDon) {
-        try {
-            List<ChiTietHoaDon> chiTietList = chiTietHoaDonDAO.getChiTietByMaHoaDon(maHoaDon);
-            for (ChiTietHoaDon cthd : chiTietList) {
-                chiTietHoaDonDAO.deleteChiTietHoaDon(maHoaDon, cthd.getVe().getMaVe());
-            }
-
-            // Xóa hóa đơn chính
-            // (cần có phương thức deleteHoaDon() trong HoaDonDAO nếu bạn muốn thêm)
-            System.out.println("Đã xóa chi tiết, giờ có thể xóa Hóa đơn: " + maHoaDon);
-            return true;
-        } catch (Exception e) {
-            System.err.println("Lỗi khi xóa hóa đơn: " + e.getMessage());
-            return false;
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+            conn.close();
         }
     }
 }

@@ -20,6 +20,13 @@ public class ToaTau {
         setHeSoGia(heSoGia);
         setTau(tau);
     }
+    public ToaTau(String maToa, int soThuTuToa, int soLuongCho, String maTau) {
+        setMaToa(maToa);
+        setSoThuTu(soThuTuToa); 
+        setSoLuongCho(soLuongCho);
+
+        this.tau = new Tau(maTau); 
+    }
     public ToaTau(String maToa) {
     	setMaToa(maToa);
     }

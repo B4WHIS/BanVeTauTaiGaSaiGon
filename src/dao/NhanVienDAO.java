@@ -12,10 +12,8 @@ import connectDB.connectDB;
 import entity.NhanVien;
 
 public class NhanVienDAO {
-	private NhanVienDAO nhanVienDAO = new NhanVienDAO();
 
-    // Phương thức lấy tất cả tên nhân viên (cho ComboBox) - Chỉ hoTen
-    public List<String> getAllTenNhanVien() {
+	public List<String> getAllTenNhanVien() {
         List<String> listTenNV = new ArrayList<>();
         String sql = "SELECT hoTen FROM NhanVien ORDER BY hoTen";
         try (Connection conn = connectDB.getConnection();
@@ -120,7 +118,6 @@ public class NhanVienDAO {
         return null;
     }
 
-    // Helper: Tạo NhanVien từ ResultSet - Cập nhật để load IDloaiChucVu
     private NhanVien taoNhanVienTuResultSet(ResultSet rs) throws SQLException {
         NhanVien nv = new NhanVien();
         nv.setMaNhanVien(rs.getString("maNhanVien"));
@@ -130,7 +127,8 @@ public class NhanVienDAO {
         if (rs.getString("cmndCccd") != null) {
             nv.setCmndCccd(rs.getString("cmndCccd"));
         }
-        nv.setIDloaiChucVu(rs.getInt("IDloaiChucVu"));  // Load IDloaiChucVu
+        nv.setIDloaiChucVu(rs.getInt("IDloaiChucVu")); // Load IDloaiChucVu
         return nv;
     }
+
 }
