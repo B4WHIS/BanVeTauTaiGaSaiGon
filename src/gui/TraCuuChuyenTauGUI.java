@@ -45,6 +45,7 @@ import entity.ChuyenTau;
 import entity.Ga;
 import entity.NhanVien;
 import entity.ToaTau;
+import entity.Ve;
 
 public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     private JPanel pnlChinh;
@@ -79,8 +80,21 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     private TauDAO tauDAO = new TauDAO();
     private final DateTimeFormatter dinhDangNgayGio = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
+    private Ve veCu; // Thêm để hỗ trợ đổi vé
+    private JFrame previousScreen; // Để quay lại màn hình trước (TraCuuVeTauGUI)
+
     public TraCuuChuyenTauGUI(NhanVien nhanVien) {
+        this(nhanVien, null, null);
+    }
+
+    public TraCuuChuyenTauGUI(JFrame previous, Ve veCu) {
+        this(new NhanVien("NV-001"), previous, veCu); // Giả định NV mặc định nếu không có
+    }
+
+    public TraCuuChuyenTauGUI(NhanVien nhanVien, JFrame previous, Ve veCu) {
         this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");
+        this.previousScreen = previous;
+        this.veCu = veCu;
         initializeUI();
         loadGaDataToComboBox();
     }
@@ -121,7 +135,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         pnlThongTinTim.add(lblGaDi, gbc);
-
         cbGaDi = new JComboBox<>();
         cbGaDi.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         gbc.gridx = 1;
@@ -136,7 +149,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.NONE;
         pnlThongTinTim.add(lblGaDen, gbc);
-
         cbGaDen = new JComboBox<>();
         cbGaDen.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         gbc.gridx = 1;
@@ -151,7 +163,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         gbc.gridy = 2;
         gbc.fill = GridBagConstraints.NONE;
         pnlThongTinTim.add(lblNgayDi, gbc);
-
         dateChooser = new JDateChooser();
         dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         dateChooser.setPreferredSize(new Dimension(0, 35));
@@ -310,8 +321,9 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
             this.setVisible(false);
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new ChonChoNgoiGUI(ct, nhanVienHienTai, null).setVisible(true);
-                } catch (SQLException ex) {
+                    // Constructor KHÔNG throws → không cần catch SQLException
+                    new ChonChoNgoiGUI(ct, nhanVienHienTai, this, veCu).setVisible(true);
+                } catch (Exception ex) { // Bắt Exception chung
                     JOptionPane.showMessageDialog(null, "Lỗi khi mở màn hình chọn chỗ: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }
@@ -432,6 +444,9 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
             pnlTrungTam.repaint();
         } else if (src == btnTroVe) {
             this.dispose();
+            if (previousScreen != null) {
+                previousScreen.setVisible(true);
+            }
             // Optionally return to main menu, e.g., new NhanVienBanVeGUI(nhanVienHienTai).setVisible(true);
         }
     }

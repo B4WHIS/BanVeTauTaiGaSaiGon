@@ -1,495 +1,255 @@
+// File: src/gui/GiaoDienHuyVe.java
 package gui;
-
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.math.BigDecimal;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 
 import control.QuanLyVeControl;
 import entity.LichSuVe;
 import entity.NhanVien;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 public class GiaoDienHuyVe extends GiaoDienChinh {
-	private JPanel jpmenu;
-	private JPanel jpContent;
-	private JPanel jpTrai;
-	private JPanel jpPhai;
-	private JButton btn;
-	private CardLayout cardLayout;
-	private JPanel jpB1;
-	private JLabel lbltileB1;
-	private JPanel jpInfo;
-	private JLabel lblStd;
-	private JTextField txtSDT;
-	private JLabel lblCCCD;
-	private JTextField txtCCCD;
-	private JLabel lblHT;
-	private JTextField txtHT;
-	private JLabel lblLuuY;
-	private JPanel jpTongPhai;
-	
-	private JLabel[] lblCacBuoc;
-	private JPanel jpTienTrinh;
-	private int buocHT = 0;
-	private JButton btnQuayLai;
-	private JButton btnTiepTheo;
-	private JPanel jpDieuHuong;
-	private DefaultTableModel tblModel;
-	private JTable tableB2;
-	private JScrollPane srcollPane;
-	private JLabel lblB2;
-	private JPanel jpInfoB2;
-	private Component txtHTht;
-	private Component txtSDTht;
-	private JTextField txtCCCDht;
-	
-	public GiaoDienHuyVe() {
-		setTitle("Hệ thống bán vé");
-		setSize(1200,800);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//Layout của frame tổng.
-		setLayout(new BorderLayout());
-		 
-		// Frame Menu
-		jpmenu = new JPanel(new FlowLayout());
-		
-		jpmenu.setPreferredSize(new Dimension(1000, 50));
-		// Frame content
-		jpContent = new JPanel(new BorderLayout());
-	
-		// các frame con của Frame content
-		//Frame trái
-	
-		
-	
-		jpTongPhai = new JPanel(new BorderLayout());
-	
-		cardLayout = new CardLayout();
-		jpPhai = new JPanel(cardLayout);
-		jpPhai.setBorder(new EmptyBorder(20,20,20,20));
-	
-		//tạo Frame cho từng bước
-		JPanel step1Panel = createStep1Panel();
-		jpPhai.add(step1Panel,"Step1");
-	    JPanel step2Panel = createStep2Panel();
-	    jpPhai.add(step2Panel,"Step2");
-	    JPanel step3Panel = createStep3Panel();
-	    jpPhai.add(step3Panel,"Step3");
-	    JPanel step4Panel = createStep4Panel();
-	    jpPhai.add(step4Panel,"Step4");
-		
-		
-		
-		jpTienTrinh = taoThanhQuyTrinh();
-		jpDieuHuong = taoDieuHuong();
-		jpTongPhai.add(jpTienTrinh,BorderLayout.NORTH);
-		jpTongPhai.add(jpPhai,BorderLayout.CENTER);
-		jpTongPhai.add(jpDieuHuong,BorderLayout.SOUTH);
-		
-		
-		jpContent.add(jpTongPhai,BorderLayout.CENTER);
-		
-		
-		//add component vào Frame tổng
-		add(jpmenu, BorderLayout.NORTH);
-		add(jpContent, BorderLayout.CENTER);
-		
-		cardLayout.show(jpPhai, "Step1");
-		capNhatTienTrinh();
-		setVisible(true);
-		
-	}
-	private JPanel createStep1Panel() {
-		jpB1 = new JPanel(new BorderLayout());
-		jpB1.setBorder(new EmptyBorder(30,30,30,100));
-		lbltileB1 = new JLabel("Để hiển thị các vé cần hủy hãy nhập các thông tin dưới đây:");
-		lbltileB1.setFont(new Font("Arial", Font.BOLD,25));
-		lbltileB1.setHorizontalAlignment(SwingConstants.CENTER);
-		lbltileB1.setForeground(new Color(74, 140, 103));
-	
-		
-		lblLuuY = new JLabel("Lưu ý : các thông tin này phải khớp với thông tin trên vé");
-		lblLuuY.setFont(new Font("Arial", Font.ITALIC, 14));
-		lblLuuY.setForeground(new Color(229, 115, 11));
-		lblLuuY.setHorizontalAlignment(SwingConstants.CENTER);
-		
-		
-		jpInfo = new JPanel(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.WEST;
-		lblHT = new JLabel("Họ và tên:");
-		txtHT = new JTextField();
-		txtHT.setPreferredSize(new Dimension(300,25));
-		lblStd = new JLabel("Số điện thoại:");
-		txtSDT = new JTextField();
-		txtSDT.setPreferredSize(new Dimension(300,25));
-		lblCCCD = new JLabel("CCCD:");
-		txtCCCD = new JTextField();
-		txtCCCD.setPreferredSize(new Dimension(300,25));
-		
-		gbc.gridx = 0; gbc.gridy=0;
-		jpInfo.add(lblHT,gbc);
-		gbc.gridx = 1;
-		jpInfo.add(txtHT,gbc);
-		
-		gbc.gridx = 0; gbc.gridy=1;
-		jpInfo.add(lblStd,gbc);
-		gbc.gridx = 1;
-		jpInfo.add(txtSDT,gbc);
-		
-		gbc.gridx = 0; gbc.gridy=2;
-		jpInfo.add(lblCCCD,gbc);
-		gbc.gridx = 1;
-		jpInfo.add(txtCCCD,gbc);
-		
-		
-		jpB1.add(lbltileB1,BorderLayout.NORTH);
-		jpB1.add(lblLuuY,BorderLayout.SOUTH);
-		jpB1.add(jpInfo,BorderLayout.CENTER);
-		
-		return jpB1;
-		
-		
-	}
-	private JPanel createStep2Panel() {
-		JPanel jpB2 = new JPanel(new BorderLayout());
-		jpB2.setBorder(new EmptyBorder(20,20,20,20));
-		String [] colums = {"#","Họ tên","Thông tin vé","Thành tiền (VND)","Lệ phí trả vé","Tiền trả lại","Thông tin vé trả","Chọn trả vé"};
-		Object[][] data = {};
-		DefaultTableModel model = new DefaultTableModel(data, colums) {
-	            @Override
-	            public Class<?> getColumnClass(int columnIndex) {
-	                if (columnIndex == 7) return Boolean.class; // cột checkbox
-	                return String.class;
-	            }
+    private JPanel jpPhai;
+    private CardLayout cardLayout;
+    private DefaultTableModel tableModel;
+    private JTable table;
+    private JLabel lblTongTien, lblTongPhi, lblTongHoan;
+    private List<String> maVeList;
+    private QuanLyVeControl veControl = new QuanLyVeControl();
+    private NhanVien nhanVien = new NhanVien("NV-001", "Nguyễn Văn A", LocalDate.of(1985, 05, 15), "0987654321", "001122334455", 1); // Thay bằng đăng nhập thật
 
-	            @Override
-	            public boolean isCellEditable(int row, int column) {
-	                return column == 7; // chỉ cho phép tick vào checkbox
-	            }
-	        };
+    public GiaoDienHuyVe(List<Object[]> danhSachVe, List<String> maVeList) {
+        this.maVeList = maVeList;
+        setTitle("Hủy vé tàu");
+        setSize(1000, 700);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		
-		tableB2 = new JTable(model);
-		srcollPane = new JScrollPane(tableB2);
-		
-		lblB2 = new JLabel("Thông tin của vé: ");
-		lblB2.setFont(new Font("Arial", Font.BOLD, 16));
-		lblB2.setForeground(new Color(229, 115, 11));
-		
-		
-		JPanel panelSouth = new JPanel(new BorderLayout());
-		JLabel lblInFoDV = new JLabel("Thông tin người đặt vé:");
-		lblInFoDV.setFont(new Font("Arial", Font.BOLD, 16));
-		lblInFoDV.setForeground(new Color(229,115,11));
-		jpInfoB2 = new JPanel(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.WEST;
-		lblHT = new JLabel("Họ và tên:");
-		txtHTht = new JTextField();
-		txtHTht.setPreferredSize(new Dimension(300,25));
-		txtHTht.setEnabled(false);
-		lblStd = new JLabel("Số điện thoại:");
-		txtSDTht = new JTextField();
-		txtSDTht.setPreferredSize(new Dimension(300,25));
-		txtSDTht.setEnabled(false);
-		lblCCCD = new JLabel("CCCD:");
-		txtCCCDht = new JTextField();
-		txtCCCDht.setPreferredSize(new Dimension(300,25));
-		txtCCCDht.setEnabled(false);
-		gbc.gridx = 0; gbc.gridy=0;
-		jpInfoB2.add(lblHT,gbc);
-		gbc.gridx = 1;
-		jpInfoB2.add(txtHTht,gbc);
-		
-		gbc.gridx = 0; gbc.gridy=1;
-		jpInfoB2.add(lblStd,gbc);
-		gbc.gridx = 1;
-		jpInfoB2.add(txtSDTht,gbc);
-		
-		gbc.gridx = 0; gbc.gridy=2;
-		jpInfoB2.add(lblCCCD,gbc);
-		gbc.gridx = 1;
-		jpInfoB2.add(txtCCCDht,gbc);
-		panelSouth.add(lblInFoDV,BorderLayout.NORTH);
-		panelSouth.add(jpInfoB2,BorderLayout.CENTER);
-		
-		
-		jpB2.add(lblB2,BorderLayout.NORTH);
-		jpB2.add(srcollPane,BorderLayout.CENTER);
-		jpB2.add(panelSouth,BorderLayout.SOUTH);
-		return jpB2;
-		
-		
-	}
-	private JPanel createStep3Panel() {
-		 JPanel panel = new JPanel(new BorderLayout());
-	        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        initComponents(danhSachVe);
+        setupLayout();
+        tinhToanTong();
+    }
 
-	        JLabel title = new JLabel("Thông tin vé chọn hủy:");
-	        title.setFont(new Font("Arial", Font.BOLD, 18));
-	        title.setForeground(new Color(229,115,11));
+    private void initComponents(List<Object[]> danhSachVe) {
+        jpPhai = new JPanel();
+        cardLayout = new CardLayout();
+        jpPhai.setLayout(cardLayout);
 
-	       
-	        String[] columnNames = {"Mục", "Nội dung"};
-	        Object[][] data = {
-	                {"- Họ tên: ", " "},
-	                {"- Số giấy tờ", " "},
-	                {"- Tàu", " "},
-	                {"- Số toa", " "},
-	                {"- Số chỗ ngồi", " "},
-	                {"- Tiền vé", " "},
-	                {"- Lệ phí trả vé", " "},
-	                {"- Tiền trả", " "},
-	        };
+        // BƯỚC 1: DANH SÁCH VÉ
+        JPanel step1 = taoBuoc1(danhSachVe);
+        jpPhai.add(step1, "Step1");
 
-	        JTable table = new JTable(data, columnNames) {
-	            public boolean isCellEditable(int row, int column) {
-	                return false;
-	            }
-	        };
-	        table.setRowHeight(30);
-	        table.setFont(new Font("Arial", Font.PLAIN, 14));
-	        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-	        table.setFillsViewportHeight(true);
+        // BƯỚC 2: XÁC NHẬN
+        JPanel step2 = taoBuoc2();
+        jpPhai.add(step2, "Step2");
 
-	        JScrollPane scrollPane = new JScrollPane(table);
-	        scrollPane.setPreferredSize(new Dimension(500, 150));
-	        scrollPane.setBorder(BorderFactory.createTitledBorder("Thông tin xác nhận:"));
-	        
-	        JLabel lblLuuYxn = new JLabel("Lưu ý: Xác nhận đúng thông tin và nhấn nút tiếp theo để hoàn tất thủ tục hủy vé");
-	        lblLuuYxn.setFont(new Font("Arial", Font.ITALIC, 14));
-	        lblLuuYxn.setForeground(new Color(229,115,11));
+        // BƯỚC 3: HOÀN TẤT
+        JPanel step3 = taoBuoc3();
+        jpPhai.add(step3, "Step3");
+    }
 
-	        panel.add(title, BorderLayout.NORTH);
-	        panel.add(scrollPane, BorderLayout.CENTER);
-	        panel.add(lblLuuYxn,BorderLayout.SOUTH);
+    private JPanel taoBuoc1(List<Object[]> danhSachVe) {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-	        return panel;
-	}
-	private JPanel createStep4Panel() {
-		JPanel jpB4 = new JPanel(new BorderLayout());
-		JLabel lblTB = new JLabel("Đã hủy vé thành công!",SwingConstants.CENTER);
-		lblTB.setFont(new Font("Arial", Font.BOLD, 20));
-		lblTB.setForeground(new Color(74, 140, 103));
-		jpB4.add(lblTB,BorderLayout.CENTER);
-		return jpB4;
-		
-	}
-	private JPanel taoThanhQuyTrinh() {
-	    JPanel jpQuyTrinh = new JPanel();
-	    jpQuyTrinh.setLayout(new BoxLayout(jpQuyTrinh, BoxLayout.X_AXIS));
-	    jpQuyTrinh.setBorder(new EmptyBorder(10, 0, 10, 0));
-	    jpQuyTrinh.setBackground(new Color(74, 140, 103));
-	    
-	    lblCacBuoc = new JLabel[4];
-	    String[] cacBuoc = {"Nhập thông tin", "Chọn vé", "Xác nhận", "Hoàn tất"};
-	    
-	  
-	    jpQuyTrinh.add(Box.createHorizontalGlue());
-	    
-	    for (int i = 0; i < 4; i++) {
-	       
-	        JPanel stepSubPanel = new JPanel();
-	        stepSubPanel.setLayout(new BoxLayout(stepSubPanel, BoxLayout.Y_AXIS));
-	        stepSubPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-	        stepSubPanel.setPreferredSize(new Dimension(150, 70));  
-	        stepSubPanel.setMinimumSize(new Dimension(150, 70));
-	        stepSubPanel.setMaximumSize(new Dimension(150, 70));
-	        stepSubPanel.setBackground(new Color(74, 140, 103));  
+        JLabel title = new JLabel("Chọn vé để hủy", SwingConstants.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setForeground(new Color(74, 140, 103));
 
-	        
-	        ImageIcon stepIcon = chinhKichThuoc("/img/step-icon-" + (i+1) + ".png", 30, 30);
-	        JLabel iconLabel = new JLabel(stepIcon);
-	        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-	        stepSubPanel.add(iconLabel);
+        // BẢNG GIỐNG TRA CỨU
+        String[] cols = {"#", "Họ tên", "Thông tin vé", "Thành tiền (VNĐ)", "Loại vé", "Trạng thái"};
+        tableModel = new DefaultTableModel(cols, 0) {
+            @Override public boolean isCellEditable(int row, int col) { return false; }
+        };
 
-	        // Label chính (bước hiện tại)
-	        lblCacBuoc[i] = new JLabel(cacBuoc[i]);
-	        lblCacBuoc[i].setForeground(Color.WHITE);
-	        lblCacBuoc[i].setFont(new Font("Arial", Font.BOLD, 16));
-	        lblCacBuoc[i].setHorizontalAlignment(SwingConstants.CENTER);
-	        lblCacBuoc[i].setBorder(BorderFactory.createLineBorder(new Color(225, 242, 232), 1, true));
-	        lblCacBuoc[i].setAlignmentX(Component.CENTER_ALIGNMENT);
-	        stepSubPanel.add(lblCacBuoc[i]);
+        for (Object[] row : danhSachVe) {
+            tableModel.addRow(row);
+        }
 
-	        // Label dưới (thêm mô tả, ví dụ số bước hoặc tùy chỉnh)
-	        JLabel subLabel = new JLabel("Bước " + (i + 1));  // Hoặc text khác như "Hoàn thành" cho bước đã làm
-	        subLabel.setForeground(Color.WHITE);
-	        subLabel.setFont(new Font("Arial", Font.PLAIN, 10));
-	        subLabel.setHorizontalAlignment(SwingConstants.CENTER);
-	        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-	        stepSubPanel.add(subLabel);
+        table = new JTable(tableModel);
+        table.setRowHeight(60);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.getColumnModel().getColumn(0).setMaxWidth(50);
+        JScrollPane scroll = new JScrollPane(table);
 
-	        jpQuyTrinh.add(stepSubPanel);
-	        
-	        if (i < 3) {
-	            JLabel muiTen = new JLabel("→");
-	            muiTen.setForeground(Color.WHITE);
-	            muiTen.setFont(new Font("Arial", Font.BOLD, 14));
-	            muiTen.setPreferredSize(new Dimension(30, 60));  // Height tăng để fit sub-panel
-	            muiTen.setAlignmentY(Component.CENTER_ALIGNMENT);
-	            jpQuyTrinh.add(muiTen);
-	        }
-	    }
-	    
-	    // Thêm glue để căn giữa
-	    jpQuyTrinh.add(Box.createHorizontalGlue());
-	    
-	    // Cập nhật bước đầu tiên
-	    lblCacBuoc[0].setOpaque(true);
-	    lblCacBuoc[0].setBackground(Color.WHITE);
-	    lblCacBuoc[0].setForeground(new Color(52, 152, 219));
-	    
-	    return jpQuyTrinh;
-	}
-	 
-	private JPanel taoDieuHuong () {
-		JPanel jpDieuHuong = new JPanel(new BorderLayout());
-		jpDieuHuong.setBorder(new EmptyBorder(10,0,10,0));
-		jpDieuHuong.setPreferredSize(new Dimension(150,80));
-		
-		btnQuayLai = new JButton("Quay lại");
-		btnTiepTheo = new JButton("Tiếp theo");
-		
-		btnQuayLai.setEnabled(false);
-		btnQuayLai.addActionListener(e -> {
-			if(buocHT > 0) {
-				buocHT--;
-				cardLayout.previous(jpPhai);
-				capNhatTienTrinh();
-				btnTiepTheo.setText(buocHT == 3 ? "Hoàn tất":"Tiếp theo");
-				btnQuayLai.setEnabled(buocHT > 0);
-				btnTiepTheo.setEnabled(buocHT < 3);
-			}
-		});
-		btnTiepTheo.addActionListener(e ->{
-			if(buocHT < 3) {
-				if(buocHT == 0) {
-					buocHT++;
-					cardLayout.next(jpPhai);
-					capNhatTienTrinh();
-					btnTiepTheo.setText(buocHT == 3 ? "Hoàn tất":"Tiếp theo");
-					btnQuayLai.setEnabled(true);
-					btnTiepTheo.setEnabled(buocHT < 3);	
-				}else {
-					buocHT++;
-					cardLayout.next(jpPhai);
-					capNhatTienTrinh();
-					btnTiepTheo.setText(buocHT == 3 ? "Hoàn tất":"Tiếp theo");
-					btnQuayLai.setEnabled(true);
-					btnTiepTheo.setEnabled(buocHT < 3);
-					
-			}
-		}
-		});
-		btnQuayLai.setFont(new Font("Arial", Font.PLAIN, 16));
-		btnTiepTheo.setFont(new Font("Arial", Font.PLAIN, 16));
-		btnTiepTheo.setBackground(new Color(93, 156, 236));
-		btnTiepTheo.setForeground(Color.WHITE);
-		btnQuayLai.setBorder(new EmptyBorder(20,40,20,40));
-		btnTiepTheo.setBorder(new EmptyBorder(20,40,20,40));
-		jpDieuHuong.add(btnQuayLai,BorderLayout.WEST);
-		jpDieuHuong.add(btnTiepTheo,BorderLayout.EAST);
-		jpDieuHuong.setBackground(new Color(103, 192, 144));
-		return jpDieuHuong;
-	
-	}
-	private void capNhatTienTrinh() {
-		for(int i = 0 ; i < 4; i++) {
-			if(i < buocHT ) {
-				lblCacBuoc[i].setOpaque(true);
-			lblCacBuoc[i].setBackground(new Color(103, 192, 144));
-				lblCacBuoc[i].setForeground(Color.WHITE);
-			}else if(i == buocHT) {
-				lblCacBuoc[i].setOpaque(true);
-				lblCacBuoc[i].setBackground(Color.white);
-				lblCacBuoc[i].setForeground(new Color(103, 192, 144));
-			}else {
-				lblCacBuoc[i].setOpaque(true);
-				lblCacBuoc[i].setForeground(new Color(151,151,151));
-				lblCacBuoc[i].setBackground(Color.WHITE);
-			}
-		}
-	}
-	
-	public static void main(String[] args) {
-		LookAndFeelManager.setNimbusLookAndFeel();
-		new GiaoDienHuyVe();
-	}
+        // TỔNG TIỀN
+        JPanel panelTong = new JPanel(new GridLayout(1, 3, 20, 0));
+        panelTong.setBorder(BorderFactory.createTitledBorder("Tổng kết"));
+        lblTongTien = new JLabel("Tổng tiền vé: 0 VNĐ");
+        lblTongPhi = new JLabel("Tổng phí hủy: 0 VNĐ");
+        lblTongHoan = new JLabel("Tổng hoàn: 0 VNĐ");
+        lblTongTien.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTongPhi.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTongHoan.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        panelTong.add(lblTongTien);
+        panelTong.add(lblTongPhi);
+        panelTong.add(lblTongHoan);
+
+        panel.add(title, BorderLayout.NORTH);
+        panel.add(scroll, BorderLayout.CENTER);
+        panel.add(panelTong, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JPanel taoBuoc2() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel title = new JLabel("Xác nhận hủy vé", SwingConstants.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+
+        JTable confirmTable = new JTable(tableModel);
+        confirmTable.setEnabled(false);
+        JScrollPane scroll = new JScrollPane(confirmTable);
+
+        JLabel note = new JLabel("Kiểm tra kỹ thông tin trước khi xác nhận.");
+        note.setForeground(Color.RED);
+        note.setHorizontalAlignment(SwingConstants.CENTER);
+
+        panel.add(title, BorderLayout.NORTH);
+        panel.add(scroll, BorderLayout.CENTER);
+        panel.add(note, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    private JPanel taoBuoc3() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+
+        JLabel success = new JLabel("HỦY VÉ THÀNH CÔNG!", SwingConstants.CENTER);
+        success.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        success.setForeground(new Color(74, 140, 103));
+
+        JLabel detail = new JLabel("<html><center>Đã hoàn tất thủ tục hủy.<br>Tiền sẽ được hoàn trong 3-5 ngày làm việc.</center></html>");
+        detail.setHorizontalAlignment(SwingConstants.CENTER);
+        detail.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+
+        panel.add(success, BorderLayout.CENTER);
+        panel.add(detail, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    private void setupLayout() {
+        JPanel main = new JPanel(new BorderLayout());
+        main.add(taoThanhTienTrinh(), BorderLayout.NORTH);
+        main.add(jpPhai, BorderLayout.CENTER);
+        main.add(taoDieuHuong(), BorderLayout.SOUTH);
+        add(main);
+    }
+
+    private JPanel taoThanhTienTrinh() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 10));
+        panel.setBackground(new Color(74, 140, 103));
+        String[] steps = {"Chọn vé", "Xác nhận", "Hoàn tất"};
+        for (int i = 0; i < steps.length; i++) {
+            JLabel lbl = new JLabel(steps[i]);
+            lbl.setForeground(Color.WHITE);
+            lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            panel.add(lbl);
+            if (i < steps.length - 1) {
+                JLabel arrow = new JLabel("→");
+                arrow.setForeground(Color.WHITE);
+                panel.add(arrow);
+            }
+        }
+        return panel;
+    }
+
+    private JPanel taoDieuHuong() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
+        JButton btnQuay = new JButton("Quay lại");
+        JButton btnTiep = new JButton("Tiếp theo");
+
+        btnQuay.addActionListener(e -> cardLayout.previous(jpPhai));
+        btnTiep.addActionListener(e -> {
+            String current = cardLayout.toString();
+            if (jpPhai.getComponent(1).isVisible()) { // Bước xác nhận
+                thucHienHuyVe();
+            } else {
+                cardLayout.next(jpPhai);
+            }
+        });
+
+        panel.add(btnQuay);
+        panel.add(btnTiep);
+        return panel;
+    }
+
+    private void tinhToanTong() {
+        // Chỉ lấy giá vé từ bảng (cột "Thành tiền")
+        BigDecimal tongVe = BigDecimal.ZERO;
+        BigDecimal tongPhi = BigDecimal.ZERO;
+        BigDecimal tongHoan = BigDecimal.ZERO;
+
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            String thanhTienStr = (String) tableModel.getValueAt(i, 3);
+            thanhTienStr = thanhTienStr.replace(",", "").replace(" VNĐ", "");
+            BigDecimal tienVe = new BigDecimal(thanhTienStr);
+            tongVe = tongVe.add(tienVe);
+
+            // Giả sử phí hủy 10% (hoặc lấy từ DB sau)
+            BigDecimal phi = tienVe.multiply(new BigDecimal("0.1"));
+            tongPhi = tongPhi.add(phi);
+        }
+        tongHoan = tongVe.subtract(tongPhi);
+
+        lblTongTien.setText("Tổng tiền vé: " + String.format("%,.0f", tongVe) + " VNĐ");
+        lblTongPhi.setText("Tổng phí hủy: ~" + String.format("%,.0f", tongPhi) + " VNĐ");
+        lblTongHoan.setText("Tổng hoàn: ~" + String.format("%,.0f", tongHoan) + " VNĐ");
+    }
+    private void thucHienHuyVe() {
+        List<String> thanhCong = new ArrayList<>();
+        List<String> thatBai = new ArrayList<>();
+        BigDecimal tongVe = BigDecimal.ZERO;
+        BigDecimal tongPhi = BigDecimal.ZERO;
+        BigDecimal tongHoan = BigDecimal.ZERO;
+
+        for (String maVe : maVeList) {
+            try {
+                LichSuVe ls = veControl.xuLyHuyVe(maVe, "Hủy từ giao diện", nhanVien);
+                BigDecimal phi = ls.getPhiXuLy() != null ? ls.getPhiXuLy() : BigDecimal.ZERO;
+                BigDecimal hoan = ls.getTienHoan() != null ? ls.getTienHoan() : BigDecimal.ZERO;
+                BigDecimal tienVe = hoan.add(phi);
+
+                thanhCong.add(maVe);
+                tongVe = tongVe.add(tienVe);
+                tongPhi = tongPhi.add(phi);
+                tongHoan = tongHoan.add(hoan);
+            } catch (Exception ex) {
+                thatBai.add(maVe + ": " + ex.getMessage());
+            }
+        }
+
+        // Cập nhật tổng kết
+        lblTongTien.setText("Tổng tiền vé: " + String.format("%,.0f", tongVe) + " VNĐ");
+        lblTongPhi.setText("Tổng phí hủy: " + String.format("%,.0f", tongPhi) + " VNĐ");
+        lblTongHoan.setText("Tổng hoàn: " + String.format("%,.0f", tongHoan) + " VNĐ");
+
+        // Hiển thị kết quả
+        String msg = "<html><b>Hủy thành công: " + thanhCong.size() + " vé</b><br>";
+        if (!thatBai.isEmpty()) {
+            msg += "<b>Thất bại:</b><br>" + String.join("<br>", thatBai) + "<br>";
+        }
+        msg += "<b>Tổng hoàn: " + String.format("%,.0f", tongHoan) + " VNĐ</b></html>";
+
+        JOptionPane.showMessageDialog(this, msg, "Kết quả hủy vé", JOptionPane.INFORMATION_MESSAGE);
+        cardLayout.show(jpPhai, "Step3");
+    }
+
+    public static void main(String[] args) {
+        new GiaoDienHuyVe(null, null).setVisible(true);
+    }
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		Object obj = e.getSource();
-		if(obj == btnTiepTheo) {
-			if(buocHT < 3) {
-				if(buocHT == 0) {
-					String maVeCanHuy = layMaVeTuForm();
-					NhanVien nvThucHien = layThongTinNhanVien();
-					QuanLyVeControl veCT = new QuanLyVeControl();
-					try {
-						LichSuVe kqHuy = veCT.xuLyHuyVe(maVeCanHuy, "Kiểm tra điều kiện hủy", nvThucHien);
-						BigDecimal phiHuy = kqHuy.getPhiXuLy();
-						
-		                JOptionPane.showMessageDialog(this, 
-		                		"Vé hợp lệ! Phí hủy: " + phiHuy +
-		                		". Chuyển sang Bước 2.",
-                                "Thành công", JOptionPane.INFORMATION_MESSAGE);
-		                
-		                buocHT++;
-		                cardLayout.next(jpPhai);
-		                capNhatTienTrinh();
-		                btnTiepTheo.setText(buocHT == 3 ? "Hoàn tất" : "Tiếp theo");
-		                btnQuayLai.setEnabled(true);
-					}catch (Exception ex) {
-						// TODO: handle exception
-						JOptionPane.showMessageDialog(this, ex.getMessage(),
-								"Lỗi nghiệp vụ", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-		}else {
-			buocHT++;
-			cardLayout.next(jpPhai);
-			capNhatTienTrinh();
-			btnTiepTheo.setText(buocHT == 3 ? "Hoàn tất" : "Tiếp theo");
-			btnQuayLai.setEnabled(true);
-			btnTiepTheo.setEnabled(buocHT < 3);
-		}
-	}
-	private NhanVien layThongTinNhanVien() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	private String layMaVeTuForm() {
-		// TODO Auto-generated method stub
-		return null;
+		
 	}
 }

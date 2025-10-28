@@ -144,5 +144,4 @@ public class Ve {
 				+ ", maHanhkhach=" + maHanhkhach + ", maKhuyenMai=" + maKhuyenMai + ", maNhanVien=" + maNhanVien + "]";
 	}
 
-    
 }

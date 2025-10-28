@@ -65,49 +65,36 @@ public class VeDAO {
         }
     }
     
-    public String themVe(Ve ve) throws SQLException {
-        String sql = """
-            INSERT INTO Ve (ngayDat, giaVeGoc, giaThanhToan, trangThai, 
-                            maChoNgoi, maChuyenTau, maHanhKhach, maKhuyenMai, maNhanVien)
-            OUTPUT INSERTED.maVe
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
-
-        try (Connection conn = connectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Tham số 1 đến 4: Dữ liệu thuộc tính của Vé
-            stmt.setTimestamp(1, Timestamp.valueOf(ve.getNgayDat())); // ngayDat
-            stmt.setBigDecimal(2, ve.getGiaVeGoc()); // giaVeGoc (giaVeGoc > 0) [3, 4]
-            stmt.setBigDecimal(3, ve.getGiaThanhToan()); // giaThanhToan (giaThanhToan > 0) [3, 4]
-            stmt.setString(4, ve.getTrangThai()); // Trang thái ("Khả dụng")
-
-            // Tham số 5 đến 9: Khóa ngoại
-            stmt.setString(5, ve.getMaChoNgoi().getMaChoNgoi());
-            stmt.setString(6, ve.getMaChuyenTau().getMaChuyenTau());
-            stmt.setString(7, ve.getMaHanhkhach().getMaKH());
-            
-            // Xử lý MaKhuyenMai có thể NULL
-            if (ve.getMaKhuyenMai() != null) {
-                stmt.setString(8, ve.getMaKhuyenMai().getMaKhuyenMai());
-            } else {
-                stmt.setNull(8, Types.VARCHAR);
-            }
-            stmt.setString(9, ve.getMaNhanVien().getMaNhanVien());
-
-            // Thực thi và lấy kết quả trả về (maVe)
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    String maVe = rs.getString(1); 
-                    ve.setMaVe(maVe); // Cập nhật lại mã vé cho đối tượng
-                    return maVe;
-                }
-            }
-            throw new SQLException("Thêm vé thất bại, không nhận được mã vé trả về.");
-        }
+    //THÊM
+    public boolean themVe(Ve ve) throws SQLException {
+    	String sql = "INSERT INTO Ve (maVe, ngayDat, giaVeGoc, giaThanhToan, maChoNgoi, maChuyenTau, maHanhKhach"
+    			+ "maKhuyenMai, maNhanVien)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    	try(Connection con = connectDB.getConnection();
+    		PreparedStatement ps = con.prepareStatement(sql);){	
+			ps.setString(1, ve.getMaVe());
+			ps.setTimestamp(2, Timestamp.valueOf(ve.getNgayDat()));
+			ps.setBigDecimal(3, ve.getGiaVeGoc());
+			ps.setBigDecimal(4, ve.getGiaThanhToan());
+			ps.setString(5, ve.getMaChoNgoi().getMaChoNgoi());
+			ps.setString(6, ve.getMaChuyenTau().getMaChuyenTau());
+			ps.setString(7, ve.getMaHanhkhach().getMaKH());
+			
+			if(ve.getMaKhuyenMai() != null) {
+				ps.setString(8, ve.getMaKhuyenMai().getMaKhuyenMai());
+			}else {
+				ps.setNull(8, Types.VARCHAR);
+			}
+			ps.setString(9, ve.getMaNhanVien().getMaNhanVien());
+			
+			return ps.executeUpdate() > 0;
+			
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return false;
+		}
     }
-
-
+    
     //ĐỌC
     public Ve layVeTheoMa(String maVe) throws SQLException {
     	String sql = "SELECT * FROM Ve WHERE maVe = ?";
@@ -198,6 +185,40 @@ public class VeDAO {
     		return false;
     	}
     }
+    
+    // Thêm method update full Ve cho đổi vé
+    public boolean updateVe(Ve ve) throws SQLException {
+        String sql = """
+            UPDATE Ve SET 
+                ngayDat = ?, trangThai = ?, giaVeGoc = ?, giaThanhToan = ?, 
+                maChoNgoi = ?, maChuyenTau = ?, maHanhKhach = ?, 
+                maKhuyenMai = ?, maNhanVien = ?
+            WHERE maVe = ?
+        """;
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(ve.getNgayDat()));
+            ps.setString(2, ve.getTrangThai());
+            ps.setBigDecimal(3, ve.getGiaVeGoc());
+            ps.setBigDecimal(4, ve.getGiaThanhToan());
+            ps.setString(5, ve.getMaChoNgoi().getMaChoNgoi());
+            ps.setString(6, ve.getMaChuyenTau().getMaChuyenTau());
+            ps.setString(7, ve.getMaHanhkhach().getMaKH());
+            if (ve.getMaKhuyenMai() != null) {
+                ps.setString(8, ve.getMaKhuyenMai().getMaKhuyenMai());
+            } else {
+                ps.setNull(8, Types.VARCHAR);
+            }
+            ps.setString(9, ve.getMaNhanVien().getMaNhanVien());
+            ps.setString(10, ve.getMaVe());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     //Xoa
     public boolean xoaVe(String maVe) throws SQLException{
     	String sql = "DELETE FROM Ve WHERE maVe = ?";
@@ -273,20 +294,5 @@ public class VeDAO {
         }
         return danhSachVe;
     }
-    
-    public List<String> getDanhSachChoDaDat(String maChuyenTau) throws SQLException {
-        List<String> dsCho = new ArrayList<>();
-        Connection con = connectDB.getConnection();
-        String sql = "SELECT maChoNgoi FROM Ve WHERE maChuyenTau = ? AND trangThai = N'Đã đặt'";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, maChuyenTau);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            dsCho.add(rs.getString("maChoNgoi"));
-        }
-        return dsCho;
-    }
-    
-
     
 }
