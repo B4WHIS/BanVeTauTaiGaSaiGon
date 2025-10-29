@@ -65,19 +65,16 @@ public class VeDAO {
         }
     }
     
-    public String themVe(Ve ve) throws SQLException {
+    public String themVe(Ve ve, Connection conn) throws SQLException {
         String sql = """
-            INSERT INTO Ve (ngayDat, giaVeGoc, giaThanhToan, trangThai, 
-                            maChoNgoi, maChuyenTau, maHanhKhach, maKhuyenMai, maNhanVien)
-            OUTPUT INSERTED.maVe
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
-
-        try (Connection conn = connectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Tham số 1 đến 4: Dữ liệu thuộc tính của Vé
-            stmt.setTimestamp(1, Timestamp.valueOf(ve.getNgayDat())); // ngayDat
+        INSERT INTO Ve (ngayDat, giaVeGoc, giaThanhToan, trangThai,
+        maChoNgoi, maChuyenTau, maHanhKhach, maKhuyenMai, maNhanVien)
+        OUTPUT INSERTED.maVe
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+        // Dùng conn được truyền vào
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        	stmt.setTimestamp(1, Timestamp.valueOf(ve.getNgayDat())); // ngayDat
             stmt.setBigDecimal(2, ve.getGiaVeGoc()); // giaVeGoc (giaVeGoc > 0) [3, 4]
             stmt.setBigDecimal(3, ve.getGiaThanhToan()); // giaThanhToan (giaThanhToan > 0) [3, 4]
             stmt.setString(4, ve.getTrangThai()); // Trang thái ("Khả dụng")
@@ -94,8 +91,8 @@ public class VeDAO {
                 stmt.setNull(8, Types.VARCHAR);
             }
             stmt.setString(9, ve.getMaNhanVien().getMaNhanVien());
-
-            // Thực thi và lấy kết quả trả về (maVe)
+            
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String maVe = rs.getString(1); 

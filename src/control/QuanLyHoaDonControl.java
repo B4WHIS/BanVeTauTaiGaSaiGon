@@ -9,6 +9,7 @@ import connectDB.connectDB;
 import dao.ChiTietHoaDonDAO;
 import dao.HanhKhachDAO;
 import dao.HoaDonDAO;
+import dao.LichSuVeDAO;
 import dao.VeDAO;
 import entity.ChiTietHoaDon;
 import entity.HanhKhach;
@@ -35,11 +36,7 @@ public class QuanLyHoaDonControl {
         conn.setAutoCommit(false);
 
         try {
-            // 1. Thêm vé
-            for (Ve ve : dsVe) {
-                String maVe = veDAO.themVe(ve);
-                ve.setMaVe(maVe);
-            }
+            
 
             // 2. Tính tổng + VAT
             BigDecimal tongTruocVAT = dsVe.stream()
@@ -52,10 +49,11 @@ public class QuanLyHoaDonControl {
             hd.setMaHanhKhach(hk);
             hd.setMaNhanVien(nv);
             hd.setNgayLap(LocalDateTime.now());
-            hd.setTongTien(tongSauVAT); // DÙNG setTongTien
-
+            hd.setTongTien(tongSauVAT); 
+            
             // 4. Thêm vào DB → SQL sinh maHoaDon
-            String maHoaDon = hoaDonDAO.insert(hd);
+            String maHoaDon = hoaDonDAO.insert(hd, conn); // <== GIẢ ĐỊNH HOA DON DAO ĐÃ SỬA
+            hd.setMaHoaDon(maHoaDon);
 
             // 5. Thêm chi tiết
             for (Ve ve : dsVe) {
@@ -63,7 +61,13 @@ public class QuanLyHoaDonControl {
                 cthd.setHoaDon(hd);
                 cthd.setVe(ve);
                 cthd.setDonGia(ve.getGiaThanhToan());
-                chiTietDAO.insert(cthd);
+                chiTietDAO.insert(cthd, conn); // <== GIẢ ĐỊNH CHI TIET HOA DON DAO ĐÃ SỬA
+            }
+            for (Ve ve : dsVe) {
+                // ve đã có maVe (do datVe trả về)
+                // LsvDao phải được sửa để có phương thức updateMaHoaDonByMaVe
+                LichSuVeDAO lsvDao = new LichSuVeDAO(); 
+                lsvDao.updateMaHoaDonByMaVe(ve.getMaVe(), maHoaDon, conn);
             }
 
             conn.commit();
@@ -73,8 +77,10 @@ public class QuanLyHoaDonControl {
             conn.rollback();
             throw e;
         } finally {
-            conn.setAutoCommit(true);
-            conn.close();
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
         }
     }
 }

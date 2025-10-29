@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,4 +127,37 @@ public class HoaDonDAO {
         }
         return list;
     }
+
+    public String insert(HoaDon hd, Connection conn) throws SQLException {
+        // CSDL sử dụng OUTPUT INSERTED.maHoaDon để trả về mã hóa đơn tự động tạo (HD-XXXXXX)
+        String sql = """
+            INSERT INTO HoaDon (ngayLap, tongTien, maHanhKhach, maNhanVien)
+            OUTPUT INSERTED.maHoaDon 
+            VALUES (?, ?, ?, ?)
+        """;
+        
+        String maHoaDon = null;
+
+        // Sử dụng Connection được truyền vào (conn)
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { 
+            ps.setTimestamp(1, Timestamp.valueOf(hd.getNgayLap())); // [2]
+            ps.setBigDecimal(2, hd.getTongTien()); // [2]
+            ps.setString(3, hd.getMaHanhKhach().getMaKH()); // [2]
+            ps.setString(4, hd.getMaNhanVien().getMaNhanVien()); // [3]
+
+            // Thực thi và nhận mã hóa đơn (giống như VeDAO.themVe sử dụng OUTPUT [4])
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    maHoaDon = rs.getString(1);
+                    hd.setMaHoaDon(maHoaDon); // Cập nhật mã hóa đơn cho đối tượng
+                }
+            }
+        }
+        
+        if (maHoaDon == null) {
+            throw new SQLException("Thêm hóa đơn thất bại, không nhận được mã hóa đơn trả về.");
+        }
+        return maHoaDon;
+    }
+
 }
