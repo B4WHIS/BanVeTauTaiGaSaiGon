@@ -12,7 +12,7 @@ import entity.ToaTau;
 public class ChoNgoiDAO {
 
     
-
+///chauchau
     //Thêm chỗ ngồi mới
     public boolean insertChoNgoi(ChoNgoi cn) throws SQLException {
         Connection conn = connectDB.getConnection();
