@@ -359,4 +359,5 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 	        }
 	    });
 	}
+	
 	}
