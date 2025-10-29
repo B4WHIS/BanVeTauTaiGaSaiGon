@@ -5,46 +5,45 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
-
-public class QuanLyNhanVien extends JFrame implements ActionListener {
+//check
+public class QuanLyNhanVien extends JFrame {
     private JTable tblNhanVien;
     private DefaultTableModel modelNV;
-    private JTextField txtMaNV, txtHoTen, txtNgaySinh, txtCMND, txtChucVu;
+    private JTextField txtHoTen, txtNgaySinh, txtCMND, txtDienThoai; // THÊM txtDienThoai
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
     private JComboBox<String> cbChucVu;
 
     public QuanLyNhanVien() {
         setTitle("Quản lý nhân viên");
-        setSize(1500, 1000);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // ===== GẮN THANH MENU BAR TRÊN CÙNG =====
         setJMenuBar(taoMenuBar());
 
-        // ===== MAIN PANEL =====
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));
         pnlMain.setBackground(new Color(245, 247, 250));
 
-        // ===== TITLE =====
+        // TITLE
         JLabel lblTitle = new JLabel("QUẢN LÝ NHÂN VIÊN", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setOpaque(true);
-        lblTitle.setBackground(new Color(103,192,144));
+        lblTitle.setBackground(new Color(103, 192, 144));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
-        // ===== LEFT PANEL =====
+        // LEFT PANEL
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
         pnlLeft.setPreferredSize(new Dimension(450, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
 
-        JLabel lblLeftTitle_mn = new JLabel("THÔNG TIN NHÂN VIÊN", SwingConstants.CENTER);
-        lblLeftTitle_mn.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblLeftTitle_mn.setForeground(new Color(103,192,144));
-        lblLeftTitle_mn.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        // ===== FORM =====
+        JLabel lblLeftTitle = new JLabel("THÔNG TIN NHÂN VIÊN", SwingConstants.CENTER);
+        lblLeftTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblLeftTitle.setForeground(new Color(103, 192, 144));
+        lblLeftTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        // FORM
         JPanel pnlForm = new JPanel(new GridBagLayout());
         pnlForm.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
@@ -55,30 +54,29 @@ public class QuanLyNhanVien extends JFrame implements ActionListener {
         Font lblFont = new Font("Segoe UI", Font.BOLD, 19);
         Font txtFont = new Font("Segoe UI", Font.PLAIN, 20);
 
-        JLabel lblMaNV = new JLabel("Mã NV:");
         JLabel lblHoTen = new JLabel("Họ tên:");
         JLabel lblNgaySinh = new JLabel("Ngày sinh:");
         JLabel lblCMND = new JLabel("CMND/CCCD:");
+        JLabel lblDienThoai = new JLabel("Số điện thoại:"); // THÊM
         JLabel lblChucVu = new JLabel("Chức vụ:");
 
-        JLabel[] labels = {lblMaNV, lblHoTen, lblNgaySinh, lblCMND, lblChucVu};
+        JLabel[] labels = {lblHoTen, lblNgaySinh, lblCMND, lblDienThoai, lblChucVu};
         for (JLabel lbl : labels) {
             lbl.setFont(lblFont);
             lbl.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        txtMaNV = new JTextField();
         txtHoTen = new JTextField();
         txtNgaySinh = new JTextField("dd/MM/yyyy");
         txtCMND = new JTextField();
+        txtDienThoai = new JTextField(); // THÊM
 
-        // ===== COMBOBOX CHỨC VỤ =====
-        cbChucVu = new JComboBox<>(new String[]{"Nhân viên bán vé","Quản lý"});
+        cbChucVu = new JComboBox<>(new String[]{"Nhân viên bán vé", "Quản lý"});
         cbChucVu.setFont(txtFont);
         cbChucVu.setBackground(Color.WHITE);
         cbChucVu.setBorder(BorderFactory.createLineBorder(new Color(150, 150, 150)));
 
-        JTextField[] textFields = {txtMaNV, txtHoTen, txtNgaySinh, txtCMND};
+        JTextField[] textFields = {txtHoTen, txtNgaySinh, txtCMND, txtDienThoai}; // THÊM
         for (JTextField txt : textFields) {
             txt.setFont(txtFont);
             txt.setBorder(BorderFactory.createCompoundBorder(
@@ -86,32 +84,42 @@ public class QuanLyNhanVien extends JFrame implements ActionListener {
                     BorderFactory.createEmptyBorder(5, 8, 5, 8)
             ));
         }
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-       
-        for (int i = 0; i < 4; i++) {
-            gbc.gridx = 0;
-            gbc.gridy = i;
-            gbc.weightx = 0.3;
-            pnlForm.add(labels[i], gbc);
+        // Dòng 0: Họ tên
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.3;
+        pnlForm.add(lblHoTen, gbc);
+        gbc.gridx = 1; gbc.weightx = 0.7;
+        pnlForm.add(txtHoTen, gbc);
 
-            gbc.gridx = 1;
-            gbc.weightx = 0.7;
-            pnlForm.add(textFields[i], gbc);
-        }
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weightx = 0.3;
+        // Dòng 1: Ngày sinh
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.3;
+        pnlForm.add(lblNgaySinh, gbc);
+        gbc.gridx = 1; gbc.weightx = 0.7;
+        pnlForm.add(txtNgaySinh, gbc);
+
+        // Dòng 2: CMND
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0.3;
+        pnlForm.add(lblCMND, gbc);
+        gbc.gridx = 1; gbc.weightx = 0.7;
+        pnlForm.add(txtCMND, gbc);
+
+        // Dòng 3: Số điện thoại 
+        gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0.3;
+        pnlForm.add(lblDienThoai, gbc);
+        gbc.gridx = 1; gbc.weightx = 0.7;
+        pnlForm.add(txtDienThoai, gbc);
+
+        // Dòng 4: Chức vụ
+        gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0.3;
         pnlForm.add(lblChucVu, gbc);
-
-        gbc.gridx = 1;
-        gbc.weightx = 0.7;
+        gbc.gridx = 1; gbc.weightx = 0.7;
         pnlForm.add(cbChucVu, gbc);
 
-
-        // ===== BUTTONS =====
+        // BUTTONS
         btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus.png");
         btnSua = taoButton("Sửa", new Color(241, 196, 15), "/img/maintenance.png");
         btnXoa = taoButton("Xóa", new Color(231, 76, 60), "/img/bin.png");
@@ -120,22 +128,20 @@ public class QuanLyNhanVien extends JFrame implements ActionListener {
 
         JPanel pnlButtons = new JPanel(new GridLayout(3, 2, 10, 10));
         pnlButtons.setBackground(new Color(245, 247, 250));
-        pnlButtons.add(btnThem);
-        pnlButtons.add(btnSua);
-        pnlButtons.add(btnXoa);
-        pnlButtons.add(btnReset);
+        pnlButtons.add(btnThem); pnlButtons.add(btnSua);
+        pnlButtons.add(btnXoa); pnlButtons.add(btnReset);
         pnlButtons.add(btnExport);
 
-        pnlLeft.add(lblLeftTitle_mn, BorderLayout.NORTH);
+        pnlLeft.add(lblLeftTitle, BorderLayout.NORTH);
         pnlLeft.add(pnlForm, BorderLayout.CENTER);
         pnlLeft.add(pnlButtons, BorderLayout.SOUTH);
 
-
-        // ===== RIGHT PANEL =====
+        // RIGHT PANEL
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
         pnlRight.setBackground(new Color(245, 247, 250));
 
-        String[] colHeader = {"Mã NV", "Họ tên", "Ngày sinh", "CMND/CCCD", "Chức vụ"};
+        // THÊM CỘT "Số ĐT"
+        String[] colHeader = {"Mã NV", "Họ tên", "Ngày sinh", "CMND/CCCD", "Số ĐT", "Chức vụ"};
         modelNV = new DefaultTableModel(colHeader, 0);
         tblNhanVien = new JTable(modelNV);
         tblNhanVien.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -147,20 +153,62 @@ public class QuanLyNhanVien extends JFrame implements ActionListener {
         scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         pnlRight.add(scroll, BorderLayout.CENTER);
 
-        // ===== FOOTER =====
+        // FOOTER
         JPanel pnlFooter = new JPanel(new BorderLayout());
-        pnlFooter.setBackground(new Color(103,192,144)); 
+        pnlFooter.setBackground(new Color(103, 192, 144));
         pnlFooter.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         btnTroVe = taoButton("Trở về", new Color(41, 128, 185), "/img/loginicon.png");
         btnTroVe.setPreferredSize(new Dimension(130, 45));
         pnlFooter.add(btnTroVe, BorderLayout.WEST);
 
-        // ===== GẮN TẤT CẢ VÀO MAIN =====
+        // GẮN TẤT CẢ
         pnlMain.add(pnlLeft, BorderLayout.WEST);
         pnlMain.add(pnlRight, BorderLayout.CENTER);
         pnlMain.add(pnlFooter, BorderLayout.SOUTH);
         add(pnlMain);
+
+        // Gắn Controller
+        new control.QuanLyNhanVienControl(this);
+    }
+
+    // --- GETTERS ---
+    public JTable getTblNhanVien() { return tblNhanVien; }
+    public DefaultTableModel getModelNV() { return modelNV; }
+    public JTextField getTxtHoTen() { return txtHoTen; }
+    public JTextField getTxtNgaySinh() { return txtNgaySinh; }
+    public JTextField getTxtCMND() { return txtCMND; }
+    public JTextField getTxtDienThoai() { return txtDienThoai; } // THÊM
+    public JComboBox<String> getCbChucVu() { return cbChucVu; }
+    public JButton getBtnThem() { return btnThem; }
+    public JButton getBtnSua() { return btnSua; }
+    public JButton getBtnXoa() { return btnXoa; }
+    public JButton getBtnReset() { return btnReset; }
+    public JButton getBtnExport() { return btnExport; }
+    public JButton getBtnTroVe() { return btnTroVe; }
+
+    public static JButton taoButton(String text, Color bg, String iconPath) {
+        ImageIcon icon = chinhKichThuoc(iconPath, 24, 24);
+        JButton btn = new JButton(text, icon != null ? icon : null);
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+        });
+        return btn;
+    }
+
+    public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
+        URL iconUrl = QuanLyNhanVien.class.getResource(duongDan);
+        if (iconUrl == null) return null;
+        ImageIcon icon = new ImageIcon(iconUrl);
+        Image img = icon.getImage().getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
+        return new ImageIcon(img);
     }
 
     private JMenuBar taoMenuBar() {
@@ -182,13 +230,12 @@ public class QuanLyNhanVien extends JFrame implements ActionListener {
         mnuThongKe.setIcon(chinhKichThuoc("/img/thongKe.png", 30, 30));
         mnuTroGiup.setIcon(chinhKichThuoc("/img/troGiup.png", 30, 30));
 
-        // Menu con
         mnuHeThong.add(new JMenuItem("Đăng xuất"));
         mnuHeThong.add(new JMenuItem("Thoát"));
         mnuQly.add(new JMenuItem("Quản lý nhân viên"));
         mnuQly.add(new JMenuItem("Quản lý hành khách"));
         mnuQly.add(new JMenuItem("Quản lý chuyến tàu"));
-        mnuQly.add(new JMenuItem("Quản lý khuyến mãi"));
+        mnuQly.add(new JMenuItem("Quản lý khuyến mại"));
 
         menuBar.add(mnuHeThong);
         menuBar.add(mnuNghiepVuVe);
@@ -207,34 +254,8 @@ public class QuanLyNhanVien extends JFrame implements ActionListener {
         return menuBar;
     }
 
-    private JButton taoButton(String text, Color bg, String iconPath) {
-        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
-        btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
-            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
-        });
-        return btn;
-    }
-
-    public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
-        URL iconUrl = QuanLyNhanVien.class.getResource(duongDan);
-        if (iconUrl == null) return null;
-        ImageIcon icon = new ImageIcon(iconUrl);
-        Image img = icon.getImage().getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
-        return new ImageIcon(img);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) { }
-
     public static void main(String[] args) {
-    	LookAndFeelManager.setNimbusLookAndFeel();
+        LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> new QuanLyNhanVien().setVisible(true));
     }
 }

@@ -46,7 +46,7 @@ public class QuanLyUuDaiControl {
         return udDao.xoaUuDai(maUD); 
     }
     
-    public Map<Integer, String> layTatCaLoaiUuDai() throws SQLException {
+    public Map<String, String> layTatCaLoaiUuDai() throws SQLException {
         return udDao.layTatCaLoaiUuDai(); 
     }
     public boolean themLoaiUuDai(String tenLoai) throws Exception {

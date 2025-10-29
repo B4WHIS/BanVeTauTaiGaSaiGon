@@ -14,11 +14,9 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
 
     public DanhSachKhuyenMai() {
         setTitle("Quản lý khuyến mãi");
-        setSize(1400, 950);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-
-
         setJMenuBar(taoMenuBar());
 
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));

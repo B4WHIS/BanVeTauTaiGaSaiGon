@@ -9,7 +9,11 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/ADMIN/Downloads/jcommon-1.0.24.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ADMIN/Downloads/jfreechart-1.5.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-22">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/NHTB/Downloads/pdfbox-app-3.0.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
