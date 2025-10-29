@@ -1,3 +1,4 @@
+// File: src/dao/ChoNgoiDAO.java
 package dao;
 
 import java.sql.Connection;
@@ -13,8 +14,6 @@ import entity.ToaTau;
 
 public class ChoNgoiDAO {
 
-    
-
     //Thêm chỗ ngồi mới
     public boolean insertChoNgoi(ChoNgoi cn) throws SQLException {
         Connection conn = connectDB.getConnection();
@@ -29,6 +28,56 @@ public class ChoNgoiDAO {
             return false;
         }
     }
+    public ChoNgoi layChoNgoiTheoMa(String maChoNgoi) throws SQLException {
+        if (maChoNgoi == null || maChoNgoi.trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã chỗ ngồi không được rỗng!");
+        }
+
+        String sql = """
+            SELECT 
+                CN.maChoNgoi, 
+                CN.IDloaiGhe, 
+                CN.trangThai,
+                TT.maToa AS maToa
+            FROM ChoNgoi CN
+            JOIN ToaTau TT ON CN.maToa = TT.maToa
+            WHERE CN.maChoNgoi = ?
+            """;
+
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, maChoNgoi.trim());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // 1. Lấy dữ liệu từ ResultSet
+                    String ma = rs.getString("maChoNgoi");
+                    int idLoaiGhe = rs.getInt("IDloaiGhe");
+                    String trangThai = rs.getString("trangThai");
+                    String maToa = rs.getString("maToa");
+
+                    // 2. Tạo đối tượng ToaTau
+                    ToaTau toaTau = new ToaTau();
+                    toaTau.setMaToa(maToa);
+
+                    // 3. Tạo đối tượng ChoNgoi (dùng constructor đầy đủ)
+                    ChoNgoi choNgoi = new ChoNgoi();
+                    choNgoi.setMaChoNgoi(ma);
+                    choNgoi.setIDloaiGhe(idLoaiGhe);
+                    choNgoi.setTrangThai(trangThai);
+                    choNgoi.setToaTau(toaTau);
+
+                    return choNgoi;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi truy vấn ChoNgoi theo mã: " + maChoNgoi);
+            e.printStackTrace();
+            throw e;
+        }
+
+        return null; 
     
     public String getTenLoaiGheByID(int IDloaiGhe) throws SQLException {
         String tenLoai = null;
@@ -164,4 +213,40 @@ public class ChoNgoiDAO {
         return result;
     }
 
+    // Lấy danh sách chỗ ngồi theo mã toa (đồng bộ với getSeatsByMaToa, nhưng giữ nguyên method gốc nếu có)
+    public List<ChoNgoi> getChoNgoiByToa(String maToa) throws SQLException {
+        return getSeatsByMaToa(maToa); // Liên kết với method gốc
+    }
+
+    // Lấy tất cả chỗ ngồi
+    public List<ChoNgoi> getAllChoNgoi() throws SQLException {
+        List<ChoNgoi> danhSachCho = new ArrayList<>();
+        String sql = "SELECT maChoNgoi, IDloaiGhe, trangThai, maToa FROM ChoNgoi ORDER BY maChoNgoi";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ToaTau toaTau = new ToaTau(rs.getString("maToa"));
+                ChoNgoi cn = new ChoNgoi(
+                    rs.getString("maChoNgoi"),
+                    rs.getInt("IDloaiGhe"),
+                    rs.getString("trangThai"),
+                    toaTau
+                );
+                danhSachCho.add(cn);
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi CSDL khi tải tất cả chỗ ngồi: " + e.getMessage());
+            throw e;
+        }
+        return danhSachCho;
+    }
+	public List<ChoNgoi> timKiemChoNgoi(String maToa, String maChuyenTau, Object object, Object object2, Object object3,
+			Object object4) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+}
 }

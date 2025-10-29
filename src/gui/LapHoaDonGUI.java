@@ -10,7 +10,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -242,27 +242,20 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
         return lbl;
     }
 
-    private String safe(String s) {
-        return s == null ? "N/A" : s;
+        pnlActions.add(btnTroVe);
+        pnlActions.add(btnInMoPhong);
+        root.add(pnlActions, BorderLayout.SOUTH);
     }
 
-    private BigDecimal computeTongTienTruocVAT() {
-        BigDecimal sum = BigDecimal.ZERO;
-        for (Ve v : danhSachVe) {
-            if (v.getGiaThanhToan() != null) sum = sum.add(v.getGiaThanhToan());
-        }
-        return sum.setScale(0, RoundingMode.HALF_UP);
+    private void loadDataToPreview() {
+        txtPreview.setText(buildInvoiceString());
     }
 
     private void setListeners() {
         btnInHoaDon.addActionListener(this);
         btnInVe.addActionListener(this);
         btnTroVe.addActionListener(this);
-    }
-
-    private void loadDataToPreview() {
-        txtPreview.setText(buildInvoiceString());
-        txtPreview.setCaretPosition(0);
+        btnInMoPhong.addActionListener(this);
     }
 
     private String buildInvoiceString() {

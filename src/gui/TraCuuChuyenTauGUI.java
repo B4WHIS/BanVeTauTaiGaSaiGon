@@ -41,6 +41,7 @@ import dao.VeDAO;
 import entity.ChuyenTau;
 import entity.NhanVien;
 import entity.ToaTau;
+import entity.Ve;
 
 // GUI PHẢI GỌI QUA CONTROL. Đã loại bỏ các DAO khỏi đây.
 public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
@@ -81,8 +82,21 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     // Định dạng ngày giờ [7]
     private final DateTimeFormatter dinhDangNgayGio = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
+    private Ve veCu; // Thêm để hỗ trợ đổi vé
+    private JFrame previousScreen; // Để quay lại màn hình trước (TraCuuVeTauGUI)
+
     public TraCuuChuyenTauGUI(NhanVien nhanVien) {
+        this(nhanVien, null, null);
+    }
+
+    public TraCuuChuyenTauGUI(JFrame previous, Ve veCu) {
+        this(new NhanVien("NV-001"), previous, veCu); // Giả định NV mặc định nếu không có
+    }
+
+    public TraCuuChuyenTauGUI(NhanVien nhanVien, JFrame previous, Ve veCu) {
         this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");
+        this.previousScreen = previous;
+        this.veCu = veCu;
         
         // Khởi tạo Control thay vì DAO
         this.control = new TraCuuChuyenTauControl(this);
@@ -313,6 +327,10 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
             this.dispose();
             SwingUtilities.invokeLater(() -> {
                 try {
+                    // Constructor KHÔNG throws → không cần catch SQLException
+                    new ChonChoNgoiGUI(ct, nhanVienHienTai, this, veCu).setVisible(true);
+                } catch (Exception ex) { // Bắt Exception chung
+                    JOptionPane.showMessageDialog(null, "Lỗi khi mở màn hình chọn chỗ: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                     // Truyền thông tin chuyến tàu và nhân viên hiện tại.
                     // Tham số thứ 3 (null) có thể là mã phiếu đặt chỗ nếu cần, 
                     // nhưng vì chúng ta đang BÁN TRỰC TIẾP, tham số này là null.
@@ -417,6 +435,10 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
             pnlTrungTam.repaint();
         } else if (src == btnTroVe) { 
             this.dispose();
+            if (previousScreen != null) {
+                previousScreen.setVisible(true);
+            }
+            // Optionally return to main menu, e.g., new NhanVienBanVeGUI(nhanVienHienTai).setVisible(true);
             try {
 				new NhanVienBanVeGUI(nhanVienHienTai).setVisible(true);
 			} catch (IOException e1) {

@@ -103,8 +103,7 @@ public class VeDAO {
             throw new SQLException("Thêm vé thất bại, không nhận được mã vé trả về.");
         }
     }
-
-
+    
     //ĐỌC
     public Ve layVeTheoMa(String maVe) throws SQLException {
     	String sql = "SELECT * FROM Ve WHERE maVe = ?";
@@ -195,6 +194,40 @@ public class VeDAO {
     		return false;
     	}
     }
+    
+    // Thêm method update full Ve cho đổi vé
+    public boolean updateVe(Ve ve) throws SQLException {
+        String sql = """
+            UPDATE Ve SET 
+                ngayDat = ?, trangThai = ?, giaVeGoc = ?, giaThanhToan = ?, 
+                maChoNgoi = ?, maChuyenTau = ?, maHanhKhach = ?, 
+                maKhuyenMai = ?, maNhanVien = ?
+            WHERE maVe = ?
+        """;
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(ve.getNgayDat()));
+            ps.setString(2, ve.getTrangThai());
+            ps.setBigDecimal(3, ve.getGiaVeGoc());
+            ps.setBigDecimal(4, ve.getGiaThanhToan());
+            ps.setString(5, ve.getMaChoNgoi().getMaChoNgoi());
+            ps.setString(6, ve.getMaChuyenTau().getMaChuyenTau());
+            ps.setString(7, ve.getMaHanhkhach().getMaKH());
+            if (ve.getMaKhuyenMai() != null) {
+                ps.setString(8, ve.getMaKhuyenMai().getMaKhuyenMai());
+            } else {
+                ps.setNull(8, Types.VARCHAR);
+            }
+            ps.setString(9, ve.getMaNhanVien().getMaNhanVien());
+            ps.setString(10, ve.getMaVe());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     //Xoa
     public boolean xoaVe(String maVe) throws SQLException{
     	String sql = "DELETE FROM Ve WHERE maVe = ?";
@@ -270,20 +303,5 @@ public class VeDAO {
         }
         return danhSachVe;
     }
-    
-    public List<String> getDanhSachChoDaDat(String maChuyenTau) throws SQLException {
-        List<String> dsCho = new ArrayList<>();
-        Connection con = connectDB.getConnection();
-        String sql = "SELECT maChoNgoi FROM Ve WHERE maChuyenTau = ? AND trangThai = N'Đã đặt'";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, maChuyenTau);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            dsCho.add(rs.getString("maChoNgoi"));
-        }
-        return dsCho;
-    }
-    
-
     
 }

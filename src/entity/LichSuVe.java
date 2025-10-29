@@ -13,6 +13,7 @@ public class LichSuVe {
     private String maNhanVien;
     private String maHoaDon;
     private String maHanhKhach;
+    private BigDecimal tienHoan;
  
     public LichSuVe() {
          
@@ -91,6 +92,11 @@ public class LichSuVe {
 	public void setMaHanhKhach(String maHanhKhach) {
 		this.maHanhKhach = maHanhKhach;
 	}
+	public BigDecimal getTienHoan() { return tienHoan; }
+	public void setTienHoan(BigDecimal tienHoan) {
+	    this.tienHoan = (tienHoan == null) ? BigDecimal.ZERO : tienHoan;
+	}
+	
 	
     
 }
