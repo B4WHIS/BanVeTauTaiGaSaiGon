@@ -1,5 +1,5 @@
 package dao;
-
+//check
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,8 +14,7 @@ import entity.NhanVien;
 public class NhanVienDAO {
 	
 
-    // Phương thức lấy tất cả tên nhân viên (cho ComboBox) - Chỉ hoTen
-    public List<String> getAllTenNhanVien() {
+	public List<String> getAllTenNhanVien() {
         List<String> listTenNV = new ArrayList<>();
         String sql = "SELECT hoTen FROM NhanVien ORDER BY hoTen";
         try (Connection conn = connectDB.getConnection();
@@ -46,6 +45,24 @@ public class NhanVienDAO {
         }
         return null;
     }
+
+    // Method mới: Lấy tất cả nhân viên chưa có tài khoản
+    public List<NhanVien> getAllNhanVienWithoutTaiKhoan() {
+        List<NhanVien> list = new ArrayList<>();
+        String sql = "SELECT * FROM NhanVien nv WHERE NOT EXISTS (SELECT 1 FROM TaiKhoan tk WHERE tk.maNhanVien = nv.maNhanVien) ORDER BY hoTen";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(taoNhanVienTuResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Phương thức lấy danh sách loại chức vụ
     public List<Object[]> getDanhSachLoaiChucVu() {
         // Danh sách chứa kết quả trả về
         List<Object[]> dsLoaiChucVu = new ArrayList<>();
@@ -120,6 +137,26 @@ public class NhanVienDAO {
         return null;
     }
 
+    // === LẤY TẤT CẢ NHÂN VIÊN ===
+    public List<NhanVien> getAllNhanVien() {
+        List<NhanVien> list = new ArrayList<>();
+        String sql = "SELECT * FROM NhanVien ORDER BY hoTen";
+
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                NhanVien nv = taoNhanVienTuResultSet(rs);
+                list.add(nv);
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi lấy danh sách nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     // Helper: Tạo NhanVien từ ResultSet - Cập nhật để load IDloaiChucVu
     private NhanVien taoNhanVienTuResultSet(ResultSet rs) throws SQLException {
         NhanVien nv = new NhanVien();
@@ -130,7 +167,7 @@ public class NhanVienDAO {
         if (rs.getString("cmndCccd") != null) {
             nv.setCmndCccd(rs.getString("cmndCccd"));
         }
-        nv.setIDloaiChucVu(rs.getInt("IDloaiChucVu"));  // Load IDloaiChucVu
+        nv.setIDloaiChucVu(rs.getInt("IDloaiChucVu")); // Load IDloaiChucVu
         return nv;
     }
 }

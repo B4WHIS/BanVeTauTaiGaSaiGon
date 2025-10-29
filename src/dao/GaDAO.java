@@ -151,4 +151,48 @@ public class GaDAO {
         }
         return false;
     }
+
+    public String getTenGaDiByMaLichTrinh(String maLichTrinh) throws SQLException {
+        String tenGa = null;
+        // LT.gaDi là mã ga đi trong bảng LichTrinh [1]. G.maGa là mã ga trong bảng Ga [2].
+        String sql = "SELECT G.tenGa FROM LichTrinh LT JOIN Ga G ON LT.gaDi = G.maGa WHERE LT.maLichTrinh = ?";
+        
+        try (Connection conn = connectDB.getConnection(); // Lấy kết nối [3]
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, maLichTrinh);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    tenGa = rs.getString("tenGa");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi CSDL khi lấy Tên Ga Đi theo Mã Lịch Trình: " + e.getMessage());
+            // Ném lỗi để tầng Control xử lý hoặc log
+            throw e;
+        }
+        return tenGa;
+    }
+    public String getTenGaDenByMaLichTrinh(String maLichTrinh) throws SQLException {
+        String tenGa = null;
+        // Thay đổi LT.gaDi thành LT.gaDen
+        String sql = "SELECT G.tenGa FROM LichTrinh LT JOIN Ga G ON LT.gaDen = G.maGa WHERE LT.maLichTrinh = ?";
+        
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, maLichTrinh);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    tenGa = rs.getString("tenGa");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi CSDL khi lấy Tên Ga Đến theo Mã Lịch Trình: " + e.getMessage());
+            throw e;
+        }
+        return tenGa;
+    }
 }

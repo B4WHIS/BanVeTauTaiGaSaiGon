@@ -26,10 +26,11 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     private JButton btnTimChuyenTau;
     private JButton btnDangXuat;
     private JButton btnDoiVe;
-
+    private NhanVien nhanVien;
    
     public NhanVienBanVeGUI(NhanVien nhanVien) throws IOException {
-        super(nhanVien); // TRUYỀN NHÂN VIÊN CHO GIAO DIỂN CHÍNH
+        super(nhanVien); 
+        this.nhanVien = nhanVien;
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
     }
@@ -138,14 +139,14 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand(); 
         try {
-            if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
-                new TraCuuChuyenTauGUI().setVisible(true); 
-            } else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
-                new TraCuuVeTauGUI().setVisible(true); 
+        	if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
+        	    new TraCuuChuyenTauGUI(this.nhanVien).setVisible(true);
+        	} else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
+                new GiaoDienHuyVe().setVisible(true); 
             } else if (command.equals("ĐỔI VÉ") || e.getSource() == btnDoiVe) {
                 new TraCuuVeTauGUI().setVisible(true);
             } else if (command.equals("TÌM CHUYẾN") || e.getSource() == btnTimChuyenTau) {
-                new TraCuuChuyenTauGUI().setVisible(true); 
+                new TraCuuChuyenTauGUI(this.nhanVien).setVisible(true);
             } else if (command.equals("ĐĂNG XUẤT") || e.getSource() == btnDangXuat) {
                 int confirm = JOptionPane.showConfirmDialog(
                     this,
