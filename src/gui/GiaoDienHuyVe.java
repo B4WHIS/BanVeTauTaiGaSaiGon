@@ -237,13 +237,13 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
                 BigDecimal hoan = ls.getTienHoan() != null ? ls.getTienHoan() : BigDecimal.ZERO; // [10]
                 BigDecimal tienVe = hoan.add(phi);
                 
-                thanhCong.add(maVe); // [10]
+                thanhCong.add(maVe); 
 
-                tongVe = tongVe.add(tienVe); // [12]
+                tongVe = tongVe.add(tienVe); 
                 tongPhi = tongPhi.add(phi);
                 tongHoan = tongHoan.add(hoan);
             } catch (Exception ex) {
-                thatBai.add(maVe + ": " + ex.getMessage()); // [12]
+                thatBai.add(maVe + ": " + ex.getMessage()); 
             }
         }
 

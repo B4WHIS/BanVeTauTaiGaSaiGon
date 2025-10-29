@@ -272,6 +272,6 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Không cần dùng vì đã dùng ActionListener riêng
+        
     }
 }

@@ -42,10 +42,10 @@ import entity.ChuyenTau;
 import entity.NhanVien;
 import entity.ToaTau;
 
-// GUI PHẢI GỌI QUA CONTROL. Đã loại bỏ các DAO khỏi đây.
+
 public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     
-    // Tách Control ra khỏi GUI [5]
+    // Tách Control ra khỏi GUI
     private TraCuuChuyenTauControl control;
     
     // Các thành phần UI

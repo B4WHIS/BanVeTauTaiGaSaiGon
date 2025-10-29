@@ -43,7 +43,7 @@ import entity.Ve;
 
 public class ThanhToanGUI extends JFrame implements ActionListener {
 
-    // Constants (Dựa trên [2])
+    // Constants 
     private final Color mauChinh = new Color(74, 140, 103);
     private final Color mauTongKet = new Color(200, 30, 30);
     private final Color MAU_NUT_QUAYLAI = new Color(0, 128, 255);
@@ -51,7 +51,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     private final Font phongChuGiaTri = new Font("Segoe UI", Font.PLAIN, 15);
     private final Font phongChuTongKet = new Font("Segoe UI", Font.BOLD, 22);
 
-    // Components (Sử dụng tiền tố chuẩn [1, 3])
+    // Components 
     private JTextField txtTenKhachHang, txtCmndPayer, txtSdtPayer;
     private JTextField txtMaKhuyenMai;
     private JTextField txtTongTienVeGoc;
@@ -60,14 +60,14 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     private JTable tblChiTiet;
     private DefaultTableModel moHinhBang;
     private JButton btnQuayLai, btnThanhToan, btnApDungMa;
-    private JPanel pnlNhapLieu; // Panel chứa form nhập liệu
+    private JPanel pnlNhapLieu; 
     private QuanLyVeControl dieuKhienVe = new QuanLyVeControl();
     // Data Holders
     private List<Ve> danhSachVe;
     private HanhKhach nguoiThanhToan;
     private NhanVien nhanVienLap;
     private QuanLyHoaDonControl hdControl = new QuanLyHoaDonControl();
-    private VeDAO vedao = new VeDAO(); // DAO để lưu vé
+    private VeDAO vedao = new VeDAO(); 
     private BigDecimal tongTienTruocVAT = BigDecimal.ZERO;
     private ChuyenTau chuyenTauDuocChon;
     
@@ -105,7 +105,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
         taiDuLieuGiaoDich();
     }
 
-    // Helper methods cho GridBagLayout (Dựa trên [4])
+    // Helper methods cho GridBagLayout 
     private GridBagConstraints taoGBC(int x, int y, int fill, int anchor, double weightx, Insets insets) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x;
@@ -135,7 +135,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
         return nut;
     }
 
-    // R4: Helper method để lấy thông tin Ga Đi/Đến (Dựa trên [5])
+    
     private String layThongTinGa(ChuyenTau ct) {
         if (ct == null || ct.getMaLichTrinh() == null) return "N/A - N/A";
         String maLichTrinh = ct.getMaLichTrinh();
@@ -363,7 +363,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
                     System.out.println("LỖI: Đối tượng nhanVienLap là NULL.");
                 }
                 veChuaMa.setMaVe(maVe);
-                danhSachVeDaDat.add(veChuaMa); // Danh sách vé đã có mã
+                danhSachVeDaDat.add(veChuaMa); 
             }
             
             // --- BƯỚC 2: Lập Hóa đơn sau khi tất cả vé đã được đặt thành công ---
@@ -374,7 +374,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
             JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
             
-            // !!! QUAN TRỌNG: Nếu BƯỚC 2 (lập hóa đơn) thất bại,
+            //  QUAN TRỌNG: Nếu BƯỚC 2 (lập hóa đơn) thất bại,
             // các vé vừa được tạo (VE000023, VE000024) và Lịch sử vé đã bị COMMIT 
             // trong BƯỚC 1 vẫn tồn tại (gây ra lỗi mâu thuẫn).
             // Cần thêm logic ROLLBACK/HỦY VÉ nếu Lập Hóa đơn thất bại.

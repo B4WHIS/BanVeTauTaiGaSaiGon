@@ -55,7 +55,7 @@ import entity.Ve;
 
 public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
 
-    /* ====================== CONSTANTS & COLORS ====================== */
+ 
     private final Color MAU_CHU_DAO = new Color(74, 140, 103);
     private final Color MAU_NEN_TIEU_DE = new Color(225, 242, 232);
     private static final Font FONT_NHAN = new Font("Segoe UI", Font.BOLD, 14);
@@ -64,7 +64,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
     private BigDecimal tongTienCanThanhToan = BigDecimal.ZERO;
     private Color MAU_NUT_QUAY_LAI = new Color(0, 128, 255);
     
-    /* ====================== UI COMPONENTS ====================== */
+  
     private JTextField txtHoTen, txtSoDienThoai, txtCmndCccd;
     private JDateChooser chonNgaySinh;
     private JComboBox<String> hopChonUuDai;
@@ -87,11 +87,11 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
     private final QuanLyVeControl dieuKhienVe;
     private final UuDaiDAO daoLoaiUuDai;
 
-    /* ====================== STATE FOR EDIT ====================== */
+    
     private boolean dangSua = false;
     private int dongDangSua = -1;
 
-    /* ====================== CONSTRUCTOR ====================== */
+   
     public ThongTinKhachHangGUI(ChuyenTau ct, List<ChoNgoi> gheDaChon, NhanVien nv) {
         this.chuyenTauDuocChon = ct;
         this.danhSachChoNgoi = gheDaChon != null ? gheDaChon : new ArrayList<>();
@@ -157,7 +157,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         return nut;
     }
 
-    /* ====================== UI INITIALISATION ====================== */
+    
     private void khoiTaoThanhPhan() {
         // ----- UI components -----
         txtHoTen = new JTextField(20);
@@ -341,7 +341,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         xuLyLamMoiForm();
     }
 
-    /* ====================== EVENT SETUP ====================== */
+    
     private void thietLapSuKien() {
         nutThemHanhKhach.addActionListener(this);
         nutQuayLai.addActionListener(this);
@@ -351,7 +351,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         nutSuaHanhKhach.addActionListener(this);
     }
 
-    /* ====================== TABLE INITIAL DATA ====================== */
+   
     private void hienThiDanhSachChoNgoiBanDau(List<ChoNgoi> gheDaChon) {
         moHinhBang.setRowCount(0);
         for (int i = 0; i < gheDaChon.size(); i++) {
@@ -376,7 +376,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         }
     }
 
-    /* ====================== TỔNG TIỀN ====================== */
+    
     private void capNhatTongTien() {
         tongTienCanThanhToan = BigDecimal.ZERO;
         for (int i = 0; i < moHinhBang.getRowCount(); i++) {
@@ -390,7 +390,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         lblTongTien.setText("TỔNG CỘNG: " + String.format("%,.2f VNĐ", tongTienCanThanhToan));
     }
 
-    /* ====================== CLEAR FORM ====================== */
+    
     private void xuLyLamMoiForm() {
         txtHoTen.setText("");
         chonNgaySinh.setDate(null);

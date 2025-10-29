@@ -28,7 +28,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
 
    
     public NhanVienQuanLyGUI(NhanVien nhanVien) {
-        super(nhanVien); // TRUYỀN NHÂN VIÊN CHO GIAO DIỂN CHÍNH
+        super(nhanVien); 
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
 
@@ -50,7 +50,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         pnlChucNang.setLayout(new GridLayout(0, 2, 0, 10));
         pnlChucNang.setBackground(new Color(221, 218, 208));
 
-        // === Nút Quản lý nhân viên ===
+        
         btnDatVe = new JButton("QUẢN LÝ NHÂN VIÊN");
         btnDatVe.setBackground(Color.white);
         btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
@@ -58,7 +58,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         btnDatVe.setIcon(chinhKichThuoc("/img/group.png", 60, 60));
         themHieuUngHover(btnDatVe, new Color(93, 156, 236));
 
-        // === Nút Quản lý hành khách ===
+        
         btnHuyVe = new JButton("QUẢN LÝ HÀNH KHÁCH");
         btnHuyVe.setBackground(Color.white);
         btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
@@ -66,7 +66,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         btnHuyVe.setIcon(chinhKichThuoc("/img/passenger.png", 55, 55));
         themHieuUngHover(btnHuyVe, new Color(74, 140, 103));
 
-        // === Nút Quản lý chuyến tàu ===
+        
         btnDoiVe = new JButton("QUẢN LÝ CHUYẾN TÀU");
         btnDoiVe.setBackground(Color.white);
         btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
@@ -74,7 +74,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         btnDoiVe.setIcon(chinhKichThuoc("/img/QLtrain.png", 55, 55));
         themHieuUngHover(btnDoiVe, new Color(247, 82, 112));
 
-        // === Nút Quản lý khuyến mãi ===
+        
         btnTimChuyenTau = new JButton("QUẢN LÝ KHUYẾN MÃI");
         btnTimChuyenTau.setBackground(Color.white);
         btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 35));

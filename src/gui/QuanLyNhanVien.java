@@ -9,7 +9,7 @@ import java.net.URL;
 public class QuanLyNhanVien extends JFrame {
     private JTable tblNhanVien;
     private DefaultTableModel modelNV;
-    private JTextField txtHoTen, txtNgaySinh, txtCMND, txtDienThoai; // THÊM txtDienThoai
+    private JTextField txtHoTen, txtNgaySinh, txtCMND, txtDienThoai; 
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
     private JComboBox<String> cbChucVu;
 
@@ -57,7 +57,7 @@ public class QuanLyNhanVien extends JFrame {
         JLabel lblHoTen = new JLabel("Họ tên:");
         JLabel lblNgaySinh = new JLabel("Ngày sinh:");
         JLabel lblCMND = new JLabel("CMND/CCCD:");
-        JLabel lblDienThoai = new JLabel("Số điện thoại:"); // THÊM
+        JLabel lblDienThoai = new JLabel("Số điện thoại:");
         JLabel lblChucVu = new JLabel("Chức vụ:");
 
         JLabel[] labels = {lblHoTen, lblNgaySinh, lblCMND, lblDienThoai, lblChucVu};
@@ -69,7 +69,7 @@ public class QuanLyNhanVien extends JFrame {
         txtHoTen = new JTextField();
         txtNgaySinh = new JTextField("dd/MM/yyyy");
         txtCMND = new JTextField();
-        txtDienThoai = new JTextField(); // THÊM
+        txtDienThoai = new JTextField(); 
 
         cbChucVu = new JComboBox<>(new String[]{"Nhân viên bán vé", "Quản lý"});
         cbChucVu.setFont(txtFont);
@@ -178,7 +178,7 @@ public class QuanLyNhanVien extends JFrame {
     public JTextField getTxtHoTen() { return txtHoTen; }
     public JTextField getTxtNgaySinh() { return txtNgaySinh; }
     public JTextField getTxtCMND() { return txtCMND; }
-    public JTextField getTxtDienThoai() { return txtDienThoai; } // THÊM
+    public JTextField getTxtDienThoai() { return txtDienThoai; } 
     public JComboBox<String> getCbChucVu() { return cbChucVu; }
     public JButton getBtnThem() { return btnThem; }
     public JButton getBtnSua() { return btnSua; }

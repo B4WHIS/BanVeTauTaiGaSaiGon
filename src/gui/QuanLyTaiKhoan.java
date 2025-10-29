@@ -201,7 +201,7 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
     private void loadCombosFromDB() {
         cbNhanVien.removeAllItems();
 
-        // DÙNG getAllNhanVien() → TẤT CẢ NHÂN VIÊN
+        // DÙNG getAllNhanVien() 
         List<NhanVien> nhanVienList = nhanVienDAO.getAllNhanVien();
 
         for (NhanVien nv : nhanVienList) {
@@ -285,8 +285,8 @@ public class QuanLyTaiKhoan extends GiaoDienChinh {
     public void loadFormData(TaiKhoan tk) {
         if (tk != null) {
             txtTenDangNhap.setText(tk.getTenDangNhap());
-            txtMatKhau.setText(tk.getMatKhau().toString());  // Load rõ cho edit
-            cbNhanVien.setSelectedItem(tk.getNhanVien());  // Chọn object NhanVien tương ứng
+            txtMatKhau.setText(tk.getMatKhau().toString());  
+            cbNhanVien.setSelectedItem(tk.getNhanVien());  
         }
     }
  // Method để reset form

@@ -99,14 +99,14 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
         pnlChucNang.add(btnDangXuat);
         pnlChucNang.setPreferredSize(new Dimension(350, 70));
         
-        // **THÊM HOVER EFFECT**
+        
         addHoverEffect(btnDatVe, mauDatVe);
         addHoverEffect(btnHuyVe, mauHuyVe);
         addHoverEffect(btnDoiVe, mauDoiVe);
         addHoverEffect(btnTimChuyenTau, mauTimChuyen);
         addHoverEffect(btnDangXuat, mauDangXuat);
         
-        // **GẮN SỰ KIỆN**
+        
         btnDatVe.addActionListener(this);
         btnHuyVe.addActionListener(this);
         btnDoiVe.addActionListener(this);

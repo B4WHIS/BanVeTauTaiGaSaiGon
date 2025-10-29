@@ -474,8 +474,8 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
             this.lines = this.content.split("\r?\n|\r");
             FontMetrics fm = new JPanel().getFontMetrics(font);
             int lineHeight = fm.getHeight();
-            double pageHeight = 11.0 * 72; // A4 ~ 11 inch
-            double margin = 0.75 * 72; // lề 0.75 inch
+            double pageHeight = 11.0 * 72; 
+            double margin = 0.75 * 72; 
             this.linesPerPage = (int) ((pageHeight - 2 * margin) / lineHeight) - 1;
         }
 

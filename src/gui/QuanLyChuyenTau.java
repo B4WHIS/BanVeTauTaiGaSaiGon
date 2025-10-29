@@ -41,28 +41,27 @@ import dao.TauDAO;
 import entity.ChuyenTau;
 
 public class QuanLyChuyenTau extends GiaoDienChinh {
-    // Components
+   
     private JTable tblChuyenTau;
     private DefaultTableModel modelCT;
     private JTextField txtMaChuyenTau, txtGiaChuyen;
-    private JComboBox<String> cbTenTau, cbTenLichTrinh, cbTrangThai;  // Đổi tên để rõ ràng: hiển thị tên
+    private JComboBox<String> cbTenTau, cbTenLichTrinh, cbTrangThai;  
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
-    private JButton btnLuu;  // Nút Lưu (cho add/update)
+    private JButton btnLuu;  
     
-    // SỬA: Thay JTextField thời gian bằng JDateChooser (date + time qua format)
+    
     private JDateChooser dcThoiGianKhoiHanh, dcThoiGianDen;
 
-    // Date formatter for display
+    
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");  // THÊM: Để format Date từ JDateChooser
-
-    // Controller
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");  
+    
     private QuanLyChuyenTauController controller;
-    private ChuyenTauDAO dao;  // DAO để load data
+    private ChuyenTauDAO dao;  
     private LichTrinhDAO lichTrinhDAO;
     private TauDAO tauDAO;
     
-    // THÊM: Timer để tự động update trạng thái mỗi 1 phút (60000 ms)
+  
     private Timer autoUpdateTimer;
 
     public QuanLyChuyenTau() {
@@ -81,7 +80,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));
         pnlMain.setBackground(new Color(245, 247, 250));
 
-        // ===== TITLE =====
+        
         JLabel lblTitle = new JLabel("QUẢN LÝ CHUYẾN TÀU", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(Color.WHITE);
@@ -90,7 +89,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
-        // ===== LEFT PANEL ====
+        
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
         pnlLeft.setPreferredSize(new Dimension(450, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
@@ -100,7 +99,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         lblLeftTitle.setForeground(new Color(103,192,144));
         lblLeftTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        // ===== FORM =====
+      
         JPanel pnlForm = new JPanel(new GridBagLayout());
         pnlForm.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
@@ -125,12 +124,12 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
             lbl.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        txtMaChuyenTau = new JTextField();  // Read-only, computed by DB
+        txtMaChuyenTau = new JTextField();  
         txtMaChuyenTau.setEditable(false);
-        cbTenTau = new JComboBox<>();  // Hiển thị tên tàu
-        cbTenLichTrinh = new JComboBox<>();  // Hiển thị tên lịch trình
+        cbTenTau = new JComboBox<>();  
+        cbTenLichTrinh = new JComboBox<>();  
         
-        // SỬA: Khởi tạo JDateChooser với format datetime (date + time spinner)
+        
         dcThoiGianKhoiHanh = new JDateChooser();
         dcThoiGianKhoiHanh.setDateFormatString("yyyy-MM-dd HH:mm");
         dcThoiGianKhoiHanh.setFont(txtFont);
@@ -147,7 +146,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         });
         cbTrangThai.setSelectedIndex(0);  // Mặc định "Chưa khởi hành"
         
-        // SỬA: Cập nhật inputFields để bao gồm JDateChooser
+        
         Component[] inputFields = {txtMaChuyenTau, cbTenTau, cbTenLichTrinh, dcThoiGianKhoiHanh, dcThoiGianDen, txtGiaChuyen, cbTrangThai};
         for (Component comp : inputFields) {
             if (comp instanceof JTextField) {
@@ -162,7 +161,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
                 cb.setFont(txtFont);
                 cb.setPreferredSize(new Dimension(200, 30));
             } else if (comp instanceof JDateChooser) {
-                // JDateChooser đã set font và size ở trên
+                
             }
         }
 
@@ -191,7 +190,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         btnLuu.setEnabled(false);  // Ban đầu disable
    
 
-        // ===== MAIN BUTTONS =====
+        // button
         btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus.png");
         btnSua = taoButton("Sửa", new Color(241, 196, 15), "/img/maintenance.png");
         btnXoa = taoButton("Xóa", new Color(231, 76, 60), "/img/bin.png");
@@ -206,13 +205,13 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         pnlButtons.add(btnReset);
         pnlButtons.add(btnLuu);
         pnlButtons.add(btnExport);
-        pnlButtons.add(new JLabel(" "));  // Placeholder để cân bằng
+        pnlButtons.add(new JLabel(" "));  
 
         pnlLeft.add(lblLeftTitle, BorderLayout.NORTH);
         pnlLeft.add(pnlForm, BorderLayout.CENTER);
         pnlLeft.add(pnlButtons, BorderLayout.SOUTH);
 
-        // ===== RIGHT PANEL =====
+      
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
         pnlRight.setBackground(new Color(245, 247, 250));
 
@@ -229,7 +228,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         pnlRight.add(scroll, BorderLayout.CENTER);
 
-        // ===== FOOTER =====
+        // footer
         JPanel pnlFooter = new JPanel(new BorderLayout());
         pnlFooter.setBackground(new Color(103,192,144)); 
         pnlFooter.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -238,26 +237,26 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         btnTroVe.setPreferredSize(new Dimension(130, 45));
         pnlFooter.add(btnTroVe, BorderLayout.WEST);
 
-        // ===== ADD ALL =====
+      
         pnlMain.add(pnlLeft, BorderLayout.WEST);
         pnlMain.add(pnlRight, BorderLayout.CENTER);
         pnlMain.add(pnlFooter, BorderLayout.SOUTH);
         add(pnlMain);
 
-        // Attach listeners
+     
         attachListeners();
         
-        // Load combos và data từ DB
+       
         loadCombosFromDB();
         loadDataFromDB();
         
-        // THÊM: Khởi tạo Timer tự động update trạng thái
+        
         autoUpdateTimer = new Timer(60000, e -> {
-            dao.updateTrangThaiTuThoiGian();  // Update DB
-            loadDataFromDB();  // Refresh table
+            dao.updateTrangThaiTuThoiGian();  
+            loadDataFromDB();  
             System.out.println("Auto-update trạng thái lúc: " + LocalDateTime.now());
         });
-        autoUpdateTimer.start();  // Bắt đầu timer
+        autoUpdateTimer.start(); 
     }
     public JButton taoButton2(String text, Color bg, String iconPath) {
         JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
@@ -334,7 +333,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         });
     }
 
-    // ===== GETTERS CHO CONTROLLER =====
+    
     public JButton getBtnThem() { return btnThem; }
     public JButton getBtnSua() { return btnSua; }
     public JButton getBtnXoa() { return btnXoa; }
@@ -386,14 +385,14 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
             
             txtGiaChuyen.setText(ct.getGiaChuyen().toString());
             cbTrangThai.setSelectedItem(ct.getTrangThai());
-            // KHÔNG enable btnLuu hay fields ở đây
+            
         }
     }
 
     // SỬA: Method để cập nhật form từ dữ liệu selected row (gọi từ controller cho edit) - Chỉ load data, controller sẽ enable
     public void updateForm(ChuyenTau ct) {
-        loadFormData(ct);  // Gọi method mới để load data
-        // KHÔNG enable tự động ở đây nữa
+        loadFormData(ct);  
+        
     }
 
     // Method để reset form (cho add mode)
@@ -401,7 +400,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         txtMaChuyenTau.setText("");
         cbTenTau.setSelectedIndex(0);
         cbTenLichTrinh.setSelectedIndex(0);
-        dcThoiGianKhoiHanh.setDate(null);  // SỬA: Clear JDateChooser
+        dcThoiGianKhoiHanh.setDate(null);  
         dcThoiGianDen.setDate(null);
         txtGiaChuyen.setText("");
         cbTrangThai.setSelectedIndex(0);
@@ -415,7 +414,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
     public void enableFormFields(boolean enable) {
         cbTenTau.setEnabled(enable);
         cbTenLichTrinh.setEnabled(enable);
-        dcThoiGianKhoiHanh.setEnabled(enable);  // SỬA: Enable JDateChooser
+        dcThoiGianKhoiHanh.setEnabled(enable);  
         dcThoiGianDen.setEnabled(enable);
         txtGiaChuyen.setEnabled(enable);
         cbTrangThai.setEnabled(enable);
@@ -423,8 +422,8 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
 
     // Method để refresh data - THÊM: Update trạng thái trước refresh
     public void refreshData() {
-        dao.updateTrangThaiTuThoiGian();  // Update DB trước
-        loadDataFromDB();  // Refresh table
+        dao.updateTrangThaiTuThoiGian();  
+        loadDataFromDB();  
         resetForm();
     }
 
@@ -432,7 +431,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
     public String getSelectedMaChuyenTau() {
         int selectedRow = tblChuyenTau.getSelectedRow();
         if (selectedRow >= 0) {
-            return (String) modelCT.getValueAt(selectedRow, 0);  // Cột 0: Mã chuyến
+            return (String) modelCT.getValueAt(selectedRow, 0);  
         }
         return null;
     }
