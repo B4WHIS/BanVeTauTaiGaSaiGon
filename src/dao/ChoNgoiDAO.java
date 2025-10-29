@@ -78,6 +78,21 @@ public class ChoNgoiDAO {
         }
 
         return null; 
+    
+    public String getTenLoaiGheByID(int IDloaiGhe) throws SQLException {
+        String tenLoai = null;
+        String sql = "SELECT tenLoai FROM LoaiGhe WHERE IDloaiGhe = ?";
+        
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, IDloaiGhe);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    tenLoai = rs.getString("tenLoai");
+                }
+            }
+        }
+        return tenLoai != null ? tenLoai : "[Không xác định]";
     }
     
     public boolean capNhatChoNgoi(ChoNgoi choNgoi) throws SQLException {
@@ -171,17 +186,31 @@ public class ChoNgoiDAO {
     }
 
     // Cập nhật trạng thái 
-    public boolean updateTrangThai(String maChoNgoi, String trangThai) throws SQLException {
-        Connection conn = connectDB.getConnection();
+    public boolean updateTrangThai(String maChoNgoi, String trangThai, Connection conn) throws SQLException {
         String sql = "UPDATE ChoNgoi SET trangThai = ? WHERE maChoNgoi = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        // Dùng conn được truyền vào
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { 
             ps.setString(1, trangThai);
             ps.setString(2, maChoNgoi);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println(" Lỗi cập nhật trạng thái chỗ ngồi: " + e.getMessage());
-            return false;
+        } 
+    }
+    public boolean updateTrangThai(String maChoNgoi, String trangThai) throws SQLException {
+        // Phương thức này tự mở kết nối và COMMIT, chỉ dùng cho các cập nhật độc lập
+        Connection conn = connectDB.getConnection();
+        String sql = "UPDATE ChoNgoi SET trangThai = ? WHERE maChoNgoi = ?";
+        boolean result = false;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { 
+            ps.setString(1, trangThai);
+            ps.setString(2, maChoNgoi);
+            result = ps.executeUpdate() > 0;
+            conn.commit(); // Tự commit
+        } finally {
+            if (conn != null) {
+                conn.close(); // Đóng kết nối
+            }
         }
+        return result;
     }
 
     // Lấy danh sách chỗ ngồi theo mã toa (đồng bộ với getSeatsByMaToa, nhưng giữ nguyên method gốc nếu có)
@@ -219,4 +248,5 @@ public class ChoNgoiDAO {
 	}
 
 
+}
 }

@@ -112,4 +112,19 @@ public class ChiTietHoaDonDAO {
         }
         return BigDecimal.ZERO;
     }
+
+    public boolean insert(ChiTietHoaDon cthd, Connection conn) throws SQLException { // <-- THÊM THAM SỐ CONNECTION
+        // Bảng ChiTietHoaDon chứa maHoaDon, maVe, donGia [5, 6]
+        String sql = "INSERT INTO ChiTietHoaDon (maHoaDon, maVe, donGia) VALUES (?, ?, ?)";
+        
+        // Sử dụng Connection được truyền vào (conn)
+        try (PreparedStatement ps = conn.prepareStatement(sql)) { 
+            ps.setString(1, cthd.getHoaDon().getMaHoaDon()); 
+            ps.setString(2, cthd.getVe().getMaVe());
+            ps.setBigDecimal(3, cthd.getDonGia()); 
+            
+            // executeUpdate() thực hiện INSERT và trả về số hàng bị ảnh hưởng [7]
+            return ps.executeUpdate() > 0;
+        }
+    }
 }

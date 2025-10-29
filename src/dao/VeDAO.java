@@ -65,34 +65,43 @@ public class VeDAO {
         }
     }
     
-    //THÊM
-    public boolean themVe(Ve ve) throws SQLException {
-    	String sql = "INSERT INTO Ve (maVe, ngayDat, giaVeGoc, giaThanhToan, maChoNgoi, maChuyenTau, maHanhKhach"
-    			+ "maKhuyenMai, maNhanVien)" + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    	try(Connection con = connectDB.getConnection();
-    		PreparedStatement ps = con.prepareStatement(sql);){	
-			ps.setString(1, ve.getMaVe());
-			ps.setTimestamp(2, Timestamp.valueOf(ve.getNgayDat()));
-			ps.setBigDecimal(3, ve.getGiaVeGoc());
-			ps.setBigDecimal(4, ve.getGiaThanhToan());
-			ps.setString(5, ve.getMaChoNgoi().getMaChoNgoi());
-			ps.setString(6, ve.getMaChuyenTau().getMaChuyenTau());
-			ps.setString(7, ve.getMaHanhkhach().getMaKH());
-			
-			if(ve.getMaKhuyenMai() != null) {
-				ps.setString(8, ve.getMaKhuyenMai().getMaKhuyenMai());
-			}else {
-				ps.setNull(8, Types.VARCHAR);
-			}
-			ps.setString(9, ve.getMaNhanVien().getMaNhanVien());
-			
-			return ps.executeUpdate() > 0;
-			
-		} catch (SQLException e) {
-			// TODO: handle exception
-			e.printStackTrace();
-			return false;
-		}
+    public String themVe(Ve ve, Connection conn) throws SQLException {
+        String sql = """
+        INSERT INTO Ve (ngayDat, giaVeGoc, giaThanhToan, trangThai,
+        maChoNgoi, maChuyenTau, maHanhKhach, maKhuyenMai, maNhanVien)
+        OUTPUT INSERTED.maVe
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+        // Dùng conn được truyền vào
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        	stmt.setTimestamp(1, Timestamp.valueOf(ve.getNgayDat())); // ngayDat
+            stmt.setBigDecimal(2, ve.getGiaVeGoc()); // giaVeGoc (giaVeGoc > 0) [3, 4]
+            stmt.setBigDecimal(3, ve.getGiaThanhToan()); // giaThanhToan (giaThanhToan > 0) [3, 4]
+            stmt.setString(4, ve.getTrangThai()); // Trang thái ("Khả dụng")
+
+            // Tham số 5 đến 9: Khóa ngoại
+            stmt.setString(5, ve.getMaChoNgoi().getMaChoNgoi());
+            stmt.setString(6, ve.getMaChuyenTau().getMaChuyenTau());
+            stmt.setString(7, ve.getMaHanhkhach().getMaKH());
+            
+            // Xử lý MaKhuyenMai có thể NULL
+            if (ve.getMaKhuyenMai() != null) {
+                stmt.setString(8, ve.getMaKhuyenMai().getMaKhuyenMai());
+            } else {
+                stmt.setNull(8, Types.VARCHAR);
+            }
+            stmt.setString(9, ve.getMaNhanVien().getMaNhanVien());
+            
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String maVe = rs.getString(1); 
+                    ve.setMaVe(maVe); // Cập nhật lại mã vé cho đối tượng
+                    return maVe;
+                }
+            }
+            throw new SQLException("Thêm vé thất bại, không nhận được mã vé trả về.");
+        }
     }
     
     //ĐỌC

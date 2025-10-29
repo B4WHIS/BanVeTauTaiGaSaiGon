@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -34,6 +35,7 @@ import javax.swing.table.DefaultTableModel;
 
 // Giả định các lớp Control và Entity đã được import đúng
 import control.QuanLyHoaDonControl;
+import control.QuanLyVeControl;
 import dao.VeDAO;
 import entity.ChuyenTau;
 import entity.HanhKhach;
@@ -46,7 +48,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     // Constants (Dựa trên [2])
     private final Color mauChinh = new Color(74, 140, 103);
     private final Color mauTongKet = new Color(200, 30, 30);
-    private final Color MAU_NUT_QUAYLAI = new Color(220, 20, 60);
+    private final Color MAU_NUT_QUAYLAI = new Color(0, 128, 255);
     private final Color MAU_NUT_THANHTOAN = new Color(103, 192, 144);
     private final Font phongChuGiaTri = new Font("Segoe UI", Font.PLAIN, 15);
     private final Font phongChuTongKet = new Font("Segoe UI", Font.BOLD, 22);
@@ -61,7 +63,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     private DefaultTableModel moHinhBang;
     private JButton btnQuayLai, btnThanhToan, btnApDungMa;
     private JPanel pnlNhapLieu; // Panel chứa form nhập liệu
-
+    private QuanLyVeControl dieuKhienVe = new QuanLyVeControl();
     // Data Holders
     private List<Ve> danhSachVe;
     private HanhKhach nguoiThanhToan;
@@ -70,25 +72,36 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     private VeDAO vedao = new VeDAO(); // DAO để lưu vé
     private BigDecimal tongTienTruocVAT = BigDecimal.ZERO;
     private ChuyenTau chuyenTauDuocChon;
-    private boolean laDoiVe = false;
     
-    public ThanhToanGUI(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv) {
+    private ThongTinKhachHangGUI previousScreen;
+    public ThanhToanGUI(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,
+    		ThongTinKhachHangGUI previous) {
         if (danhSachVe == null || danhSachVe.isEmpty()) {
             throw new IllegalArgumentException("Danh sách vé không được rỗng.");
         }
+       
+        if (nguoiThanhToan == null || nv == null) {
+            throw new IllegalArgumentException("Thông tin người thanh toán không được rỗng.");
+        }
+        this.previousScreen = previous;
         this.danhSachVe = danhSachVe;
-        this.nguoiThanhToan = nguoiThanhToan != null ? nguoiThanhToan : new HanhKhach();
-        this.nhanVienLap = nv != null ? nv : new NhanVien("NV-001");
+        this.nhanVienLap = nv;
+        this.nguoiThanhToan = nguoiThanhToan;
 
-        
-        this.laDoiVe = danhSachVe.size() == 1 
-                       && danhSachVe.get(0).getTrangThai() != null 
-                       && danhSachVe.get(0).getTrangThai().contains("Đã đổi");
+        for (Ve ve : danhSachVe) {
+            ve.setMaHanhkhach(this.nguoiThanhToan);
+        }
 
-        khoiTaoGiaoDien();
-        preloadThongTinKhachHang();
-        hienThiChiTietVe();
-        tinhToanTongTien();         
+        if (!danhSachVe.isEmpty()) {
+            this.chuyenTauDuocChon = danhSachVe.get(0).getMaChuyenTau();
+        }
+
+        setTitle("Thanh Toán Giao Dịch Bán Vé");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        khoiTaoThanhPhan();
         thietLapSuKien();
     }
 
@@ -115,134 +128,51 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
         pnlNhapLieu.setBorder(tb);
         pnlChinh.add(pnlNhapLieu, BorderLayout.WEST);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        pnlBangChiTiet.add(new JScrollPane(tblChiTiet), BorderLayout.CENTER);
+        pnlCenter.add(pnlBangChiTiet, BorderLayout.CENTER);
 
-        int row = 0;
+        khungChinh.add(pnlCenter, BorderLayout.CENTER);
 
-        JLabel lblTenKH = new JLabel("Họ tên:");
-        lblTenKH.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        gbc.gridx = 0; gbc.gridy = row;
-        pnlNhapLieu.add(lblTenKH, gbc);
+        // Footer (Thao tác)
+        JPanel pnlThaoTac = taoPanelThaoTac();
+        khungChinh.add(pnlThaoTac, BorderLayout.SOUTH);
 
-        txtTenKhachHang = new JTextField();
-        txtTenKhachHang.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        gbc.gridx = 1; gbc.weightx = 1;
-        pnlNhapLieu.add(txtTenKhachHang, gbc);
+        getContentPane().add(khungChinh);
+    }
 
-        row++;
-        JLabel lblCmnd = new JLabel("CMND/CCCD:");
-        lblCmnd.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        gbc.gridx = 0; gbc.gridy = row;
-        pnlNhapLieu.add(lblCmnd, gbc);
+    private JPanel taoPanelThaoTac() {
+        JPanel pnlThaoTac = new JPanel(new BorderLayout());
+        pnlThaoTac.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); 
+        
+    	pnlThaoTac.setBackground(Color.WHITE);
 
-        txtCmndPayer = new JTextField();
-        txtCmndPayer.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        gbc.gridx = 1; gbc.weightx = 1;
-        pnlNhapLieu.add(txtCmndPayer, gbc);
-
-        row++;
-        JLabel lblSdt = new JLabel("SĐT:");
-        lblSdt.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        gbc.gridx = 0; gbc.gridy = row;
-        pnlNhapLieu.add(lblSdt, gbc);
-
-        txtSdtPayer = new JTextField();
-        txtSdtPayer.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        gbc.gridx = 1; gbc.weightx = 1;
-        pnlNhapLieu.add(txtSdtPayer, gbc);
-
-        row++;
-        JLabel lblMaKM = new JLabel("Mã khuyến mãi:");
-        lblMaKM.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        gbc.gridx = 0; gbc.gridy = row;
-        pnlNhapLieu.add(lblMaKM, gbc);
-
-        JPanel pnlMaKM = new JPanel(new BorderLayout(5, 0));
-        txtMaKhuyenMai = new JTextField();
-        txtMaKhuyenMai.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        pnlMaKM.add(txtMaKhuyenMai, BorderLayout.CENTER);
-
-        btnApDungMa = new JButton("Áp dụng");
-        btnApDungMa.setBackground(mauChinh);
-        btnApDungMa.setForeground(Color.WHITE);
-        btnApDungMa.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        pnlMaKM.add(btnApDungMa, BorderLayout.EAST);
-
-        gbc.gridx = 1; gbc.gridy = row; gbc.weightx = 1;
-        pnlNhapLieu.add(pnlMaKM, gbc);
-
-        JPanel pnlTongKet = new JPanel(new GridBagLayout());
-        TitledBorder tbTongKet = BorderFactory.createTitledBorder("TỔNG KẾT");
-        tbTongKet.setTitleFont(new Font("Segoe UI", Font.BOLD, 20));
-        tbTongKet.setTitleColor(mauTongKet);
-        pnlTongKet.setBorder(tbTongKet);
-        gbc.gridx = 0; gbc.gridy = ++row; gbc.gridwidth = 2; gbc.weightx = 1;
-        pnlNhapLieu.add(pnlTongKet, gbc);
-
-        GridBagConstraints gbcTongKet = new GridBagConstraints();
-        gbcTongKet.insets = new Insets(4, 4, 4, 4);
-        gbcTongKet.anchor = GridBagConstraints.WEST;
-        gbcTongKet.fill = GridBagConstraints.HORIZONTAL;
-
-        int rowTongKet = 0;
-        JLabel lblTongVeGoc = new JLabel("Tổng tiền vé gốc:");
-        lblTongVeGoc.setFont(phongChuGiaTri);
-        gbcTongKet.gridx = 0; gbcTongKet.gridy = rowTongKet;
-        pnlTongKet.add(lblTongVeGoc, gbcTongKet);
-
-        txtTongTienVeGoc = new JTextField();
-        txtTongTienVeGoc.setEditable(false);
-        txtTongTienVeGoc.setFont(phongChuGiaTri);
-        gbcTongKet.gridx = 1; gbcTongKet.weightx = 1;
-        pnlTongKet.add(txtTongTienVeGoc, gbcTongKet);
-
-        rowTongKet++;
-        JLabel lblThueVAT = new JLabel("Thuế VAT (10%):");
-        lblThueVAT.setFont(phongChuGiaTri);
-        gbcTongKet.gridx = 0; gbcTongKet.gridy = rowTongKet;
-        pnlTongKet.add(lblThueVAT, gbcTongKet);
-
-        txtThueVAT = new JTextField();
-        txtThueVAT.setEditable(false);
-        txtThueVAT.setFont(phongChuGiaTri);
-        gbcTongKet.gridx = 1; gbcTongKet.weightx = 1;
-        pnlTongKet.add(txtThueVAT, gbcTongKet);
-
-        rowTongKet++;
-        JLabel lblTongCuoi = new JLabel("TỔNG THANH TOÁN:");
-        lblTongCuoi.setFont(phongChuTongKet);
-        gbcTongKet.gridx = 0; gbcTongKet.gridy = rowTongKet;
-        pnlTongKet.add(lblTongCuoi, gbcTongKet);
-
-        txtTongThanhToanCuoi = new JTextField();
-        txtTongThanhToanCuoi.setEditable(false);
-        txtTongThanhToanCuoi.setFont(phongChuTongKet);
-        gbcTongKet.gridx = 1; gbcTongKet.weightx = 1;
-        pnlTongKet.add(txtTongThanhToanCuoi, gbcTongKet);
-
-        JPanel pnlChiTiet = new JPanel(new BorderLayout());
-        pnlChiTiet.setBorder(BorderFactory.createTitledBorder("CHI TIẾT VÉ"));
-        pnlChinh.add(pnlChiTiet, BorderLayout.CENTER);
-
-        String[] cot = {"STT", "Mã vé", "Thông tin vé", "Thành tiền"};
-        moHinhBang = new DefaultTableModel(cot, 0);
-        tblChiTiet = new JTable(moHinhBang);
-        JScrollPane sc = new JScrollPane(tblChiTiet);
-        pnlChiTiet.add(sc, BorderLayout.CENTER);
-
-        JPanel pnlNutChucNang = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        btnQuayLai = new JButton("Quay lại", new ImageIcon(getClass().getResource("/img/reload.png")));
+        // Nút Quay lại
+        btnQuayLai = new JButton("Trở về");
+        btnQuayLai.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnQuayLai.setForeground(Color.WHITE);
         btnQuayLai.setBackground(MAU_NUT_QUAYLAI);
         btnQuayLai.setForeground(Color.WHITE);
         btnQuayLai.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        btnThanhToan = new JButton("Thanh toán", new ImageIcon(getClass().getResource("/img/plus.png")));
-        btnThanhToan.setBackground(MAU_NUT_THANHTOAN);
+        JPanel pnlLeft = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)); 
+        pnlLeft.setOpaque(false);
+        pnlLeft.add(btnQuayLai);
+        
+        pnlThaoTac.add(pnlLeft, BorderLayout.WEST); 
+        
+        // Nút Thanh Toán
+        btnThanhToan = new JButton("Thanh toán");
+        btnThanhToan.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnThanhToan.setForeground(Color.WHITE);
-        btnThanhToan.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnThanhToan.setBackground(MAU_NUT_THANHTOAN);
+        btnThanhToan.setPreferredSize(new Dimension(180, 50));
+
+        JPanel pnlRight = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0)); 
+        pnlRight.setOpaque(false);
+        pnlRight.add(btnThanhToan);
+        
+        pnlThaoTac.add(pnlRight, BorderLayout.EAST); 
+        
 
         pnlNutChucNang.add(btnQuayLai);
         pnlNutChucNang.add(btnThanhToan);
@@ -322,12 +252,42 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
         }
 
         HoaDon hoaDonDaLap = null;
+        List<Ve> danhSachVeDaDat = new ArrayList<>();
         try {
-            // TRUYỀN ĐÚNG danhSachVe (không phải null)
-            hoaDonDaLap = hdControl.lapHoaDon(nguoiThanhToan, nhanVienLap, danhSachVe);
+            // --- BƯỚC 1: Thực hiện giao dịch đặt vé (ghi vào DB) cho từng vé ---
+            for (Ve veChuaMa : danhSachVe) {
+                // Chúng ta phải sử dụng hàm datVe CÓ QUẢN LÝ TRANSACTION.
+                // datVe sẽ trả về mã vé và cập nhật trạng thái chỗ ngồi.
+                
+                // Chú ý: Vì datVe trong QuanLyVeControl BAO GỒM logic cập nhật HK
+                // (HK đã có mã KH) [11], chúng ta vẫn cần truyền HK vào, nhưng nó sẽ chỉ 
+                // CẬP NHẬT HK thay vì tạo mới.
+                
+                String maVe = dieuKhienVe.datVe(veChuaMa, veChuaMa.getMaHanhkhach(), nhanVienLap); 
+                if (maVe == null || maVe.isEmpty()) {
+                     throw new Exception("Lỗi CSDL: Không thể đặt vé cho chỗ ngồi: " + veChuaMa.getMaChoNgoi().getMaChoNgoi());
+                }
+                veChuaMa.setMaVe(maVe);
+                danhSachVeDaDat.add(veChuaMa); // Danh sách vé đã có mã
+            }
+            
+            // --- BƯỚC 2: Lập Hóa đơn sau khi tất cả vé đã được đặt thành công ---
+            hoaDonDaLap = hdControl.lapHoaDon(nguoiThanhToan, nhanVienLap, danhSachVeDaDat); // [8]
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi: " + e.getMessage(), "Thanh toán thất bại", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lỗi: " + e.getMessage(), "Thanh toán thất bại",
+            JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
+            
+            // !!! QUAN TRỌNG: Nếu BƯỚC 2 (lập hóa đơn) thất bại,
+            // các vé vừa được tạo (VE000023, VE000024) và Lịch sử vé đã bị COMMIT 
+            // trong BƯỚC 1 vẫn tồn tại (gây ra lỗi mâu thuẫn).
+            // Cần thêm logic ROLLBACK/HỦY VÉ nếu Lập Hóa đơn thất bại.
+            // Đây là vấn đề phức tạp nếu không dùng JTA hoặc Transaction xuyên suốt.
+            
+            // Nếu không dùng Transaction xuyên suốt, ta cần gọi hàm hủy vé cho tất cả 
+            // danhSachVeDaDat nếu lapHoaDon() thất bại.
+            btnThanhToan.setEnabled(true);
             return;
         }
 
@@ -359,10 +319,15 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object nguon = e.getSource();
         if (nguon == btnThanhToan) {
-            xuLyThanhToan();
+            if (btnThanhToan.isEnabled()) { 
+                xuLyThanhToan();
+            }
         } else if (nguon == btnQuayLai) {
-            // Quay lại màn hình trước đó
-            this.dispose();
+            this.dispose(); 
+            
+            if (previousScreen != null) {
+                previousScreen.setVisible(true); 
+            }
         } else if (nguon == btnApDungMa) {
             xuLyApDungKhuyenMai();
         }
