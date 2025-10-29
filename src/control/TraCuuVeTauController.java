@@ -83,6 +83,45 @@ public class TraCuuVeTauController implements ActionListener {
                 """ +
                 (!hoTen.isEmpty() ? " AND hk.hoTen LIKE ? " : "") +
                 (!cmnd.isEmpty() ? " AND hk.cmndCccd = ? " : "") +
+                (!sdt.isEmpty() ? " AND hk.soDienThoai = ? " : "") +
+                " ORDER BY ct.thoiGianKhoiHanh DESC, v.maVe";
+
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            int idx = 1;
+            if (!hoTen.isEmpty()) pstmt.setString(idx++, "%" + hoTen + "%");
+            if (!cmnd.isEmpty()) pstmt.setString(idx++, cmnd);
+            if (!sdt.isEmpty()) pstmt.setString(idx++, sdt);
+
+            ResultSet rs = pstmt.executeQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            String currentGroup = "";
+            int rowIndex = 0;
+
+            while (rs.next()) {
+                String maVe = rs.getString("maVe");
+                String gaDi = rs.getString("gaDi");
+                String gaDen = rs.getString("gaDen");
+                String thoiGian = sdf.format(rs.getTimestamp("thoiGianKhoiHanh"));
+                String maChuyenTau = rs.getString("maChuyenTau");
+
+                String groupKey = gaDi + " - " + gaDen + " " + thoiGian + "|" + maChuyenTau;
+                if (!groupKey.equals(currentGroup)) {
+                    currentGroup = groupKey;
+                    tableModel.addRow(new Object[]{
+                        "", 
+                        "<html><b>" + gaDi + " - " + gaDen + "<br>" + thoiGian + "</b></html>",
+                        "", "", "", "", 
+                        null  // DÒNG NÀY: không có checkbox
+                    });
+                }
+
+                rowIndex++;
+                String hoTenStr = rs.getString("hoTen") + "\nSố ghế: " + rs.getString("maChoNgoi");
+                String thongTinVe = String.format(
+                    "%s\nToa: %d - Ghế: %s\n%s",
+                    maVe, rs.getInt("toaSo"), rs.getString("maChoNgoi"), rs.getString("loaiGhe")
+                );
+                String thanhTien = String.format("%,.0f", rs.getDouble("giaThanhToan"));
                 (!sdt.isEmpty() ? " AND hk.soDienThoai = ? " : "");
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -174,6 +213,7 @@ public class TraCuuVeTauController implements ActionListener {
     }
 
     private void doiVe() {
+        JOptionPane.showMessageDialog(view, "Chức năng đổi vé đang phát triển...", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         List<String> danhSachMaVe = new ArrayList<>();
 
         for (int i = 0; i < tableModel.getRowCount(); i++) {

@@ -32,6 +32,11 @@ public class NhanVien {
         return maNhanVien;
     }
 
+    public void setMaNhanVien(String maNhanVien) {
+        if (maNhanVien == null || !maNhanVien.matches("^NV-\\d{3}$"))
+            throw new IllegalArgumentException("Mã nhân viên phải có dạng NV-XXX");
+        this.maNhanVien = maNhanVien;
+    }
 	public void setMaNhanVien(String maNhanVien) {
 	    if (maNhanVien == null || !maNhanVien.matches("^NV-\\d{3}$|^NV\\d{3}$"))
 	        throw new IllegalArgumentException("Mã nhân viên phải có dạng NV-XXX hoặc NVXXX");

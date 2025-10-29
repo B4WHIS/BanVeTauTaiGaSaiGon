@@ -12,6 +12,7 @@ import connectDB.connectDB;
 import entity.NhanVien;
 
 public class NhanVienDAO {
+	
 
 	public List<String> getAllTenNhanVien() {
         List<String> listTenNV = new ArrayList<>();

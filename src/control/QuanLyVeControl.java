@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +38,8 @@ public class QuanLyVeControl {
     private UuDaiDAO udDao;
     private LichSuVeDAO lsvDao;
     private KhuyenMaiDAO kmDao;
+    private LichSuVeDAO lsv;
+    private ThongKeDoanhThuDAO tkdtDao;
     private ThongKeDoanhThuDAO tkdtDao;
     private ChoNgoiDAO choNgoiDAO = new ChoNgoiDAO();
 	private GaDAO gaDao;
@@ -54,6 +57,259 @@ public class QuanLyVeControl {
         this.udDao = new UuDaiDAO();
         this.lsvDao = new LichSuVeDAO();
         this.kmDao = new KhuyenMaiDAO();
+    }
+
+    public boolean datVe(Ve veMoi, HanhKhach hkMoi, NhanVien nvlap) throws Exception {
+        HanhKhach finalHK = hkMoi;
+        try {
+            HanhKhach hanhkhachHienCo = null;
+            // xử lí và xác thực
+            if (hkMoi.getCmndCccd() != null && !hkMoi.getCmndCccd().trim().isEmpty()) {
+                hanhkhachHienCo = hkDao.layHanhKhachTheoCMND(hkMoi.getCmndCccd());
+            }
+            // khách cũ
+            if (hanhkhachHienCo != null) {
+                hkMoi.setMaKH(hanhkhachHienCo.getMaKH()); // giữ lại mã
+                hkDao.capNhatHanhKhach(hkMoi);
+                finalHK = hkMoi;
+            } else {
+                // khách mới
+                hkDao.themHanhKhach(hkMoi);
+                finalHK = hkMoi;
+            }
+            veMoi.setMaHanhkhach(finalHK);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalAccessException("Thông tin hành khách không hợp lệ: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi CSDL" + e.getMessage());
+        }
+        // Tính toán
+        try {
+            BigDecimal giaThanhToan = tinhGiaVeCuoiCung(veMoi.getGiaVeGoc(), finalHK.getMaUuDai(), veMoi.getMaKhuyenMai());
+
+            if (giaThanhToan.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new Exception("Giá thanh toán cuối cùng không hợp lệ.");
+            }
+            veMoi.setGiaThanhToan(giaThanhToan);
+
+            // cập nhật chỗ ngồi
+            String maChoNgoi = veMoi.getMaChoNgoi().getMaChoNgoi();
+            cnDao.updateTrangThai(maChoNgoi, "Đã đặt");
+
+            return veDao.themVe(veMoi);
+
+        } catch (Exception e) {
+            throw new Exception("Lỗi trong quá trình tính toán giá" + e.getMessage());
+        }
+    }
+
+    // =====================================================================
+    // CHỈ SỬA PHẦN HỦY VÉ – BẮT ĐẦU TỪ ĐÂY
+    // =====================================================================
+
+    public BigDecimal tinhPhiHuy(BigDecimal giaGoc, LocalDateTime thoiGianKhoiHanh) {
+        LocalDateTime thoiGianNOW = LocalDateTime.now();
+        Duration duration = Duration.between(thoiGianNOW, thoiGianKhoiHanh);
+        long gioConLai = duration.toHours();
+
+        // Không cho phép hủy nếu < 4 giờ
+        if (gioConLai < 4) {
+            return null;
+        }
+
+        BigDecimal tiLePhi;
+        if (gioConLai >= 24) {
+            tiLePhi = new BigDecimal("0.10"); // 10%
+        } else if (gioConLai >= 12) {
+            tiLePhi = new BigDecimal("0.20"); // 20%
+        } else {
+            tiLePhi = new BigDecimal("0.30"); // 30%
+        }
+
+        return giaGoc.multiply(tiLePhi).setScale(0, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public LichSuVe xuLyHuyVe(String maVe, String liDoHuy, NhanVien nvThucHien) throws Exception {
+        // 1. Tìm vé
+        Ve ve = veDao.layVeTheoMa(maVe);
+        if (ve == null) {
+            throw new Exception("Không tìm thấy vé có mã: " + maVe);
+        }
+
+        // 2. Kiểm tra trạng thái: chỉ hủy được vé "Khả dụng"
+        if (!"Khả dụng".equalsIgnoreCase(ve.getTrangThai())) {
+            throw new Exception("Vé đã hủy hoặc đã sử dụng, không thể hủy lại!");
+        }
+
+        // 3. Lấy thông tin chuyến tàu
+        ChuyenTau chuyenTau = ctDao.getChuyenTauByMaChuyenTau(ve.getMaChuyenTau().getMaChuyenTau());
+        if (chuyenTau == null) {
+            throw new Exception("Không tìm thấy thông tin chuyến tàu.");
+        }
+
+        // 4. Tính phí hủy theo điều kiện
+        BigDecimal phiHuy = tinhPhiHuy(ve.getGiaVeGoc(), chuyenTau.getThoiGianKhoiHanh());
+        if (phiHuy == null) {
+            throw new Exception("Không thể hủy: còn dưới 4 giờ trước giờ tàu chạy!");
+        }
+
+        // 5. Tính tiền hoàn
+        BigDecimal tienHoan = ve.getGiaThanhToan().subtract(phiHuy);
+        if (tienHoan.compareTo(BigDecimal.ZERO) < 0) {
+            tienHoan = BigDecimal.ZERO;
+        }
+
+        // 6. GIAO DỊCH: Cập nhật DB
+        try {
+            // Cập nhật trạng thái vé
+            if (!veDao.capNhatTrangThaiVe(maVe, "Đã hủy")) {
+                throw new SQLException("Lỗi cập nhật trạng thái vé");
+            }
+
+            // Giải phóng ghế
+            String maChoNgoi = ve.getMaChoNgoi().getMaChoNgoi();
+            if (!cnDao.updateTrangThai(maChoNgoi, "Trống")) {
+                throw new SQLException("Lỗi cập nhật trạng thái chỗ ngồi");
+            }
+
+            // GHI LỊCH SỬ HỦY VÉ – ĐÚNG VỚI ENTITY BẠN GỬI
+            LichSuVe lichSu = new LichSuVe(
+                null, 
+                ID_HUY_VE, 
+                LocalDateTime.now(), 
+                maVe, 
+                nvThucHien != null ? nvThucHien.getMaNhanVien() : "NV001"
+            );
+
+            lichSu.setMaHanhKhach(ve.getMaHanhkhach().getMaKH());
+            lichSu.setLyDo(liDoHuy + " | Hoàn: " + tienHoan + " VNĐ");
+            lichSu.setPhiXuLy(phiHuy);
+            // Nếu entity có field tienHoan → thêm setter
+            lichSu.setTienHoan(tienHoan);
+
+            if (!lsvDao.themLichSuVe(lichSu)) {
+                throw new SQLException("Lỗi ghi lịch sử hủy vé");
+            }
+
+            return lichSu;
+
+        } catch (SQLException e) {
+            throw new Exception("Lỗi CSDL khi hủy vé: " + e.getMessage());
+        }
+    }
+    // =====================================================================
+    // KẾT THÚC PHẦN HỦY VÉ – KHÔNG ĐỘNG GÌ DƯỚI ĐÂY
+    // =====================================================================
+
+    public boolean doiVe(String maVeCu, ChuyenTau ctMoi, ChoNgoi cnMoi, NhanVien nv) throws Exception {
+        //kiểm tra vé cũ
+        Ve veCu = veDao.layVeTheoMa(maVeCu);
+        if (veCu == null) {
+            throw new Exception("Không tìm thấy vé có mã " + maVeCu);
+        }
+
+        //kiểm tra thời gian
+        LocalDateTime TGKH_Cu = veCu.getMaChuyenTau().getThoiGianKhoiHanh();
+        if(TGKH_Cu.minusHours(4).isBefore(LocalDateTime.now())) {
+            throw new Exception("Vé không đủ điều kiện đổi, phải đổi trước giờ khởi hành 4 giờ.");
+        }
+
+        //Kiểm tra chỗ ngồi mới
+        ChoNgoi trangThaiChoMoi = cnDao.getChoNgoiByMa(cnMoi.getMaChoNgoi());
+        if (trangThaiChoMoi == null || !trangThaiChoMoi.getTrangThai().equalsIgnoreCase("Trống")) {
+            throw new Exception("Chỗ ngồi mới đã có người đặt hoặc không tồn tại");
+        }
+
+        //tính toán giá vé mới
+        BigDecimal giaCu = veCu.getGiaThanhToan();
+        BigDecimal giaVeGocMoi = ctMoi.getGiaChuyen();
+
+        BigDecimal giaMoiThanhToan = tinhGiaVeCuoiCung(giaVeGocMoi, veCu.getMaHanhkhach().getMaUuDai(), veCu.getMaKhuyenMai());
+
+        BigDecimal chenhLech = giaMoiThanhToan.subtract(giaCu);
+
+        try {
+            //Giao dịch
+            if(!cnDao.updateTrangThai(veCu.getMaChoNgoi().getMaChoNgoi(), "Trống")) {
+                throw new SQLException("Lỗi chỗ ngồi cũ.");
+            }
+
+            if(!veDao.capNhatTrangThaiVe(maVeCu,"Đã đổi")) {
+                throw new SQLException("Lỗi cập nhật trạng thái vé cũ");
+            }
+
+            //Thêm vé mới
+            Ve veMoi = new Ve();
+
+            veMoi.setMaChuyenTau(ctMoi);
+            veMoi.setMaChoNgoi(cnMoi);
+            veMoi.setGiaVeGoc(giaVeGocMoi);
+            veMoi.setGiaThanhToan(giaMoiThanhToan);
+            veMoi.setMaHanhkhach(veCu.getMaHanhkhach());
+            veMoi.setMaNhanVien(nv);
+            veMoi.setNgayDat(LocalDateTime.now());
+            veMoi.setTrangThai("Khả dụng");
+
+            if(!veDao.themVe(veMoi)) {
+                throw new SQLException("Lỗi thêm vé mới");
+            }
+            if(!cnDao.updateTrangThai(cnMoi.getMaChoNgoi(), "Đã đặt")) {
+                throw new SQLException("Lỗi cập nhật trạng thái vé");
+            }
+
+            //ghi lịch sửa
+            LichSuVe lichSu = new LichSuVe(null, ID_DOI_VE, LocalDateTime.now(), veMoi.getMaVe(), nv.getMaNhanVien());
+            lichSu.setPhiXuLy(chenhLech.abs());
+            lichSu.setMaHanhKhach(veCu.getMaHanhkhach().getMaKH());
+            lichSu.setLyDo("Đổi vé từ " + maVeCu + "sang " + veMoi.getMaVe() + ". Chênh lệch: " + chenhLech.toString());
+            if(!lsvDao.themLichSuVe(lichSu)) {
+                throw new SQLException("Lỗi ghi lịch sử đổi vé");
+            }
+
+            ThongKeDoanhThu tkHienTai = tkdtDao.getThongKeTheoNgayVaNV(LocalDate.now(), nv.getMaNhanVien());
+            if(tkHienTai != null) {
+                tkHienTai.setTongSoHoanDoi(tkHienTai.getTongSoHoanDoi() + 1);
+                tkdtDao.updateThongKe(tkHienTai);
+            }else {
+                ThongKeDoanhThu tkMoi = new ThongKeDoanhThu(null, LocalDate.now(), nv.getMaNhanVien(), BigDecimal.ZERO, 0);
+                tkMoi.setTongSoHoanDoi(1);
+                tkdtDao.insertThongKe(tkMoi);
+            }
+
+            //Thông báo chênh lệch
+            if(chenhLech.compareTo(BigDecimal.ZERO) > 0) {
+                System.out.println("Cần thanh toán thêm: " + chenhLech.toString());
+            }else if(chenhLech.compareTo(BigDecimal.ZERO) < 0) {
+                System.out.println("Cần hoàn tiền lại: " + chenhLech.abs().toString());
+            }
+            return true;
+        } catch (Exception e) {
+            throw new Exception("Đổi vé thất bại do lỗi giao dịch: "+ e.getMessage());
+        }
+    }
+
+    private BigDecimal tinhGiaVe(ChuyenTau ctMoi, ChoNgoi cnMoi, KhuyenMai maKhuyenMai) {
+        return null;
+    }
+
+    public BigDecimal tinhGiaVeCuoiCung(BigDecimal giaGoc, String maUuDai, KhuyenMai kmDinhKem) throws Exception {
+        if (giaGoc == null || giaGoc.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new Exception("Giá vé gốc không hợp lệ.");
+        }
+        BigDecimal giaThanhToan = giaGoc;
+        UuDai ud = udDao.timUuDaiTheoMa(maUuDai);
+        if (ud != null) {
+            BigDecimal mucGiamGiaPT = ud.getMucGiamGia().divide(new BigDecimal("100"));
+            BigDecimal soTienGiam = giaGoc.multiply(mucGiamGiaPT);
+            giaThanhToan = giaGoc.subtract(soTienGiam);
+        }
+
+        if (kmDinhKem != null && kmDinhKem.getMaKhuyenMai() != null) {
+            KhuyenMai kmKhaDung = kmDao.TimKhuyenMaiTheoMa(kmDinhKem.getMaKhuyenMai());
+
+            if (kmKhaDung != null && kmKhaDung.getNgayKetThuc().isAfter(LocalDate.now())) {
+                BigDecimal mucGiamGiaKM = kmKhaDung.getMucGiamGia().divide(new BigDecimal("100"));
+                giaThanhToan = giaThanhToan.subtract(giaThanhToan.multiply(mucGiamGiaKM));
         this.tkdtDao = new ThongKeDoanhThuDAO();
         this.tauDao = new TauDAO();
         this.gaDao = new GaDAO();
@@ -84,6 +340,36 @@ public class QuanLyVeControl {
         return giaThanhToan.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
+    public class MockData {
+        public static NhanVien taoNhanVienTest() {
+            try {
+                return new NhanVien("NV001", "Nguyen Van B", LocalDate.now().minusYears(20), "0901234567", "123456789", 1);
+            } catch (Exception e) {
+                System.err.println("Lỗi tạo NV giả lập: " + e.getMessage());
+                return null;
+            }
+        }
+        public static KhuyenMai taoKhuyenMaiGiaLap(boolean hopLe) {
+            try {
+                LocalDate ngayKetThuc = LocalDate.now().plusMonths(1);
+                return new KhuyenMai("KMTEST001", "Giam 10%", new BigDecimal("10"), LocalDate.now().minusDays(10), ngayKetThuc, "Khong dieu kien");
+            } catch (Exception e) {
+                System.err.println("Lỗi tạo KM giả lập: " + e.getMessage());
+                return null;
+            }
+        }
+    }
+
+    private UuDai timUuDaiTest(String maUuDai) {
+        if ("UD001".equals(maUuDai)) {
+            try {
+                return new UuDai("UD001", 1, new BigDecimal("10"), "Khach hang than thiet");
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return null;
+    }
     /**
      * Thực hiện giao dịch đặt vé.
      * Đã FIX: Đảm bảo tính toàn vẹn dữ liệu chỗ ngồi và vé bằng logic rollback thủ công.

@@ -102,16 +102,10 @@ public class ChuyenTauDAO {
         if (!tonTaiTau(ct.getMaTau())) {
             throw new IllegalArgumentException("Mã tàu không tồn tại!");
         }
-        // Kiểm tra FK: maLichTrinh tồn tại
-        if (!tonTaiLichTrinh(ct.getMaLichTrinh())) {
-            throw new IllegalArgumentException("Mã lịch trình không tồn tại!");
-        }
-        // Kiểm tra trạng thái hợp lệ
+    
         kiemTraTrangThaiHopLe(ct.getTrangThai());
         // Kiểm tra trùng chuyến (cùng lịch trình và ngày KH)
-        if (isTrungChuyen(ct.getMaLichTrinh(), ct.getThoiGianKhoiHanh().toLocalDate())) {
-            throw new IllegalArgumentException("Chuyến tàu trùng lịch trình và ngày khởi hành đã tồn tại!");
-        }
+      
         String sql = "INSERT INTO ChuyenTau (thoiGianKhoiHanh, thoiGianDen, maTau, maLichTrinh, trangThai, giaChuyen) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -173,10 +167,8 @@ public class ChuyenTauDAO {
         if (coVeLienQuan(maChuyenTau)) {
             throw new IllegalArgumentException("Không thể xóa chuyến có vé đã bán!");
         }
-        // Kiểm tra có phiếu đặt chỗ liên quan
-        if (coPhieuDatChoLienQuan(maChuyenTau)) {
-            throw new IllegalArgumentException("Không thể xóa chuyến có phiếu đặt chỗ!");
-        }
+       
+    
         String sql = "DELETE FROM ChuyenTau WHERE maChuyenTau = ?";
         try (Connection conn = connectDB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -374,22 +366,7 @@ public class ChuyenTauDAO {
         return false;
     }
 
-    // Helper: Kiểm tra có phiếu đặt chỗ liên quan không
-    private boolean coPhieuDatChoLienQuan(String maChuyenTau) {
-        String sql = "SELECT COUNT(*) FROM ChiTietPhieuDatCho WHERE maChuyenTau = ?";
-        try (Connection conn = connectDB.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, maChuyenTau);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+  
 
     // Method tự động cập nhật trạng thái dựa trên thời gian thực (gọi định kỳ)
     public void updateTrangThaiTuThoiGian() {

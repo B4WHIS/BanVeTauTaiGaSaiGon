@@ -60,6 +60,8 @@ public class HanhKhach {
     }
 
     public void setMaKH(String maKH) {
+        if (maKH == null || !maKH.matches("^HK-\\d{5}$"))
+            throw new IllegalArgumentException("Mã khách hàng phải có dạng HK-XXX");
         // Ràng buộc DB: HK-XXXXX (2 kí tự đầu cố định, 5 kí tự số) [1]
         if (maKH == null || !maKH.matches("^HK-\\d{5}$")) 
         {
