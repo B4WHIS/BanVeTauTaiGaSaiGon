@@ -50,7 +50,32 @@ public class LichSuVeDAO {
 			throw new SQLException("Lỗi khi tạo đối tượng Ve từ ResultSet: " + e.getMessage(), e);
 		}	
 	}
+	public boolean updateMaHoaDonByMaVe(String maVe, String maHoaDon, Connection conn) throws SQLException {
+	    String sql = "UPDATE LichSuVe SET maHoaDon = ? WHERE maVe = ? AND maHoaDon IS NULL AND IDloaiGiaoDich = 1";
+	    
+	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+	        ps.setString(1, maHoaDon);
+	        ps.setString(2, maVe);
+	        return ps.executeUpdate() > 0;
+	    }
+	}
 //	THEM
+	public boolean themLichSuVe(LichSuVe lichSu, Connection conn) throws SQLException {
+	    String sql = "INSERT INTO LichSuVe (IDloaiGiaoDich, ngayGiaoDich, lyDo, phiXuLy, maVe, maNhanVien, maHoaDon, maHanhKhach) "
+	    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	    // Dùng conn được truyền vào
+	    try (PreparedStatement ps = conn.prepareStatement(sql)) { 
+	    	 ps.setInt(1, lichSu.getIDloaiGiaoDich()); 
+	         ps.setTimestamp(2, Timestamp.valueOf(lichSu.getNgayGiaoDich())); 
+	         ps.setString(3, lichSu.getLyDo()); 
+	         ps.setBigDecimal(4, lichSu.getPhiXuLy()); 
+	         ps.setString(5, lichSu.getMaVe()); 
+	         ps.setString(6, lichSu.getMaNhanVien()); 
+	         ps.setString(7, lichSu.getMaHoaDon()); 
+	         ps.setString(8, lichSu.getMaHanhKhach()); 
+	    	return ps.executeUpdate() > 0;
+	    }
+	}
     public boolean themLichSuVe(LichSuVe lichSu) {
         String sql = "INSERT INTO LichSuVe (IDloaiGiaoDich, ngayGiaoDich, lyDo, phiXuLy, maVe, maNhanVien, maHoaDon, maHanhKhach) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";

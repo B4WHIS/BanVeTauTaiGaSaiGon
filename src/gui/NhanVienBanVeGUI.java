@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -13,13 +14,8 @@ import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import entity.NhanVien;
 
@@ -30,10 +26,11 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     private JButton btnTimChuyenTau;
     private JButton btnDangXuat;
     private JButton btnDoiVe;
-
+    private NhanVien nhanVien;
    
     public NhanVienBanVeGUI(NhanVien nhanVien) throws IOException {
-        super(nhanVien); // TRUYỀN NHÂN VIÊN CHO GIAO DIỂN CHÍNH
+        super(nhanVien); 
+        this.nhanVien = nhanVien;
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
     }
@@ -142,14 +139,14 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand(); 
         try {
-            if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
-                new TraCuuChuyenTauGUI().setVisible(true); 
-            } else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
+        	if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
+        	    new TraCuuChuyenTauGUI(this.nhanVien).setVisible(true);
+        	} else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
                 new GiaoDienHuyVe().setVisible(true); 
             } else if (command.equals("ĐỔI VÉ") || e.getSource() == btnDoiVe) {
                 new TraCuuVeTauGUI().setVisible(true);
             } else if (command.equals("TÌM CHUYẾN") || e.getSource() == btnTimChuyenTau) {
-                new TraCuuChuyenTauGUI().setVisible(true); 
+                new TraCuuChuyenTauGUI(this.nhanVien).setVisible(true);
             } else if (command.equals("ĐĂNG XUẤT") || e.getSource() == btnDangXuat) {
                 int confirm = JOptionPane.showConfirmDialog(
                     this,

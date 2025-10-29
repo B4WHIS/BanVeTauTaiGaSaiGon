@@ -1,5 +1,6 @@
 package dao;
 import java.sql.Connection;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +11,10 @@ import java.util.List;
 
 import connectDB.connectDB;
 import entity.HanhKhach;
+
+
 public class HanhKhachDAO {
+	
     private HanhKhach layHanhKhachTuResultSet(ResultSet rs) throws SQLException {
         String maHK = rs.getString("maHanhKhach");
         String hoTen = rs.getString("hoTen");

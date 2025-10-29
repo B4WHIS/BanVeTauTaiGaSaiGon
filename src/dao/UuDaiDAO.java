@@ -265,5 +265,27 @@ public class UuDaiDAO {
         
         return danhSachTenUuDai;
     }
+    
+    public String getTenLoaiByID(int idLoaiUD) throws SQLException {
+        // IDloaiUD là cột khóa chính của bảng LoaiUuDai [3]
+        String sql = "SELECT tenLoai FROM LoaiUuDai WHERE IDloaiUD = ?";
+        
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, idLoaiUD);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Trả về tên loại, ví dụ: "Trẻ em", "Người lớn (Mặc định)" [4]
+                    return rs.getString("tenLoai").trim(); 
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi CSDL khi truy vấn tên loại ưu đãi: " + e.getMessage());
+            throw e;
+        }
+        return "Không xác định";
+    }
 
 }
