@@ -60,11 +60,11 @@ public class DangNhapController implements ActionListener, MouseListener {
         try {
             conn = connectDB.getConnection();
            
-            String sql = "SELECT lc.tenLoai, nv.hoTen " +
-                         "FROM TaiKhoan tk " +
-                         "JOIN NhanVien nv ON tk.maNhanVien = nv.maNhanVien " +
-                         "JOIN LoaiChucVu lc ON nv.IDloaiChucVu = lc.IDloaiCV " +
-                         "WHERE tk.tenDangNhap = ? AND tk.matKhau = ?";
+            String sql = "SELECT lc.tenLoai, nv.hoTen, nv.maNhanVien " + // *** THÊM nv.maNhanVien ***
+                    "FROM TaiKhoan tk " +
+                    "JOIN NhanVien nv ON tk.maNhanVien = nv.maNhanVien " +
+                    "JOIN LoaiChucVu lc ON nv.IDloaiChucVu = lc.IDloaiCV " +
+                    "WHERE tk.tenDangNhap = ? AND tk.matKhau = ?";
             
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, tenDangNhap);
@@ -75,23 +75,23 @@ public class DangNhapController implements ActionListener, MouseListener {
             if (rs.next()) {
                 String loaiChucVu = rs.getString("tenLoai");
                 String hoTen = rs.getString("hoTen");
-              
+                String maNhanVien = rs.getString("maNhanVien"); // NEW: Lấy Mã NV
+
                 NhanVien nhanVien = new NhanVien();
+                nhanVien.setMaNhanVien(maNhanVien); // *** NEW: GÁN MÃ NHÂN VIÊN HỢP LỆ ***
                 nhanVien.setHoTen(hoTen);
                 nhanVien.setIDloaiChucVu(getIDFromChucVu(loaiChucVu));
-                
-               
+
                 view.dispose();
-                
-                
+                // Tiếp tục truyền đối tượng NV đã đầy đủ thông tin
                 if ("Nhân viên bán vé".equals(loaiChucVu)) {
                     try {
-                        new NhanVienBanVeGUI(nhanVien).setVisible(true);
+                        new NhanVienBanVeGUI(nhanVien).setVisible(true); // [6]
                     } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(null, "Lỗi khi mở giao diện bán vé: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        // ...
                     }
                 } else if ("Nhân viên quản lý".equals(loaiChucVu)) {
-                    new NhanVienQuanLyGUI(nhanVien).setVisible(true);
+                    new NhanVienQuanLyGUI(nhanVien).setVisible(true); // [10]
                 } else {
                     JOptionPane.showMessageDialog(null, "Loại chức vụ không được hỗ trợ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }

@@ -1,8 +1,8 @@
+// File: src/gui/TraCuuVeTauGUI.java
 package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -10,15 +10,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;  // ĐÃ THÊM DÒNG NÀY
+
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -27,22 +26,18 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
+import control.TraCuuVeTauController;
 
-    // Thành phần chính
+public class TraCuuVeTauGUI extends GiaoDienChinh {
     private JPanel pnlChinh, pnlTitle, pnlTraCuu, pnlKetQua;
     private JLabel lblTieuDe;
     private JTextField txtHoTen, txtCMND, txtSDT;
-    private JButton btnTim, btnLamMoi, btnTroVe, btnInVe;
-    private JTable tblKetQua;
-    private DefaultTableModel modelKetQua = new DefaultTableModel();
-    private JEditorPane editorPane;
-    private JScrollPane scpKetQua;
+    private JButton btnTim, btnLamMoi, btnTroVe, btnInVe, btnDoiVe, btnHuyVe;
+    private JTable table;
+    private DefaultTableModel tableModel;
 
-    // Màu sắc & Font
     private final Color COLOR_PRIMARY = new Color(74, 140, 103);
     private final Color COLOR_ACCENT = new Color(93, 156, 236);
     private final Color COLOR_ALERT = new Color(229, 115, 115);
@@ -57,56 +52,106 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
 
-        // === PNL CHÍNH ===
+        initComponents();
+        setupLayout();
+        setupActions();
+        setupEmptyTable();
+    }
+
+    private void initComponents() {
         pnlChinh = new JPanel(new BorderLayout(12, 12));
         pnlChinh.setBorder(new EmptyBorder(12, 12, 12, 12));
         getContentPane().add(pnlChinh);
 
-        // === TIÊU ĐỀ ===
+        // Tiêu đề
         pnlTitle = new JPanel(new BorderLayout());
         pnlTitle.setBorder(BorderFactory.createEtchedBorder());
         lblTieuDe = new JLabel("TRA CỨU VÉ TÀU", SwingConstants.CENTER);
         lblTieuDe.setFont(FONT_TITLE);
         lblTieuDe.setForeground(COLOR_PRIMARY);
         pnlTitle.add(lblTieuDe, BorderLayout.CENTER);
-        pnlChinh.add(pnlTitle, BorderLayout.NORTH);
 
-        // === PANEL TRÁI - FORM TRA CỨU ===
+        // Form
         pnlTraCuu = new JPanel(new GridBagLayout());
         TitledBorder tb = BorderFactory.createTitledBorder("THÔNG TIN TRA CỨU");
         tb.setTitleFont(FONT_SECTION);
         tb.setTitleColor(COLOR_ACCENT);
         pnlTraCuu.setBorder(tb);
         pnlTraCuu.setPreferredSize(new Dimension(420, 0));
-        setupFormTraCuu();
-        pnlChinh.add(pnlTraCuu, BorderLayout.WEST);
 
-        // === PANEL PHẢI - KẾT QUẢ ===
+        // Kết quả
         pnlKetQua = new JPanel(new BorderLayout());
-        TitledBorder tbKetQua = BorderFactory.createTitledBorder("KẾT QUẢ XÁC THỰC");
+        TitledBorder tbKetQua = BorderFactory.createTitledBorder("KẾT QUẢ TRA CỨU");
         tbKetQua.setTitleFont(FONT_SECTION);
         tbKetQua.setTitleColor(COLOR_ALERT);
         pnlKetQua.setBorder(tbKetQua);
-        setupTableKetQua();
+
+        // Bảng JTable
+        tableModel = new DefaultTableModel(
+        	    new Object[]{"#", "Họ tên", "Thông tin vé", "Thành tiền (VNĐ)", "Loại vé", "Trạng thái", "Chọn"}, 0
+        	) {
+        	    @Override
+        	    public Class<?> getColumnClass(int columnIndex) {
+        	        return columnIndex == 6 ? Boolean.class : String.class;
+        	    }
+
+        	    @Override
+        	    public boolean isCellEditable(int row, int column) {
+        	        if (column != 6) return false;
+        	        Object value = getValueAt(row, 6);
+        	        // Chỉ cho phép chỉnh sửa nếu là Boolean (true/false) → tức là vé cho phép hủy
+        	        return value instanceof Boolean;
+        	    }
+        	};
+        table = new JTable(tableModel);
+        table.setRowHeight(60);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getColumnModel().getColumn(0).setMaxWidth(50);
+        table.getColumnModel().getColumn(6).setMaxWidth(60);
+        table.getColumnModel().getColumn(6).setCellRenderer((table1, value, isSelected, hasFocus, row, column) -> {
+            JCheckBox cb = new JCheckBox();
+            cb.setHorizontalAlignment(SwingConstants.CENTER);
+
+            if (value instanceof Boolean) {
+                cb.setSelected((Boolean) value);
+                cb.setEnabled(true); // Cho phép click
+            } else {
+                cb.setSelected(false);
+                cb.setEnabled(false); // Không cho click
+                cb.setToolTipText("Vé không đủ điều kiện hủy");
+            }
+
+            if (isSelected) {
+                cb.setBackground(table1.getSelectionBackground());
+                cb.setForeground(table1.getSelectionForeground());
+            } else {
+                cb.setBackground(table1.getBackground());
+                cb.setForeground(table1.getForeground());
+            }
+
+            return cb;
+        });
+        table.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(225, 242, 232)));
+        pnlKetQua.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void setupLayout() {
+        pnlChinh.add(pnlTitle, BorderLayout.NORTH);
+        pnlChinh.add(pnlTraCuu, BorderLayout.WEST);
         pnlChinh.add(pnlKetQua, BorderLayout.CENTER);
 
-        // === NÚT TRỞ VỀ DƯỚI CÙNG ===
         JPanel pnlChucNang = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnTroVe = new JButton("Trở về", GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 20, 20));
         btnTroVe.setBackground(COLOR_ALERT);
         btnTroVe.setForeground(Color.WHITE);
         btnTroVe.setFont(FONT_LABEL);
-        btnTroVe.addActionListener(this);
         pnlChucNang.add(btnTroVe);
         pnlChinh.add(pnlChucNang, BorderLayout.SOUTH);
 
-        // Gắn sự kiện
-        btnTim.addActionListener(this);
-        btnLamMoi.addActionListener(this);
-        btnInVe.addActionListener(this);
-
-        // Dữ liệu mẫu để test
-        themDuLieuMau();
+        setupFormTraCuu();
     }
 
     private void setupFormTraCuu() {
@@ -116,7 +161,6 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         int row = 0;
 
-        // Họ tên
         JLabel lblHoTen = new JLabel("Họ tên:");
         lblHoTen.setFont(FONT_LABEL);
         gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
@@ -127,7 +171,6 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(txtHoTen, gbc);
 
-        // CMND
         JLabel lblCMND = new JLabel("CMND/Hộ chiếu:");
         lblCMND.setFont(FONT_LABEL);
         gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
@@ -138,7 +181,6 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(txtCMND, gbc);
 
-        // SĐT
         JLabel lblSDT = new JLabel("SĐT:");
         lblSDT.setFont(FONT_LABEL);
         gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
@@ -149,24 +191,34 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(txtSDT, gbc);
 
-        // Nút chức năng
         JPanel pnlNut = new JPanel(new GridLayout(1, 2, 10, 0));
         btnLamMoi = new JButton("Làm mới", GiaoDienChinh.chinhKichThuoc("/img/undo.png", 20, 20));
         btnLamMoi.setBackground(COLOR_ALERT);
         btnLamMoi.setForeground(Color.WHITE);
         btnLamMoi.setFont(FONT_LABEL);
-
         btnTim = new JButton("Tìm", GiaoDienChinh.chinhKichThuoc("/img/traCuu.png", 20, 20));
         btnTim.setBackground(COLOR_ACCENT);
         btnTim.setForeground(Color.WHITE);
         btnTim.setFont(FONT_LABEL);
-
         pnlNut.add(btnLamMoi);
         pnlNut.add(btnTim);
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(pnlNut, gbc);
 
-        // Nút in vé
+        JPanel pnlNutThem = new JPanel(new GridLayout(1, 2, 10, 0));
+        btnDoiVe = new JButton("Đổi vé", GiaoDienChinh.chinhKichThuoc("/img/change.png", 20, 20));
+        btnDoiVe.setBackground(new Color(255, 193, 7));
+        btnDoiVe.setForeground(Color.WHITE);
+        btnDoiVe.setFont(FONT_LABEL);
+        btnHuyVe = new JButton("Hủy vé", GiaoDienChinh.chinhKichThuoc("/img/cancel.png", 20, 20));
+        btnHuyVe.setBackground(COLOR_ALERT);
+        btnHuyVe.setForeground(Color.WHITE);
+        btnHuyVe.setFont(FONT_LABEL);
+        pnlNutThem.add(btnDoiVe);
+        pnlNutThem.add(btnHuyVe);
+        gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
+        pnlTraCuu.add(pnlNutThem, gbc);
+
         btnInVe = new JButton("In vé", GiaoDienChinh.chinhKichThuoc("/img/ve.png", 20, 20));
         btnInVe.setBackground(new Color(255, 237, 0));
         btnInVe.setFont(FONT_LABEL);
@@ -176,221 +228,50 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         pnlTraCuu.add(btnInVe, gbc);
     }
 
-    // === BẢNG KẾT QUẢ - 1 BẢNG DUY NHẤT, TIÊU ĐỀ NHÓM TRẢI DÀI ===
-    private void setupTableKetQua() {
-        editorPane = new JEditorPane();
-        editorPane.setContentType("text/html");
-        editorPane.setEditable(false);
-        editorPane.setBackground(Color.WHITE);
+    private void setupActions() {
+        TraCuuVeTauController controller = new TraCuuVeTauController(this);
 
-        // CSS để giống JTable
-        String css = """
-            <style>
-                body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-                table { width: 100%; border-collapse: collapse; font-size: 13px; }
-                th { background: #f5f5f5; padding: 12px 8px; text-align: left; font-weight: bold; border-bottom: 1px solid #ddd; }
-                td { padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
-                .group-row td { 
-                    background: #ADD8E6 !important; 
-                    font-weight: bold; 
-                    font-size: 14px; 
-                    padding: 10px 15px; 
-                    border-bottom: 1px solid #B0B0B0;
-                }
-                .even-row td { background: #f8fafc; }
-                .checkbox { text-align: center; }
-                input[type="checkbox"] { transform: scale(1.2); }
-            </style>
-            """;
+        btnTim.addActionListener(controller);
+        btnTim.setActionCommand("Tìm");
 
-        editorPane.setText(css + "<body><table>" +
-            "<tr><th>#</th><th>Họ tên</th><th>Thông tin vé</th><th>Thành tiền (VNĐ)</th>" +
-            "<th>Loại trả vé</th><th>Lệ phí trả vé</th><th>Tiền trả lại</th>" +
-            "<th>Thông tin trả vé</th><th class='checkbox'>Chọn</th></tr>" +
-            "</table></body>");
+        btnLamMoi.addActionListener(controller);
+        btnLamMoi.setActionCommand("Làm mới");
 
-        JScrollPane scrollPane = new JScrollPane(editorPane);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(225, 242, 232)));
-        pnlKetQua.add(scrollPane, BorderLayout.CENTER);
+        btnTroVe.addActionListener(controller);
+        btnTroVe.setActionCommand("Trở về");
 
-        // Footer
-        JPanel pnlFooter = new JPanel(new BorderLayout());
-        pnlFooter.setBorder(new EmptyBorder(8, 8, 8, 8));
-        JPanel pnlButtonsRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        pnlButtonsRight.setOpaque(false);
+        btnInVe.addActionListener(controller);
+        btnInVe.setActionCommand("In vé");
 
-      
-      
-        pnlKetQua.add(pnlFooter, BorderLayout.SOUTH);
-    }
-    // === RENDERER HTML: TIÊU ĐỀ NHÓM TRẢI DÀI TOÀN BẢNG ===
- // === RENDERER HTML: VẼ TIÊU ĐỀ NHÓM TOÀN HÀNG ===
-    private class HTMLFullRowRenderer extends DefaultTableCellRenderer {
-        private final Color GROUP_BG = new Color(173, 216, 230);
+        btnDoiVe.addActionListener(controller);
+        btnDoiVe.setActionCommand("Đổi vé");
 
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
-
-            // XỬ LÝ CHECKBOX
-            if (column == 8 && value instanceof Boolean) {
-                JCheckBox cb = new JCheckBox();
-                cb.setSelected((Boolean) value);
-                cb.setHorizontalAlignment(SwingConstants.CENTER);
-                cb.setBackground(row % 2 == 0 ? new Color(248, 250, 252) : Color.WHITE);
-                return cb;
-            }
-
-            String text = value != null ? value.toString() : "";
-            boolean isGroupRow = text.matches(".*(Hà Nội|Sài Gòn).*\\d{2}/\\d{2}/\\d{4}.*");
-
-            if (isGroupRow && column == 0) {
-                // DÙNG HTML ĐỂ VẼ TOÀN HÀNG
-                String html = "<html><div style='"
-                        + "background-color: #ADD8E6; "
-                        + "color: black; "
-                        + "font-weight: bold; "
-                        + "font-size: 14px; "
-                        + "padding: 10px 15px; "
-                        + "border-bottom: 1px solid #B0B0B0; "
-                        + "width: 100%; "
-                        + "box-sizing: border-box;'>"
-                        + text + "</div></html>";
-                setText(html);
-                setHorizontalAlignment(SwingConstants.LEFT);
-
-                // QUAN TRỌNG: Set chiều cao và chiều rộng để vẽ toàn hàng
-                setPreferredSize(new Dimension(table.getWidth(), 48));
-                return this;
-            }
-
-            // ẨN CÁC Ô KHÁC TRONG HÀNG NHÓM
-            if (isGroupRow && column != 0) {
-                setText("");
-                setBackground(GROUP_BG);
-                return this;
-            }
-
-            // DÒNG BÌNH THƯỜNG
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            setBackground(row % 2 == 0 ? new Color(248, 250, 252) : Color.WHITE);
-            setForeground(Color.BLACK);
-            setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            setHorizontalAlignment(column == 8 ? SwingConstants.CENTER : SwingConstants.LEFT);
-            setBorder(new EmptyBorder(8, 8, 8, 8));
-            return this;
-        }
+        btnHuyVe.addActionListener(controller);
+        btnHuyVe.setActionCommand("Hủy vé");
     }
 
-    // === DỮ LIỆU MẪU ===
-    private void themDuLieuMau() {
-        StringBuilder html = new StringBuilder();
-        html.append("<table>");
-
-        // Header
-        html.append("<tr><th>#</th><th>Họ tên</th><th>Thông tin vé</th><th>Thành tiền (VNĐ)</th>")
-            .append("<th>Loại vé</th>")
-            .append("<th>Trạng thái vé</th><th class='checkbox'>Chọn</th></tr>");
-
-        int rowIndex = 0;
-
-        // Nhóm 1
-        html.append("<tr class='group-row'><td colspan='9'>Hà Nội - Sài Gòn 04/01/2021</td></tr>");
-        rowIndex++;
-
-        html.append(formatRow(++rowIndex, "1", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE7 04/01 21 06:00<br>Toa: 1 chỗ số: 24<br>Ngồi mềm điều hòa",
-            "1,014,000", "Bình thường", "", false));
-
-        html.append(formatRow(++rowIndex, "4", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE7 04/01 21 06:00<br>Toa: 1 chỗ số: 24<br>Ngồi mềm điều hòa",
-            "1,014,000", "Bình thường", "Vé đã trả lại.", false));
-
-        // Khoảng trống
-        html.append("<tr><td colspan='9' style='padding: 5px;'></td></tr>");
-
-        // Nhóm 2
-        html.append("<tr class='group-row'><td colspan='9'>Sài Gòn - Hà Nội 09/01/2021</td></tr>");
-        rowIndex++;
-
-        html.append(formatRow(++rowIndex, "1", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE8 09/01 21 06:00<br>Toa: 1 chỗ số: 44<br>Ngồi mềm điều hòa",
-            "823,000", "Bình thường", "Vé đã trả lại.", false));
-
-        html.append(formatRow(++rowIndex, "4", "Nguyễn Văn A<br>Số ghế: 32A23434",
-            "SE8 09/01 21 06:00<br>Toa: 1 chỗ số: 44<br>Ngồi mềm điều hòa",
-            "823,000", "Bình thường",
-            "[Khuyến mãi cuối tuần] trả từ [1 ngày] đến [3000 ngày] áp dụng 15%", false));
-
-        html.append("</table>");
-
-        // Cập nhật nội dung
-        String fullHtml = "<html><head><style>" +
-            "body {font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0;}" +
-            "table {width: 100%; border-collapse: collapse; font-size: 13px;}" +
-            "th {background: #f5f5f5; padding: 12px 8px; text-align: left; font-weight: bold; border-bottom: 1px solid #ddd;}" +
-            "td {padding: 12px 8px; border-bottom: 1px solid #eee; vertical-align: top;}" +
-            ".group-row td {background: #ADD8E6 !important; font-weight: bold; font-size: 14px; padding: 10px 15px; border-bottom: 1px solid #B0B0B0;}" +
-            ".even-row td {background: #f8fafc;}" +
-            ".checkbox {text-align: center;}" +
-            "input[type='checkbox'] {transform: scale(1.2);}" +
-            "</style></head><body>" + html.toString() + "</body></html>";
-
-        editorPane.setText(fullHtml);
+    public void setupEmptyTable() {
+        tableModel.setRowCount(0);
+        tableModel.addRow(new Object[]{
+            "", "Nhập thông tin và nhấn Tìm để tra cứu vé", "", "", "", "", null
+        });
     }
 
-    // Hàm hỗ trợ tạo dòng
-    private String formatRow(int index, String no, String hoTen, String thongTinVe,
-                             String thanhTien, String loaiTraVe,
-                             String ghiChu, boolean checked) {
-        String rowClass = (index % 2 == 0) ? "even-row" : "";
-        String check = checked ? "checked" : "";
-        return String.format(
-            "<tr class='%s'>" +
-            "<td>%s</td><td>%s</td><td>%s</td><td>%s</td>" +
-            "<td>%s</td><td>%s</td>" +
-            "<td class='checkbox'><input type='checkbox' %s></td>" +
-            "</tr>", rowClass, no, hoTen, thongTinVe, thanhTien, loaiTraVe, ghiChu, check
-        );
-    }
-    // === XỬ LÝ SỰ KIỆN ===
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnTim) {
-            themDuLieuMau();
-            JOptionPane.showMessageDialog(this, "Tìm thấy vé phù hợp!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
-        }
-        else if (e.getSource() == btnLamMoi) {
-            txtHoTen.setText("");
-            txtCMND.setText("");
-            txtSDT.setText("");
-            modelKetQua.setRowCount(0);
-        }
-        else if (e.getSource() == btnTroVe) {
-            this.dispose();
-        }
-        else if (e.getSource() == btnInVe) {
-            JOptionPane.showMessageDialog(this, "Chức năng in vé đang phát triển...");
-        }
-        else {
-            int count = 0;
-            for (int i = 0; i < modelKetQua.getRowCount(); i++) {
-                Boolean checked = (Boolean) modelKetQua.getValueAt(i, 8);
-                if (checked != null && checked) count++;
-            }
-            if (count == 0) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một vé để trả!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Đã gửi yêu cầu trả " + count + " vé thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-            }
-        }
-    }
+    // === GETTER CHO CONTROLLER ===
+    public JTextField getTxtHoTen() { return txtHoTen; }
+    public JTextField getTxtCMND() { return txtCMND; }
+    public JTextField getTxtSDT() { return txtSDT; }
+    public DefaultTableModel getTableModel() { return tableModel; }
 
-    // === MAIN ===
     public static void main(String[] args) {
         try {
             LookAndFeelManager.setNimbusLookAndFeel();
-        } catch (Exception ex) {}
+        } catch (Exception ignored) {}
         SwingUtilities.invokeLater(() -> new TraCuuVeTauGUI().setVisible(true));
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // Không cần dùng vì đã dùng ActionListener riêng
     }
 }

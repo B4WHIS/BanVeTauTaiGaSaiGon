@@ -55,7 +55,7 @@ public class DangNhapGUI extends JFrame {
 
     public DangNhapGUI() throws IOException {
         setTitle("Đăng nhập");
-        setSize(1400, 950);
+        setSize(1400, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 

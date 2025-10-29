@@ -72,6 +72,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     private ChuyenTau chuyenTauDuocChon;
     
     private ThongTinKhachHangGUI previousScreen;
+    
     public ThanhToanGUI(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,
     		ThongTinKhachHangGUI previous) {
         if (danhSachVe == null || danhSachVe.isEmpty()) {
@@ -355,6 +356,11 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
                 String maVe = dieuKhienVe.datVe(veChuaMa, veChuaMa.getMaHanhkhach(), nhanVienLap); 
                 if (maVe == null || maVe.isEmpty()) {
                      throw new Exception("Lỗi CSDL: Không thể đặt vé cho chỗ ngồi: " + veChuaMa.getMaChoNgoi().getMaChoNgoi());
+                }
+                if (nhanVienLap != null) {
+                    System.out.println("Mã NV lập: " + nhanVienLap.getMaNhanVien());
+                } else {
+                    System.out.println("LỖI: Đối tượng nhanVienLap là NULL.");
                 }
                 veChuaMa.setMaVe(maVe);
                 danhSachVeDaDat.add(veChuaMa); // Danh sách vé đã có mã
