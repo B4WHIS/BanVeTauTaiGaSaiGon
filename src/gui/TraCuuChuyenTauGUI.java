@@ -327,7 +327,7 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
             }
 
             this.setVisible(false);
-            NhanVien nvHienTai = new NhanVien("NV001"); 
+            NhanVien nvHienTai = new NhanVien("NV-001"); 
             new ChonChoNgoiGUI(ct, nvHienTai).setVisible(true);
         });
 

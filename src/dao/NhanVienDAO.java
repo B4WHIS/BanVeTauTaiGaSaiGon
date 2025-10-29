@@ -12,7 +12,7 @@ import connectDB.connectDB;
 import entity.NhanVien;
 
 public class NhanVienDAO {
-	private NhanVienDAO nhanVienDAO = new NhanVienDAO();
+	
 
     // Phương thức lấy tất cả tên nhân viên (cho ComboBox) - Chỉ hoTen
     public List<String> getAllTenNhanVien() {

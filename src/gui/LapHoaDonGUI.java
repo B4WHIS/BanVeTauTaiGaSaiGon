@@ -492,6 +492,7 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> {
             new LapHoaDonGUI().setVisible(true);
         });

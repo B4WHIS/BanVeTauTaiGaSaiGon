@@ -43,8 +43,8 @@ public class HanhKhach {
     }
 
     public void setMaKH(String maKH) {
-        if (maKH == null || !maKH.matches("^KH\\d{3}$"))
-            throw new IllegalArgumentException("Mã khách hàng phải có dạng KHXXX");
+        if (maKH == null || !maKH.matches("^HK-\\d{5}$"))
+            throw new IllegalArgumentException("Mã khách hàng phải có dạng HK-XXX");
         this.maKH = maKH;
     }
 

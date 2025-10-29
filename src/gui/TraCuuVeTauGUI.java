@@ -1,3 +1,4 @@
+// File: src/gui/TraCuuVeTauGUI.java
 package gui;
 
 import java.awt.BorderLayout;
@@ -9,80 +10,57 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;  // ĐÃ THÊM DÒNG NÀY
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.toedter.calendar.JDateChooser;
+import control.TraCuuVeTauController;
 
-public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
-
-    //tp chính
-    private JPanel pnlChinh;         
-    private JPanel pnlTitle;        
+public class TraCuuVeTauGUI extends GiaoDienChinh {
+    private JPanel pnlChinh, pnlTitle, pnlTraCuu, pnlKetQua;
     private JLabel lblTieuDe;
+    private JTextField txtHoTen, txtCMND, txtSDT;
+    private JButton btnTim, btnLamMoi, btnTroVe, btnInVe, btnDoiVe, btnHuyVe;
+    private JTable table;
+    private DefaultTableModel tableModel;
 
-    // panel bên trái chứa form tra cứu
-    private JPanel pnlTraCuu;          
-    private JComboBox<String> cbGaDi;
-    private JComboBox<String> cbGaDen;
-    private JDateChooser jdcNgayDi;
-    private JTextField txtMaVe, txtHoTen, txtCMND, txtSDT;
-    private JComboBox<String> cbLoaiVe;
-    private JButton btnTim, btnLamMoi, btnTroVe, btnInVe;
-
-    // Panel phải
-    private JPanel pnlKetQua;
-    private JTable tblKetQua;
-    private DefaultTableModel modelKetQua;
-    private JScrollPane scpKetQua;
-
-    // Màu
-    private final Color COLOR_PRIMARY = new Color(74, 140, 103); 
-    private final Color COLOR_ACCENT = new Color(93, 156, 236);      
-    private final Color COLOR_ALERT = new Color(229, 115, 115);       
+    private final Color COLOR_PRIMARY = new Color(74, 140, 103);
+    private final Color COLOR_ACCENT = new Color(93, 156, 236);
+    private final Color COLOR_ALERT = new Color(229, 115, 115);
     private final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 42);
     private final Font FONT_SECTION = new Font("Segoe UI", Font.BOLD, 20);
     private final Font FONT_LABEL = new Font("Segoe UI", Font.BOLD, 14);
     private final Font FONT_INPUT = new Font("Segoe UI", Font.PLAIN, 14);
 
     public TraCuuVeTauGUI() {
-      
         setTitle("Tra cứu vé tàu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
 
-        //pnlChinh
+        initComponents();
+        setupLayout();
+        setupActions();
+        setupEmptyTable();
+    }
+
+    private void initComponents() {
         pnlChinh = new JPanel(new BorderLayout(12, 12));
         pnlChinh.setBorder(new EmptyBorder(12, 12, 12, 12));
         getContentPane().add(pnlChinh);
 
-        // tieude
+        // Tiêu đề
         pnlTitle = new JPanel(new BorderLayout());
         pnlTitle.setBorder(BorderFactory.createEtchedBorder());
         lblTieuDe = new JLabel("TRA CỨU VÉ TÀU", SwingConstants.CENTER);
         lblTieuDe.setFont(FONT_TITLE);
         lblTieuDe.setForeground(COLOR_PRIMARY);
         pnlTitle.add(lblTieuDe, BorderLayout.CENTER);
-        pnlChinh.add(pnlTitle, BorderLayout.NORTH);
 
-        //panel trai
+        // Form
         pnlTraCuu = new JPanel(new GridBagLayout());
         TitledBorder tb = BorderFactory.createTitledBorder("THÔNG TIN TRA CỨU");
         tb.setTitleFont(FONT_SECTION);
@@ -90,38 +68,79 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         pnlTraCuu.setBorder(tb);
         pnlTraCuu.setPreferredSize(new Dimension(420, 0));
 
-        setupFormTraCuu();
-
-        pnlChinh.add(pnlTraCuu, BorderLayout.WEST);
-
-        //pnlketQua
+        // Kết quả
         pnlKetQua = new JPanel(new BorderLayout());
-        TitledBorder tbKetQua = BorderFactory.createTitledBorder("KẾT QUẢ XÁC THỰC");
+        TitledBorder tbKetQua = BorderFactory.createTitledBorder("KẾT QUẢ TRA CỨU");
         tbKetQua.setTitleFont(FONT_SECTION);
         tbKetQua.setTitleColor(COLOR_ALERT);
         pnlKetQua.setBorder(tbKetQua);
 
-        setupTableKetQua();
+        // Bảng JTable
+        tableModel = new DefaultTableModel(
+        	    new Object[]{"#", "Họ tên", "Thông tin vé", "Thành tiền (VNĐ)", "Loại vé", "Trạng thái", "Chọn"}, 0
+        	) {
+        	    @Override
+        	    public Class<?> getColumnClass(int columnIndex) {
+        	        return columnIndex == 6 ? Boolean.class : String.class;
+        	    }
 
+        	    @Override
+        	    public boolean isCellEditable(int row, int column) {
+        	        if (column != 6) return false;
+        	        Object value = getValueAt(row, 6);
+        	        // Chỉ cho phép chỉnh sửa nếu là Boolean (true/false) → tức là vé cho phép hủy
+        	        return value instanceof Boolean;
+        	    }
+        	};
+        table = new JTable(tableModel);
+        table.setRowHeight(60);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getColumnModel().getColumn(0).setMaxWidth(50);
+        table.getColumnModel().getColumn(6).setMaxWidth(60);
+        table.getColumnModel().getColumn(6).setCellRenderer((table1, value, isSelected, hasFocus, row, column) -> {
+            JCheckBox cb = new JCheckBox();
+            cb.setHorizontalAlignment(SwingConstants.CENTER);
+
+            if (value instanceof Boolean) {
+                cb.setSelected((Boolean) value);
+                cb.setEnabled(true); // Cho phép click
+            } else {
+                cb.setSelected(false);
+                cb.setEnabled(false); // Không cho click
+                cb.setToolTipText("Vé không đủ điều kiện hủy");
+            }
+
+            if (isSelected) {
+                cb.setBackground(table1.getSelectionBackground());
+                cb.setForeground(table1.getSelectionForeground());
+            } else {
+                cb.setBackground(table1.getBackground());
+                cb.setForeground(table1.getForeground());
+            }
+
+            return cb;
+        });
+        table.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(225, 242, 232)));
+        pnlKetQua.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void setupLayout() {
+        pnlChinh.add(pnlTitle, BorderLayout.NORTH);
+        pnlChinh.add(pnlTraCuu, BorderLayout.WEST);
         pnlChinh.add(pnlKetQua, BorderLayout.CENTER);
 
-        //pnl duoi
         JPanel pnlChucNang = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnTroVe = new JButton("Trở về", GiaoDienChinh.chinhKichThuoc("/img/loginicon.png", 20, 20));
         btnTroVe.setBackground(COLOR_ALERT);
         btnTroVe.setForeground(Color.WHITE);
         btnTroVe.setFont(FONT_LABEL);
-        btnTroVe.addActionListener(this);
-
         pnlChucNang.add(btnTroVe);
         pnlChinh.add(pnlChucNang, BorderLayout.SOUTH);
 
-       
-        btnTim.addActionListener(this);
-        btnLamMoi.addActionListener(this);
-        btnInVe.addActionListener(this);
-
-//        pack();
+        setupFormTraCuu();
     }
 
     private void setupFormTraCuu() {
@@ -129,204 +148,119 @@ public class TraCuuVeTauGUI extends GiaoDienChinh implements ActionListener {
         gbc.insets = new Insets(8, 10, 8, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
-
         int row = 0;
 
-        // ga di
-        JLabel lblGaDi = new JLabel("Ga đi:");
-        lblGaDi.setFont(FONT_LABEL);
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
-        pnlTraCuu.add(lblGaDi, gbc);
-
-        cbGaDi = new JComboBox<>();
-        cbGaDi.setFont(FONT_INPUT);
-        cbGaDi.setPreferredSize(new Dimension(220, 32));
-        gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
-        pnlTraCuu.add(cbGaDi, gbc);
-
-        // ga den
-        JLabel lblGaDen = new JLabel("Ga đến:");
-        lblGaDen.setFont(FONT_LABEL);
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
-        pnlTraCuu.add(lblGaDen, gbc);
-
-        cbGaDen = new JComboBox<>();
-        cbGaDen.setFont(FONT_INPUT);
-        cbGaDen.setPreferredSize(new Dimension(220, 32));
-        gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
-        pnlTraCuu.add(cbGaDen, gbc);
-
-        //ngay di
-        JLabel lblNgayDi = new JLabel("Ngày đi:");
-        lblNgayDi.setFont(FONT_LABEL);
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
-        pnlTraCuu.add(lblNgayDi, gbc);
-
-        jdcNgayDi = new JDateChooser();
-        jdcNgayDi.setPreferredSize(new Dimension(220, 32));
-        jdcNgayDi.setFont(FONT_INPUT);
-        gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
-        pnlTraCuu.add(jdcNgayDi, gbc);
-
-        // ma ve
-        JLabel lblMaVe = new JLabel("Mã vé:");
-        lblMaVe.setFont(FONT_LABEL);
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
-        pnlTraCuu.add(lblMaVe, gbc);
-
-        txtMaVe = new JTextField();
-        txtMaVe.setFont(FONT_INPUT);
-        txtMaVe.setPreferredSize(new Dimension(220, 32));
-        gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
-        pnlTraCuu.add(txtMaVe, gbc);
-
-        // ho ten
         JLabel lblHoTen = new JLabel("Họ tên:");
         lblHoTen.setFont(FONT_LABEL);
         gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
         pnlTraCuu.add(lblHoTen, gbc);
-
         txtHoTen = new JTextField();
         txtHoTen.setFont(FONT_INPUT);
         txtHoTen.setPreferredSize(new Dimension(220, 32));
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(txtHoTen, gbc);
 
-        // cccd
         JLabel lblCMND = new JLabel("CMND/Hộ chiếu:");
         lblCMND.setFont(FONT_LABEL);
         gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
         pnlTraCuu.add(lblCMND, gbc);
-
         txtCMND = new JTextField();
         txtCMND.setFont(FONT_INPUT);
         txtCMND.setPreferredSize(new Dimension(220, 32));
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(txtCMND, gbc);
 
-        // sdt
         JLabel lblSDT = new JLabel("SĐT:");
         lblSDT.setFont(FONT_LABEL);
         gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
         pnlTraCuu.add(lblSDT, gbc);
-
         txtSDT = new JTextField();
         txtSDT.setFont(FONT_INPUT);
         txtSDT.setPreferredSize(new Dimension(220, 32));
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(txtSDT, gbc);
 
-        //loai ve
-        JLabel lblLoaiVe = new JLabel("Loại vé:");
-        lblLoaiVe.setFont(FONT_LABEL);
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0;
-        pnlTraCuu.add(lblLoaiVe, gbc);
-
-        cbLoaiVe = new JComboBox<>(new String[] {"Tất cả", "Thường", "VIP", "Pro Suite"});
-        cbLoaiVe.setFont(FONT_INPUT);
-        cbLoaiVe.setPreferredSize(new Dimension(220, 32));
-        gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
-        pnlTraCuu.add(cbLoaiVe, gbc);
-
-        // nút chức năng
         JPanel pnlNut = new JPanel(new GridLayout(1, 2, 10, 0));
         btnLamMoi = new JButton("Làm mới", GiaoDienChinh.chinhKichThuoc("/img/undo.png", 20, 20));
         btnLamMoi.setBackground(COLOR_ALERT);
         btnLamMoi.setForeground(Color.WHITE);
         btnLamMoi.setFont(FONT_LABEL);
-
         btnTim = new JButton("Tìm", GiaoDienChinh.chinhKichThuoc("/img/traCuu.png", 20, 20));
         btnTim.setBackground(COLOR_ACCENT);
         btnTim.setForeground(Color.WHITE);
         btnTim.setFont(FONT_LABEL);
-
         pnlNut.add(btnLamMoi);
         pnlNut.add(btnTim);
-
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         pnlTraCuu.add(pnlNut, gbc);
 
-        // nút in ve
+        JPanel pnlNutThem = new JPanel(new GridLayout(1, 2, 10, 0));
+        btnDoiVe = new JButton("Đổi vé", GiaoDienChinh.chinhKichThuoc("/img/change.png", 20, 20));
+        btnDoiVe.setBackground(new Color(255, 193, 7));
+        btnDoiVe.setForeground(Color.WHITE);
+        btnDoiVe.setFont(FONT_LABEL);
+        btnHuyVe = new JButton("Hủy vé", GiaoDienChinh.chinhKichThuoc("/img/cancel.png", 20, 20));
+        btnHuyVe.setBackground(COLOR_ALERT);
+        btnHuyVe.setForeground(Color.WHITE);
+        btnHuyVe.setFont(FONT_LABEL);
+        pnlNutThem.add(btnDoiVe);
+        pnlNutThem.add(btnHuyVe);
+        gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
+        pnlTraCuu.add(pnlNutThem, gbc);
+
         btnInVe = new JButton("In vé", GiaoDienChinh.chinhKichThuoc("/img/ve.png", 20, 20));
         btnInVe.setBackground(new Color(255, 237, 0));
         btnInVe.setFont(FONT_LABEL);
         btnInVe.setForeground(Color.BLACK);
-
         gbc.gridx = 1; gbc.gridy = row++; gbc.weightx = 1;
         gbc.anchor = GridBagConstraints.EAST;
         pnlTraCuu.add(btnInVe, gbc);
     }
 
-    
-    private void setupTableKetQua() {
-        String[] columns = {"STT", "Mã vé", "Họ tên", "CMND", "Chuyến tàu", "Ga đi - Ga đến", "Ngày đi", "Giá vé (VNĐ)", "Loại vé", "Trạng thái"};
-        modelKetQua = new DefaultTableModel(columns, 0) {
-            
-        };
+    private void setupActions() {
+        TraCuuVeTauController controller = new TraCuuVeTauController(this);
 
-        tblKetQua = new JTable(modelKetQua);
-        tblKetQua.setRowHeight(48);
-        tblKetQua.getTableHeader().setReorderingAllowed(false);
-        tblKetQua.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        tblKetQua.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tblKetQua.setFillsViewportHeight(true);
+        btnTim.addActionListener(controller);
+        btnTim.setActionCommand("Tìm");
 
-        scpKetQua = new JScrollPane(tblKetQua);
-        scpKetQua.setBorder(BorderFactory.createLineBorder(new Color(225, 242, 232)));
-        pnlKetQua.add(scpKetQua, BorderLayout.CENTER);
+        btnLamMoi.addActionListener(controller);
+        btnLamMoi.setActionCommand("Làm mới");
 
-        //tro ve
-        JPanel pnlFooter = new JPanel(new BorderLayout());
-        pnlFooter.setBorder(new EmptyBorder(8, 8, 8, 8));
+        btnTroVe.addActionListener(controller);
+        btnTroVe.setActionCommand("Trở về");
 
+        btnInVe.addActionListener(controller);
+        btnInVe.setActionCommand("In vé");
 
-        JPanel pnlButtonsRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        pnlButtonsRight.setOpaque(false);
-        pnlFooter.add(pnlButtonsRight, BorderLayout.EAST);
+        btnDoiVe.addActionListener(controller);
+        btnDoiVe.setActionCommand("Đổi vé");
 
-        pnlKetQua.add(pnlFooter, BorderLayout.SOUTH);
+        btnHuyVe.addActionListener(controller);
+        btnHuyVe.setActionCommand("Hủy vé");
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object src = e.getSource();
-
-        if (src == btnTim) {
-            modelKetQua.setRowCount(0); 
-            if ((txtMaVe.getText().trim().isEmpty())
-                    && (txtHoTen.getText().trim().isEmpty())
-                    && (txtCMND.getText().trim().isEmpty())
-                    && jdcNgayDi.getDate() == null) {
-                JOptionPane.showMessageDialog(this, ".", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-        } else if (src == btnLamMoi) {
-            cbGaDi.setSelectedIndex(-1);
-            cbGaDen.setSelectedIndex(-1);
-            jdcNgayDi.setDate(null);
-            txtMaVe.setText("");
-            txtHoTen.setText("");
-            txtCMND.setText("");
-            txtSDT.setText("");
-            cbLoaiVe.setSelectedIndex(0);
-            modelKetQua.setRowCount(0);
-        } else if (src == btnInVe) {
-            JOptionPane.showMessageDialog(this, ".", "In vé", JOptionPane.INFORMATION_MESSAGE);
-        } else if (src == btnTroVe) {
-        
-        }
+    public void setupEmptyTable() {
+        tableModel.setRowCount(0);
+        tableModel.addRow(new Object[]{
+            "", "Nhập thông tin và nhấn Tìm để tra cứu vé", "", "", "", "", null
+        });
     }
+
+    // === GETTER CHO CONTROLLER ===
+    public JTextField getTxtHoTen() { return txtHoTen; }
+    public JTextField getTxtCMND() { return txtCMND; }
+    public JTextField getTxtSDT() { return txtSDT; }
+    public DefaultTableModel getTableModel() { return tableModel; }
 
     public static void main(String[] args) {
         try {
             LookAndFeelManager.setNimbusLookAndFeel();
-        } catch (Exception ex) {
-        }
+        } catch (Exception ignored) {}
+        SwingUtilities.invokeLater(() -> new TraCuuVeTauGUI().setVisible(true));
+    }
 
-        SwingUtilities.invokeLater(() -> {
-            TraCuuVeTauGUI gui = new TraCuuVeTauGUI();
-            gui.setVisible(true);
-        });
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        // Không cần dùng vì đã dùng ActionListener riêng
     }
 }

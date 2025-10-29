@@ -141,7 +141,7 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
             if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
                 new TraCuuChuyenTauGUI().setVisible(true); 
             } else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
-                new GiaoDienHuyVe().setVisible(true); 
+                new TraCuuVeTauGUI().setVisible(true); 
             } else if (command.equals("ĐỔI VÉ") || e.getSource() == btnDoiVe) {
                 new TraCuuVeTauGUI().setVisible(true);
             } else if (command.equals("TÌM CHUYẾN") || e.getSource() == btnTimChuyenTau) {
