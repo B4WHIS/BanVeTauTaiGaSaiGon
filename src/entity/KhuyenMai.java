@@ -23,7 +23,13 @@ public class KhuyenMai {
         setDieuKien(dieuKien);
     }
 
-    public String getMaKhuyenMai() {
+    public KhuyenMai(String maKhuyenMai2, BigDecimal heSoUuDai) {
+		// TODO Auto-generated constructor stub
+    	setMaKhuyenMai(maKhuyenMai2);
+    	setMucGiamGia(heSoUuDai);
+	}
+
+	public String getMaKhuyenMai() {
         return maKhuyenMai;
     }
 

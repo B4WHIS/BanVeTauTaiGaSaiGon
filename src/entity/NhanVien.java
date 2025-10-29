@@ -37,15 +37,45 @@ public class NhanVien {
             throw new IllegalArgumentException("Mã nhân viên phải có dạng NV-XXX");
         this.maNhanVien = maNhanVien;
     }
+	public void setMaNhanVien(String maNhanVien) {
+	    if (maNhanVien == null || !maNhanVien.matches("^NV-\\d{3}$|^NV\\d{3}$"))
+	        throw new IllegalArgumentException("Mã nhân viên phải có dạng NV-XXX hoặc NVXXX");
+	    this.maNhanVien = maNhanVien;
+	}
 
     public String getHoTen() {
         return hoTen;
     }
 
     public void setHoTen(String hoTen) {
-        if (hoTen == null || hoTen.trim().isEmpty())
-            throw new IllegalArgumentException("Họ tên không được rỗng");
-        this.hoTen = hoTen;
+        if (hoTen == null || hoTen.trim().isEmpty()) {
+            throw new IllegalArgumentException("Họ tên không được để trống!");
+        }
+        // Chuẩn hóa: Loại bỏ số và viết hoa chữ cái đầu từng từ
+        String normalized = hoTen.trim().toLowerCase()
+                .replaceAll("[0-9]", ""); // Loại bỏ số
+        normalized = capitalizeEachWord(normalized); // Viết hoa chữ cái đầu
+        if (normalized.isEmpty()) {
+            throw new IllegalArgumentException("Họ tên không hợp lệ! Phải viết hoa chữ cái đầu, không chứa số.");
+        }
+        this.hoTen = normalized;
+    }
+
+    // Phương thức viết hoa chữ cái đầu từng từ
+    private String capitalizeEachWord(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        String[] words = str.split("\\s+");
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                result.append(Character.toUpperCase(word.charAt(0)))
+                      .append(word.substring(1).toLowerCase())
+                      .append(" ");
+            }
+        }
+        return result.toString().trim();
     }
 
     public LocalDate getNgaySinh() {
@@ -91,6 +121,7 @@ public class NhanVien {
 		return "NhanVien [maNhanVien=" + maNhanVien + ", hoTen=" + hoTen + ", ngaySinh=" + ngaySinh + ", soDienThoai="
 				+ soDienThoai + ", cmndCccd=" + cmndCccd + ", IDloaiChucVu=" + IDloaiChucVu + "]";
 	}
+	
 
     
 }

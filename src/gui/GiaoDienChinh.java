@@ -1,5 +1,5 @@
 package gui;
-
+//check
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -359,4 +359,5 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 	        }
 	    });
 	}
+	
 	}

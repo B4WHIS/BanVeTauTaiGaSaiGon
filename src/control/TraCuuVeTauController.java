@@ -4,6 +4,7 @@ package control;
 import connectDB.connectDB;
 import gui.GiaoDienHuyVe;
 import gui.TraCuuVeTauGUI;
+import gui.TraCuuChuyenTauGUI;
 import entity.LichSuVe;
 import entity.NhanVien;
 
@@ -20,6 +21,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+
+import dao.VeDAO;
+import entity.Ve;
 
 public class TraCuuVeTauController implements ActionListener {
     private final TraCuuVeTauGUI view;
@@ -118,6 +122,33 @@ public class TraCuuVeTauController implements ActionListener {
                     maVe, rs.getInt("toaSo"), rs.getString("maChoNgoi"), rs.getString("loaiGhe")
                 );
                 String thanhTien = String.format("%,.0f", rs.getDouble("giaThanhToan"));
+                (!sdt.isEmpty() ? " AND hk.soDienThoai = ? " : "");
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            int paramIndex = 1;
+            if (!hoTen.isEmpty()) ps.setString(paramIndex++, "%" + hoTen + "%");
+            if (!cmnd.isEmpty()) ps.setString(paramIndex++, cmnd);
+            if (!sdt.isEmpty()) ps.setString(paramIndex++, sdt);
+
+            ResultSet rs = ps.executeQuery();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+            int rowIndex = 0;
+            while (rs.next()) {
+                rowIndex++;
+                String hoTenStr = rs.getString("hoTen");
+                String maVe = rs.getString("maVe");
+                String gaDi = rs.getString("gaDi");
+                String gaDen = rs.getString("gaDen");
+                String thoiGianKH = sdf.format(rs.getTimestamp("thoiGianKhoiHanh"));
+                String maChoNgoi = rs.getString("maChoNgoi");
+                String loaiGhe = rs.getString("loaiGhe");
+                int toaSo = rs.getInt("toaSo");
+                String thongTinVe = maVe + "\n" +
+                                    gaDi + " → " + gaDen + "\n" +
+                                    thoiGianKH + "\n" +
+                                    "Toa " + toaSo + " - Ghế " + maChoNgoi + " (" + loaiGhe + ")";
+                String thanhTien = String.format("%,.0f VNĐ", rs.getBigDecimal("giaThanhToan").doubleValue());
                 String trangThai = rs.getString("trangThai");
 
                 boolean choPhepHuy = false;
@@ -183,6 +214,34 @@ public class TraCuuVeTauController implements ActionListener {
 
     private void doiVe() {
         JOptionPane.showMessageDialog(view, "Chức năng đổi vé đang phát triển...", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        List<String> danhSachMaVe = new ArrayList<>();
+
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            Boolean checked = (Boolean) tableModel.getValueAt(i, 6);
+            if (checked != null && checked) {
+                String maVe = ((String) tableModel.getValueAt(i, 2)).split("\n")[0];
+                danhSachMaVe.add(maVe);
+            }
+        }
+
+        if (danhSachMaVe.size() != 1) {
+            JOptionPane.showMessageDialog(view, "Vui lòng chọn đúng một vé để đổi!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String maVe = danhSachMaVe.get(0);
+        VeDAO veDAO = new VeDAO();
+        Ve veCu = null;
+        try {
+            veCu = veDAO.timVeTongHop(maVe, null, null, null, null).get(0); // Giả sử method trả list, lấy đầu
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(view, "Lỗi tải vé: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Mở màn hình tra cứu chuyến tàu với vé cũ
+        new TraCuuChuyenTauGUI(view, veCu).setVisible(true);
+        view.dispose();
     }
 
     private void lamMoiForm() {

@@ -195,7 +195,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
         pnlTraCuu.add(pnlNut, gbc);
 
         JPanel pnlNutThem = new JPanel(new GridLayout(1, 2, 10, 0));
-        btnDoiVe = new JButton("Đổi vé", GiaoDienChinh.chinhKichThuoc("/img/change.png", 20, 20));
+        btnDoiVe = new JButton("Đổi vé", GiaoDienChinh.chinhKichThuoc("/img/ve.png", 20, 20));
         btnDoiVe.setBackground(new Color(255, 193, 7));
         btnDoiVe.setForeground(Color.WHITE);
         btnDoiVe.setFont(FONT_LABEL);
