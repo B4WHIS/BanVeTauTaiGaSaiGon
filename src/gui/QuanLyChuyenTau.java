@@ -460,7 +460,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh implements ActionListener{
 		Object src = e.getSource();
         if (src == btnTroVe) { 
             this.dispose();
-            new NhanVienQuanLyGUI(nhanVienHienTai).setVisible(true);
+            new MHC_NhanVienQuanLy(nhanVienHienTai).setVisible(true);
         }
 	}
 }

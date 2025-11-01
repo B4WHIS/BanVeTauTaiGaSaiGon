@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 
 import entity.NhanVien;
 
-public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
+public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
     
     private JButton btnDatVe;
     private JButton btnHuyVe;
@@ -28,7 +28,7 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     private JButton btnDoiVe;
     private NhanVien nhanVien;
    
-    public NhanVienBanVeGUI(NhanVien nhanVien) throws IOException {
+    public MHC_NhanVienBanVe(NhanVien nhanVien) throws IOException {
         super(nhanVien); 
         this.nhanVien = nhanVien;
         pnlChucNang = taoPanelMenuChinh();
@@ -36,7 +36,7 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     }
 
   
-    public NhanVienBanVeGUI() throws IOException {
+    public MHC_NhanVienBanVe() throws IOException {
         this(null);
     }
 
@@ -140,13 +140,13 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
         String command = e.getActionCommand(); 
         try {
         	if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
-        	    new TraCuuChuyenTauGUI(this.nhanVien).setVisible(true);
+        	    new GiaoDienTraCuuChuyentau(this.nhanVien).setVisible(true);
         	} else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
-                new TraCuuVeTauGUI().setVisible(true); 
+                new GiaoDienTraCuuVeTau().setVisible(true); 
             } else if (command.equals("ĐỔI VÉ") || e.getSource() == btnDoiVe) {
-                new TraCuuVeTauGUI().setVisible(true);
+                new GiaoDienTraCuuVeTau().setVisible(true);
             } else if (command.equals("TÌM CHUYẾN") || e.getSource() == btnTimChuyenTau) {
-                new TraCuuChuyenTauGUI(this.nhanVien).setVisible(true);
+                new GiaoDienTraCuuChuyentau(this.nhanVien).setVisible(true);
             } else if (command.equals("ĐĂNG XUẤT") || e.getSource() == btnDangXuat) {
                 int confirm = JOptionPane.showConfirmDialog(
                     this,
@@ -156,7 +156,7 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
                 );
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
-                        new DangNhapGUI().setVisible(true);
+                        new GiaoDienDangNhap().setVisible(true);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -170,6 +170,6 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
     }
 
     public static void main(String[] args) throws IOException {
-        new NhanVienBanVeGUI().setVisible(true);
+        new MHC_NhanVienBanVe().setVisible(true);
     }
 }

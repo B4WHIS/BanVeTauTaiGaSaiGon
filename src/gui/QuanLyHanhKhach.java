@@ -243,7 +243,7 @@ public class QuanLyHanhKhach extends JFrame implements ActionListener {
 		Object src = e.getSource();
         if (src == btnTroVe) { 
             this.dispose();
-            new NhanVienQuanLyGUI(nhanVienHienTai).setVisible(true);
+            new MHC_NhanVienQuanLy(nhanVienHienTai).setVisible(true);
         }
 	}
 

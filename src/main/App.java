@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 
-import gui.DangNhapGUI;
+import gui.GiaoDienDangNhap;
 import gui.LookAndFeelManager;
 
 //tao va hien thi cs dang nhap
@@ -14,7 +14,7 @@ public class App {
 			try {
 				LookAndFeelManager.setNimbusLookAndFeel(); 
 				System.out.println("Khởi động ứng dụng bán vé tàu...");
-				 DangNhapGUI dangNhap = new DangNhapGUI();
+				 GiaoDienDangNhap dangNhap = new GiaoDienDangNhap();
 				 dangNhap.setVisible(true);
 			} catch (IOException e) {
 				// TODO: handle exception

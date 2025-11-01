@@ -43,7 +43,7 @@ import entity.ChuyenTau;
 import entity.NhanVien;
 import entity.ToaTau;
 
-public class ChonChoNgoiGUI extends JFrame implements ActionListener {
+public class GiaoDienChonCho extends JFrame implements ActionListener {
     private ChuyenTau chuyenTauDuocChon;
     private NhanVien nhanVienHienTai;
     private ChonChoNgoiControl control;
@@ -73,7 +73,7 @@ public class ChonChoNgoiGUI extends JFrame implements ActionListener {
     private Color MAU_NEN_TOA = new Color(103, 192, 144);
  
     private List<ChoNgoi> danhSachGheDuocChon = new ArrayList<>();
-    private TraCuuChuyenTauGUI previousScreen;
+    private GiaoDienTraCuuChuyentau previousScreen;
     private int soChoTrongBanDau = 0;
     private final int SO_HANG = 4;
     private final int SO_COT = 10;
@@ -84,14 +84,14 @@ public class ChonChoNgoiGUI extends JFrame implements ActionListener {
     private final DateTimeFormatter DTF_FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
  
     public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
-        URL iconUrl = ChonChoNgoiGUI.class.getResource(duongDan);
+        URL iconUrl = GiaoDienChonCho.class.getResource(duongDan);
         if (iconUrl == null) return null;
         ImageIcon icon = new ImageIcon(iconUrl);
         Image img = icon.getImage().getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
     }
  
-    public ChonChoNgoiGUI(ChuyenTau chuyentau, NhanVien nv, TraCuuChuyenTauGUI previous) throws SQLException {
+    public GiaoDienChonCho(ChuyenTau chuyentau, NhanVien nv, GiaoDienTraCuuChuyentau previous) throws SQLException {
         this.chuyenTauDuocChon = chuyentau;
         this.nhanVienHienTai = nv;
         this.previousScreen = previous;
@@ -190,13 +190,13 @@ public class ChonChoNgoiGUI extends JFrame implements ActionListener {
                 return;
             }
             SwingUtilities.invokeLater(() -> {
-                new ThongTinKhachHangGUI(chuyenTauDuocChon, danhSachGheDuocChon,
+                new GiaoDienNhapThongTinHK(chuyenTauDuocChon, danhSachGheDuocChon,
                         nhanVienHienTai).setVisible(true);
                 this.dispose();
             });
         } else if (nguon == nutTroVe) {
             SwingUtilities.invokeLater(() -> {
-                new TraCuuChuyenTauGUI(nhanVienHienTai).setVisible(true);
+                new GiaoDienTraCuuChuyentau(nhanVienHienTai).setVisible(true);
                 this.dispose();
             });
         }

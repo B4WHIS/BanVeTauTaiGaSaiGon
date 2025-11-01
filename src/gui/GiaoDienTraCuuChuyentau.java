@@ -42,7 +42,7 @@ import entity.ChuyenTau;
 import entity.NhanVien;
 import entity.ToaTau;
 
-public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
+public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
     
     private TraCuuChuyenTauControl control;
     
@@ -76,7 +76,7 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     
     private final DateTimeFormatter dinhDangNgayGio = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
-    public TraCuuChuyenTauGUI(NhanVien nhanVien) {
+    public GiaoDienTraCuuChuyentau(NhanVien nhanVien) {
         this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");
         
         this.control = new TraCuuChuyenTauControl(this);
@@ -300,11 +300,11 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
                 return;
             }
             
-            // Chuyển sang màn hình chọn chỗ ngồi (ChonChoNgoiGUI)
+            // Chuyển sang màn hình chọn chỗ ngồi (GiaoDienChonCho)
             this.dispose();
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new ChonChoNgoiGUI(ct, nhanVienHienTai, null).setVisible(true);
+                    new GiaoDienChonCho(ct, nhanVienHienTai, null).setVisible(true);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Lỗi khi mở màn hình chọn chỗ: " + ex.getMessage(),
                             "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -403,7 +403,7 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         } else if (src == btnTroVe) { 
             this.dispose();
             try {
-				new NhanVienBanVeGUI(nhanVienHienTai).setVisible(true);
+				new MHC_NhanVienBanVe(nhanVienHienTai).setVisible(true);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -418,6 +418,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     public static void main(String[] args) {
         LookAndFeelManager.setNimbusLookAndFeel();
         NhanVien nv = new NhanVien("NV-001");
-        SwingUtilities.invokeLater(() -> new TraCuuChuyenTauGUI(nv).setVisible(true));
+        SwingUtilities.invokeLater(() -> new GiaoDienTraCuuChuyentau(nv).setVisible(true));
     }
 }

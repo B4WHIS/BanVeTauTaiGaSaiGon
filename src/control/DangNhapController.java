@@ -13,15 +13,15 @@ import javax.swing.JOptionPane;
 
 import connectDB.connectDB;
 import entity.NhanVien;
-import gui.DangNhapGUI;
-import gui.NhanVienBanVeGUI;
-import gui.NhanVienQuanLyGUI;
+import gui.GiaoDienDangNhap;
+import gui.MHC_NhanVienBanVe;
+import gui.MHC_NhanVienQuanLy;
 
 public class DangNhapController implements ActionListener, MouseListener {
     
-    private DangNhapGUI view;
+    private GiaoDienDangNhap view;
 
-    public DangNhapController(DangNhapGUI view) {
+    public DangNhapController(GiaoDienDangNhap view) {
         this.view = view;
     }
     
@@ -84,12 +84,12 @@ public class DangNhapController implements ActionListener, MouseListener {
                 view.dispose();
                 if ("Nhân viên bán vé".equals(loaiChucVu)) {
                     try {
-                        new NhanVienBanVeGUI(nhanVien).setVisible(true); 
+                        new MHC_NhanVienBanVe(nhanVien).setVisible(true); 
                     } catch (IOException ex) {
                         // ...
                     }
                 } else if ("Nhân viên quản lý".equals(loaiChucVu)) {
-                    new NhanVienQuanLyGUI(nhanVien).setVisible(true); 
+                    new MHC_NhanVienQuanLy(nhanVien).setVisible(true); 
                 } else {
                     JOptionPane.showMessageDialog(null, "Loại chức vụ không được hỗ trợ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }

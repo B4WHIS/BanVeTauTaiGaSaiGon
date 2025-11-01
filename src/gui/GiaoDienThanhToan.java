@@ -40,7 +40,7 @@ import entity.HoaDon;
 import entity.NhanVien;
 import entity.Ve;
 
-public class ThanhToanGUI extends JFrame implements ActionListener {
+public class GiaoDienThanhToan extends JFrame implements ActionListener {
 
    
     private final Color mauChinh = new Color(74, 140, 103);
@@ -70,10 +70,10 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
     private BigDecimal tongTienTruocVAT = BigDecimal.ZERO;
     private ChuyenTau chuyenTauDuocChon;
     
-    private ThongTinKhachHangGUI previousScreen;
+    private GiaoDienNhapThongTinHK previousScreen;
     
-    public ThanhToanGUI(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,
-    		ThongTinKhachHangGUI previous) {
+    public GiaoDienThanhToan(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,
+    		GiaoDienNhapThongTinHK previous) {
         if (danhSachVe == null || danhSachVe.isEmpty()) {
             throw new IllegalArgumentException("Danh sách vé không được rỗng.");
         }
@@ -372,7 +372,7 @@ public class ThanhToanGUI extends JFrame implements ActionListener {
             this.dispose();
            
             SwingUtilities.invokeLater(() -> {
-                new LapHoaDonGUI(danhSachVe, nguoiThanhToan, nhanVienLap, this).setVisible(true);
+                new GiaoDienLapHoaDon(danhSachVe, nguoiThanhToan, nhanVienLap, this).setVisible(true);
             });
         }
     }

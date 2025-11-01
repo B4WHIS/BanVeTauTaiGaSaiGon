@@ -1,4 +1,4 @@
-// File: src/gui/TraCuuVeTauGUI.java
+// File: src/gui/GiaoDienTraCuuVeTau.java
 package gui;
 
 import java.awt.BorderLayout;
@@ -30,7 +30,7 @@ import javax.swing.table.DefaultTableModel;
 
 import control.TraCuuVeTauController;
 
-public class TraCuuVeTauGUI extends JFrame {
+public class GiaoDienTraCuuVeTau extends JFrame {
     private JPanel pnlChinh, pnlTitle, pnlTraCuu, pnlKetQua;
     private JLabel lblTieuDe;
     private JTextField txtHoTen, txtCMND, txtSDT;
@@ -46,7 +46,7 @@ public class TraCuuVeTauGUI extends JFrame {
     private final Font FONT_LABEL = new Font("Segoe UI", Font.BOLD, 14);
     private final Font FONT_INPUT = new Font("Segoe UI", Font.PLAIN, 14);
 
-    public TraCuuVeTauGUI() {
+    public GiaoDienTraCuuVeTau() {
         setTitle("Tra cứu vé tàu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -267,7 +267,7 @@ public class TraCuuVeTauGUI extends JFrame {
         try {
             LookAndFeelManager.setNimbusLookAndFeel();
         } catch (Exception ignored) {}
-        SwingUtilities.invokeLater(() -> new TraCuuVeTauGUI().setVisible(true));
+        SwingUtilities.invokeLater(() -> new GiaoDienTraCuuVeTau().setVisible(true));
     }
 
 //    @Override

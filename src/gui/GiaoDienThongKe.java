@@ -48,7 +48,7 @@ import com.toedter.calendar.JDateChooser;
 import control.ThongKeDoanhThuControl;
 
 
-public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
+public class GiaoDienThongKe extends JFrame implements ActionListener {
 
 	private JButton nutTroVe;
 	private JButton nutTimKiem;
@@ -73,7 +73,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
 
     private final DecimalFormat dinhDangTien = new DecimalFormat("#,### VNĐ");
 
-    public ThongKeBaoCaoDoanhThu() {
+    public GiaoDienThongKe() {
         dieuKhienThongKe = new ThongKeDoanhThuControl();
 
         setTitle("Thống kê doanh thu");
@@ -463,6 +463,6 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
 
     public static void main(String[] args) {
     	LookAndFeelManager.setNimbusLookAndFeel();
-        new ThongKeBaoCaoDoanhThu();
+        new GiaoDienThongKe();
     }
 }

@@ -46,7 +46,7 @@ import entity.HanhKhach;
 import entity.NhanVien;
 import entity.Ve;
 
-public class LapHoaDonGUI extends JFrame implements ActionListener {
+public class GiaoDienLapHoaDon extends JFrame implements ActionListener {
     private final Color MAU_CHINH = new Color(74, 140, 103);
     private final Color MAU_TONGKET = new Color(200, 30, 30);
     private final Color MAU_IN_HOADON = new Color(255, 184, 0); 
@@ -57,7 +57,7 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
     private List<Ve> danhSachVe;
     private HanhKhach nguoiThanhToan;
     private NhanVien nhanVienLap;
-    private ThanhToanGUI previousScreen;
+    private GiaoDienThanhToan previousScreen;
     private JButton btnTroVe;
     private JTextArea txtPreview;
     private final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -67,7 +67,7 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
  
     
     
-    public LapHoaDonGUI(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nhanVienLap, ThanhToanGUI previous) {
+    public GiaoDienLapHoaDon(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nhanVienLap, GiaoDienThanhToan previous) {
         if (danhSachVe == null || danhSachVe.isEmpty()) {
             throw new IllegalArgumentException("Danh sách vé không được rỗng.");
         }
@@ -421,7 +421,7 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
             this.dispose();
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new NhanVienBanVeGUI(nhanVienLap).setVisible(true); 
+                    new MHC_NhanVienBanVe(nhanVienLap).setVisible(true); 
                 } catch (IOException e1) {
                     System.err.println("Lỗi khi quay lại màn hình chính: " + e1.getMessage());
                 }
