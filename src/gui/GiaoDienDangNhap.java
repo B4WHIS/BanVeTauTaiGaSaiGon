@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 
 import control.DangNhapController;
 
-public class DangNhapGUI extends JFrame {
+public class GiaoDienDangNhap extends JFrame {
     
     // Các thành phần UI
     private JPanel pnlChinh;
@@ -53,7 +53,7 @@ public class DangNhapGUI extends JFrame {
     // Controller
     private DangNhapController controller;
 
-    public DangNhapGUI() throws IOException {
+    public GiaoDienDangNhap() throws IOException {
         setTitle("Đăng nhập");
         setSize(1400, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -224,7 +224,7 @@ public class DangNhapGUI extends JFrame {
     public static void main(String[] args) throws IOException {
         LookAndFeelManager.setNimbusLookAndFeel();
     
-        DangNhapGUI dn = new DangNhapGUI();
+        GiaoDienDangNhap dn = new GiaoDienDangNhap();
         dn.setVisible(true);
     }
 }

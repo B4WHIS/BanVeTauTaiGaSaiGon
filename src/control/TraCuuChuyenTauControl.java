@@ -18,11 +18,11 @@ import dao.VeDAO;
 import entity.ChuyenTau;
 import entity.Ga;
 import entity.ToaTau;
-import gui.TraCuuChuyenTauGUI;
+import gui.GiaoDienTraCuuChuyentau;
 
 // CHUẨN HÓA LUỒNG: GUI -> Control -> DAO
 public class TraCuuChuyenTauControl {
-    private TraCuuChuyenTauGUI gui;
+    private GiaoDienTraCuuChuyentau gui;
     
     // Khởi tạo các DAO cần thiết
     private ChuyenTauDAO chuyenTauDAO;
@@ -32,7 +32,7 @@ public class TraCuuChuyenTauControl {
     private TauDAO tauDAO;
     private VeDAO veDAO;
     
-    public TraCuuChuyenTauControl(TraCuuChuyenTauGUI gui) {
+    public TraCuuChuyenTauControl(GiaoDienTraCuuChuyentau gui) {
         this.gui = gui;
         // Khởi tạo DAO (Không nên khởi tạo trong GUI)
         this.chuyenTauDAO = new ChuyenTauDAO();

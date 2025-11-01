@@ -30,14 +30,14 @@ import javax.swing.table.DefaultTableModel;
 
 import entity.NhanVien;
 
-public class DanhSachKhuyenMai extends JFrame implements ActionListener {
+public class QuanLykhuyenMai extends JFrame implements ActionListener {
     private JTable tblKhuyenMai;
     private DefaultTableModel modelKM;
     private JTextField txtMaKM, txtTenKM, txtNgayBatDau, txtNgayKetThuc, txtMucGiamGia, txtDieuKien;
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
     private NhanVien nhanVienHienTai;
     
-    public DanhSachKhuyenMai() {
+    public QuanLykhuyenMai() {
         setTitle("Quản lý khuyến mãi");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -231,7 +231,7 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
     }
 
     public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
-        URL iconUrl = DanhSachKhuyenMai.class.getResource(duongDan);
+        URL iconUrl = QuanLykhuyenMai.class.getResource(duongDan);
         if (iconUrl == null) return null;
         ImageIcon icon = new ImageIcon(iconUrl);
         Image img = icon.getImage().getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
@@ -243,11 +243,11 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
     	Object src = e.getSource();
         if (src == btnTroVe) { 
             this.dispose();
-            new NhanVienQuanLyGUI(nhanVienHienTai).setVisible(true);
+            new MHC_NhanVienQuanLy(nhanVienHienTai).setVisible(true);
         }
     }
 
     public static void main(String[] args) {
-       new DanhSachKhuyenMai().setVisible(true);
+       new QuanLykhuyenMai().setVisible(true);
     }
 }

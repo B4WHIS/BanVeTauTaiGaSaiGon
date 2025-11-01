@@ -17,14 +17,14 @@ import javax.swing.table.DefaultTableModel;
 
 import connectDB.connectDB;
 import gui.GiaoDienHuyVe;
-import gui.TraCuuVeTauGUI;
+import gui.GiaoDienTraCuuVeTau;
 
 public class TraCuuVeTauController implements ActionListener {
- private final TraCuuVeTauGUI view;
+ private final GiaoDienTraCuuVeTau view;
  private final QuanLyVeControl quanLyVeControl;
  private final DefaultTableModel tableModel;
 
- public TraCuuVeTauController(TraCuuVeTauGUI view) {
+ public TraCuuVeTauController(GiaoDienTraCuuVeTau view) {
      this.view = view;
      this.quanLyVeControl = new QuanLyVeControl();
      this.tableModel = view.getTableModel();

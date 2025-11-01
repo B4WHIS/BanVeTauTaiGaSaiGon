@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 
 import entity.NhanVien;
 
-public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
+public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener {
 
     private JButton btnDatVe;
     private JButton btnHuyVe;
@@ -30,7 +30,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
 	private JButton btnLoaiChucVu;
 
    
-    public NhanVienQuanLyGUI(NhanVien nhanVien) {
+    public MHC_NhanVienQuanLy(NhanVien nhanVien) {
         super(nhanVien);
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
@@ -46,7 +46,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
     }
 
    
-    public NhanVienQuanLyGUI() {
+    public MHC_NhanVienQuanLy() {
         this(null);
     }
 
@@ -169,7 +169,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
             this.dispose();
         } 
         else if (src == btnTimChuyenTau) {
-            new DanhSachKhuyenMai().setVisible(true);
+            new QuanLykhuyenMai().setVisible(true);
             this.dispose();
         } 
         else if (src == btnDangXuat) {
@@ -181,7 +181,7 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
             );
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    new DangNhapGUI().setVisible(true);
+                    new GiaoDienDangNhap().setVisible(true);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -202,6 +202,6 @@ public class NhanVienQuanLyGUI extends GiaoDienChinh implements ActionListener {
         
     }
     public static void main(String[] args) {
-		new NhanVienQuanLyGUI().setVisible(true);
+		new MHC_NhanVienQuanLy().setVisible(true);
 	}
 }

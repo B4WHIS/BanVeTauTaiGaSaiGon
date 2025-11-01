@@ -53,7 +53,7 @@ import entity.ToaTau;
 import entity.UuDai;
 import entity.Ve;
 
-public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
+public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
 
  
     private final Color MAU_CHU_DAO = new Color(74, 140, 103);
@@ -92,7 +92,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
     private int dongDangSua = -1;
 
    
-    public ThongTinKhachHangGUI(ChuyenTau ct, List<ChoNgoi> gheDaChon, NhanVien nv) {
+    public GiaoDienNhapThongTinHK(ChuyenTau ct, List<ChoNgoi> gheDaChon, NhanVien nv) {
         this.chuyenTauDuocChon = ct;
         this.danhSachChoNgoi = gheDaChon != null ? gheDaChon : new ArrayList<>();
         this.nhanVienLap = nv != null ? nv : new NhanVien("NV-001");
@@ -112,7 +112,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Danh sách chỗ ngồi không hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new ChonChoNgoiGUI(chuyenTauDuocChon, nhanVienLap, null).setVisible(true);
+                    new GiaoDienChonCho(chuyenTauDuocChon, nhanVienLap, null).setVisible(true);
                     dispose();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this, "Lỗi khi quay lại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -223,7 +223,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
                 
                 if (dangSua) {
                     int confirm = JOptionPane.showConfirmDialog(
-                            ThongTinKhachHangGUI.this,
+                            GiaoDienNhapThongTinHK.this,
                             "Bạn có muốn hủy sửa hành khách này?",
                             "Xác nhận", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
@@ -557,7 +557,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
                 try {
                     get();
                     if (validationError != null) {
-                        JOptionPane.showMessageDialog(ThongTinKhachHangGUI.this, validationError, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(GiaoDienNhapThongTinHK.this, validationError, "Lỗi", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
@@ -607,7 +607,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
                         nutChonNguoiThanhToan.setEnabled(coDaNhap);
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(ThongTinKhachHangGUI.this,
+                    JOptionPane.showMessageDialog(GiaoDienNhapThongTinHK.this,
                             "Lỗi hệ thống: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -678,7 +678,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         }
 
         SwingUtilities.invokeLater(() -> {
-            new ThanhToanGUI(dsVe, nguoiThanhToan, nhanVienLap, this).setVisible(true);
+            new GiaoDienThanhToan(dsVe, nguoiThanhToan, nhanVienLap, this).setVisible(true);
             this.setVisible(false);
         });
     }
@@ -714,7 +714,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         } else if (src == nutQuayLai) {
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new ChonChoNgoiGUI(chuyenTauDuocChon, nhanVienLap, null).setVisible(true);
+                    new GiaoDienChonCho(chuyenTauDuocChon, nhanVienLap, null).setVisible(true);
                     dispose();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this, "Lỗi quay lại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
