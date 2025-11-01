@@ -1,5 +1,4 @@
 package control;
-//check
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -60,7 +59,7 @@ public class DangNhapController implements ActionListener, MouseListener {
         try {
             conn = connectDB.getConnection();
            
-            String sql = "SELECT lc.tenLoai, nv.hoTen, nv.maNhanVien " + // *** THÊM nv.maNhanVien ***
+            String sql = "SELECT lc.tenLoai, nv.hoTen, nv.maNhanVien " + 
                     "FROM TaiKhoan tk " +
                     "JOIN NhanVien nv ON tk.maNhanVien = nv.maNhanVien " +
                     "JOIN LoaiChucVu lc ON nv.IDloaiChucVu = lc.IDloaiCV " +
@@ -75,23 +74,22 @@ public class DangNhapController implements ActionListener, MouseListener {
             if (rs.next()) {
                 String loaiChucVu = rs.getString("tenLoai");
                 String hoTen = rs.getString("hoTen");
-                String maNhanVien = rs.getString("maNhanVien"); // NEW: Lấy Mã NV
+                String maNhanVien = rs.getString("maNhanVien"); 
 
                 NhanVien nhanVien = new NhanVien();
-                nhanVien.setMaNhanVien(maNhanVien); // *** NEW: GÁN MÃ NHÂN VIÊN HỢP LỆ ***
+                nhanVien.setMaNhanVien(maNhanVien); 
                 nhanVien.setHoTen(hoTen);
                 nhanVien.setIDloaiChucVu(getIDFromChucVu(loaiChucVu));
 
                 view.dispose();
-                // Tiếp tục truyền đối tượng NV đã đầy đủ thông tin
                 if ("Nhân viên bán vé".equals(loaiChucVu)) {
                     try {
-                        new NhanVienBanVeGUI(nhanVien).setVisible(true); // [6]
+                        new NhanVienBanVeGUI(nhanVien).setVisible(true); 
                     } catch (IOException ex) {
                         // ...
                     }
                 } else if ("Nhân viên quản lý".equals(loaiChucVu)) {
-                    new NhanVienQuanLyGUI(nhanVien).setVisible(true); // [10]
+                    new NhanVienQuanLyGUI(nhanVien).setVisible(true); 
                 } else {
                     JOptionPane.showMessageDialog(null, "Loại chức vụ không được hỗ trợ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }

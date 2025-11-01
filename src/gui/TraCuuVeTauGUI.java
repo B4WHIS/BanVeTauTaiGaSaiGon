@@ -30,7 +30,7 @@ import javax.swing.table.DefaultTableModel;
 
 import control.TraCuuVeTauController;
 
-public class TraCuuVeTauGUI extends GiaoDienChinh {
+public class TraCuuVeTauGUI extends JFrame {
     private JPanel pnlChinh, pnlTitle, pnlTraCuu, pnlKetQua;
     private JLabel lblTieuDe;
     private JTextField txtHoTen, txtCMND, txtSDT;
@@ -270,8 +270,7 @@ public class TraCuuVeTauGUI extends GiaoDienChinh {
         SwingUtilities.invokeLater(() -> new TraCuuVeTauGUI().setVisible(true));
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // Không cần dùng vì đã dùng ActionListener riêng
-    }
+//    @Override
+//    public void actionPerformed(ActionEvent e) {
+//    }
 }

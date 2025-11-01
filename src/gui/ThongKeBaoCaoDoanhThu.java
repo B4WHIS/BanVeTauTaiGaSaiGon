@@ -85,7 +85,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         giaoDienChinh.setBackground(new Color(245, 247, 250));
         giaoDienChinh.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ===== Tiêu đề =====
+       
         JPanel khungTieuDe = new JPanel(new BorderLayout());
         khungTieuDe.setBackground(new Color(74, 140, 103));
         JLabel tieuDe = new JLabel("THỐNG KÊ - BÁO CÁO DOANH THU", SwingConstants.CENTER);
@@ -95,11 +95,11 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         khungTieuDe.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         giaoDienChinh.add(khungTieuDe, BorderLayout.NORTH);
 
-        // ===== Tabs chính =====
+        
         JTabbedPane tabChinh = taoTabChinh();
         giaoDienChinh.add(tabChinh, BorderLayout.CENTER);
 
-        // ===== Footer =====
+        
         JPanel chanTrang = new JPanel(new BorderLayout());
         chanTrang.setBackground(new Color(74,140,103));
         chanTrang.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
@@ -147,7 +147,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    // tab chính 
+    
     private JTabbedPane taoTabChinh() {
         JTabbedPane tab = new JTabbedPane();
         tab.addTab("Thời gian", taoTabTheoThoiGian());
@@ -167,7 +167,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         return tab;
     }
 
-    // tab thời gian
+   
     private JPanel taoTabTheoThoiGian() {
         JPanel tong = new JPanel(new BorderLayout());
         tong.setBackground(Color.WHITE);
@@ -224,7 +224,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
 
         tong.add(boLoc, BorderLayout.NORTH);
 
-        //tab chi tiết và tổng quan
+       
         JTabbedPane tabNoi = new JTabbedPane();
         tabNoi.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
@@ -240,7 +240,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         return tong;
     }
 
-    // tab nhân viên
+   
     private JPanel taoTabTheoNhanVien() {
         JPanel p = new JPanel(new BorderLayout());
         JTabbedPane tabNoi = new JTabbedPane();
@@ -255,7 +255,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         return p;
     }
 
-    // tabkhachhang
+    
     private JPanel taoTabTheoKhachHang() {
         JPanel p = new JPanel(new BorderLayout());
         JTabbedPane tabNoi = new JTabbedPane();
@@ -270,10 +270,10 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         return p;
     }
 
-    // hàm cập nhật dữ liệu cho tab nhân viên
+   
     private void capNhatTheoNhanVien() {
         List<Object[]> ds = dieuKhienThongKe.thongKeChiTietNhanVien();
-        //hiển thị 5 nhân viên có doanh thu cao nhất
+      
         LinkedHashMap<String, Double> top5 = new LinkedHashMap<>();
         for (int i = 0; i < Math.min(5, ds.size()); i++) {
             Object[] dong = ds.get(i);
@@ -294,7 +294,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         }
         bangNhanVien.setModel(model);
     }
-    /// cập nhật dữ liệu cho khách hàng
+   
     private void capNhatTheoKhachHang() {
         List<Object[]> ds = dieuKhienThongKe.thongKeChiTietKhachHang();
 
@@ -317,14 +317,14 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         bangKhachHang.setModel(model);
     }
 
-    // hàm biểu đồ
+   
     private void hienThiBieuDo(Map<String, Double> duLieu, JPanel bieuDo, String tieuDe) {
         bieuDo.removeAll();
         
         DefaultCategoryDataset tapDuLieu = new DefaultCategoryDataset();
         
         if (duLieu != null && !duLieu.isEmpty()) {
-            // định dạng ngày 
+            
             DateTimeFormatter dinhDangGoc = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             DateTimeFormatter dinhDangMoi = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             duLieu.forEach((key, value) -> {
@@ -337,31 +337,31 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
                 }
             });
 
-            // Tạo biểu đồ cột
+           
             JFreeChart chart = ChartFactory.createBarChart(
                     tieuDe, "", "Doanh thu (VNĐ)", tapDuLieu,
                     PlotOrientation.VERTICAL, false , true, false);
 
-            // Lấy phần biểu đồ 
+            
             CategoryPlot layptubieudo = chart.getCategoryPlot();
             layptubieudo.setBackgroundPaint(Color.WHITE);
             layptubieudo.setRangeGridlinePaint(new Color(74, 140, 103));
 
-            // Định dạng số
+            
             NumberAxis trucDoc = (NumberAxis) layptubieudo.getRangeAxis();
             trucDoc.setNumberFormatOverride(new DecimalFormat("#,###"));
 
-            //màu và kiểu vẽ cột
+            
             BarRenderer veCot = (BarRenderer) layptubieudo.getRenderer();
             veCot.setSeriesPaint(0, new Color(93, 156, 23));
             veCot.setShadowVisible(false);
             veCot.setMaximumBarWidth(0.1);
             veCot.setMinimumBarLength(0.05);
 
-            // Đặt font tiêu đề
+           
             chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 20));
 
-            // Hiển thị biểu đồ trong JPanel
+            
             ChartPanel khungBieuDo = new ChartPanel(chart);
             bieuDo.add(khungBieuDo, BorderLayout.CENTER);
         } else {
@@ -382,7 +382,6 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         nut.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return nut;
     }
-    // cập nhật thống kê ở dưới footer
     private void capNhatThongKeTongQuan() {
         double tong = 0;
         for (Double v : dieuKhienThongKe.thongKeDoanhThuTheoNam().values()) tong += v;
@@ -391,7 +390,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         lblVeDaHuy.setText("Vé đã hủy: " + dieuKhienThongKe.tongVeDaHuy());
         lblVeDaHoan.setText("Vé đã hoàn: " + dieuKhienThongKe.tongVeDaHoan());
     }
-    // cập nhật hiển thị cho chọn  và tắt bộ lọc
+    
     private void capNhatHienThiBoLoc() {
         String loai = (String) cboLoaiThoiGian.getSelectedItem();
         cboNam.setEnabled(loai.equals("Theo tháng"));
@@ -406,8 +405,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
         if (nguon == cboLoaiThoiGian) {
             capNhatHienThiBoLoc();
         } else if (nguon == nutTroVe) {
-//        	GiaoDienChinh gdchinh = new GiaoDienChinh();
-//        	gdchinh.setVisible(true);
+     	
             dispose();
         } else if (nguon == nutTimKiem) {
             String loai = (String) cboLoaiThoiGian.getSelectedItem();
@@ -437,7 +435,7 @@ public class ThongKeBaoCaoDoanhThu extends JFrame implements ActionListener {
 
             hienThiBieuDo(duLieu, bieuDoThoiGian, "Doanh thu" + loai.toLowerCase());
 
-            // ===== Hiển thị bảng chi tiết =====
+            
             List<Object[]> danhSachHD = new ArrayList<>();
             if (loai.equals("Theo ngày")) {
             	danhSachHD = dieuKhienThongKe.getHoaDonTheoKhoangNgay(bd, kt);

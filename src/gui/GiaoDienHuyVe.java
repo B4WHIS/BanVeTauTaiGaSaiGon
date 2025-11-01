@@ -1,4 +1,3 @@
-// File: src/gui/GiaoDienHuyVe.java
 package gui;
 
 import java.awt.BorderLayout;
@@ -41,7 +40,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
     public GiaoDienHuyVe(List<Object[]> danhSachVe, List<String> maVeList) {
         this.maVeList = maVeList;
         setTitle("Hủy vé tàu");
-        setSize(1000, 700);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -55,15 +54,14 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
         cardLayout = new CardLayout();
         jpPhai.setLayout(cardLayout);
 
-        // BƯỚC 1: DANH SÁCH VÉ
         JPanel step1 = taoBuoc1(danhSachVe);
         jpPhai.add(step1, "Step1");
 
-        // BƯỚC 2: XÁC NHẬN
+       
         JPanel step2 = taoBuoc2();
         jpPhai.add(step2, "Step2");
 
-        // BƯỚC 3: HOÀN TẤT
+       
         JPanel step3 = taoBuoc3();
         jpPhai.add(step3, "Step3");
     }
@@ -184,7 +182,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
         btnQuay.addActionListener(e -> cardLayout.previous(jpPhai));
         btnTiep.addActionListener(e -> {
             String current = cardLayout.toString();
-            if (jpPhai.getComponent(1).isVisible()) { // Bước xác nhận
+            if (jpPhai.getComponent(1).isVisible()) { 
                 thucHienHuyVe();
             } else {
                 cardLayout.next(jpPhai);
@@ -197,7 +195,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
     }
 
     private void tinhToanTong() {
-        // Chỉ lấy giá vé từ bảng (cột "Thành tiền")
+        
         BigDecimal tongVe = BigDecimal.ZERO;
         BigDecimal tongPhi = BigDecimal.ZERO;
         BigDecimal tongHoan = BigDecimal.ZERO;
@@ -208,7 +206,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
             BigDecimal tienVe = new BigDecimal(thanhTienStr);
             tongVe = tongVe.add(tienVe);
 
-            // Giả sử phí hủy 10% (hoặc lấy từ DB sau)
+          
             BigDecimal phi = tienVe.multiply(new BigDecimal("0.1"));
             tongPhi = tongPhi.add(phi);
         }
@@ -221,38 +219,38 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
     private void thucHienHuyVe() {
         List<String> thanhCong = new ArrayList<>();
         List<String> thatBai = new ArrayList<>();
-        BigDecimal tongVe = BigDecimal.ZERO; // [9]
+        BigDecimal tongVe = BigDecimal.ZERO; 
 
         BigDecimal tongPhi = BigDecimal.ZERO;
         BigDecimal tongHoan = BigDecimal.ZERO;
         
-        // maVeList chứa danh sách mã vé cần hủy [11]
+       
         for (String maVe : maVeList) { 
             try {
-                // Gọi lớp Control để thực hiện nghiệp vụ hủy vé
-                LichSuVe ls = veControl.xuLyHuyVe(maVe, "Hủy từ giao diện", nhanVien); // [10]
+             
+                LichSuVe ls = veControl.xuLyHuyVe(maVe, "Hủy từ giao diện", nhanVien); 
                 
-                // Lấy thông tin tài chính từ đối tượng LichSuVe được trả về
-                BigDecimal phi = ls.getPhiXuLy() != null ? ls.getPhiXuLy() : BigDecimal.ZERO; // [10]
-                BigDecimal hoan = ls.getTienHoan() != null ? ls.getTienHoan() : BigDecimal.ZERO; // [10]
+                
+                BigDecimal phi = ls.getPhiXuLy() != null ? ls.getPhiXuLy() : BigDecimal.ZERO; 
+                BigDecimal hoan = ls.getTienHoan() != null ? ls.getTienHoan() : BigDecimal.ZERO; 
                 BigDecimal tienVe = hoan.add(phi);
                 
-                thanhCong.add(maVe); // [10]
+                thanhCong.add(maVe);
 
-                tongVe = tongVe.add(tienVe); // [12]
+                tongVe = tongVe.add(tienVe); 
                 tongPhi = tongPhi.add(phi);
                 tongHoan = tongHoan.add(hoan);
             } catch (Exception ex) {
-                thatBai.add(maVe + ": " + ex.getMessage()); // [12]
+                thatBai.add(maVe + ": " + ex.getMessage()); 
             }
         }
 
-        // Cập nhật tổng kết
+        
         lblTongTien.setText("Tổng tiền vé: " + String.format("%,.0f", tongVe) + " VNĐ");
         lblTongPhi.setText("Tổng phí hủy: " + String.format("%,.0f", tongPhi) + " VNĐ");
         lblTongHoan.setText("Tổng hoàn: " + String.format("%,.0f", tongHoan) + " VNĐ");
 
-        // Hiển thị kết quả
+        
         String msg = "<html><b>Hủy thành công: " + thanhCong.size() + " vé</b><br>";
         if (!thatBai.isEmpty()) {
             msg += "<b>Thất bại:</b><br>" + String.join("<br>", thatBai) + "<br>";

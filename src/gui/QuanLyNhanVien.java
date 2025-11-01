@@ -1,25 +1,52 @@
 package gui;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+
+import entity.NhanVien;
+
 //check
-public class QuanLyNhanVien extends JFrame {
+public class QuanLyNhanVien extends JFrame implements ActionListener {
     private JTable tblNhanVien;
     private DefaultTableModel modelNV;
-    private JTextField txtHoTen, txtNgaySinh, txtCMND, txtDienThoai; // THÊM txtDienThoai
+    private JTextField txtHoTen, txtNgaySinh, txtCMND, txtDienThoai; 
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
     private JComboBox<String> cbChucVu;
-
+    private NhanVien nhanVienHienTai; 
     public QuanLyNhanVien() {
         setTitle("Quản lý nhân viên");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        setJMenuBar(taoMenuBar());
+//        setJMenuBar(taoMenuBar());
 
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));
         pnlMain.setBackground(new Color(245, 247, 250));
@@ -33,7 +60,7 @@ public class QuanLyNhanVien extends JFrame {
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
-        // LEFT PANEL
+       
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
         pnlLeft.setPreferredSize(new Dimension(450, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
@@ -43,7 +70,7 @@ public class QuanLyNhanVien extends JFrame {
         lblLeftTitle.setForeground(new Color(103, 192, 144));
         lblLeftTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        // FORM
+       
         JPanel pnlForm = new JPanel(new GridBagLayout());
         pnlForm.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
@@ -89,37 +116,35 @@ public class QuanLyNhanVien extends JFrame {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Dòng 0: Họ tên
+        
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.3;
         pnlForm.add(lblHoTen, gbc);
         gbc.gridx = 1; gbc.weightx = 0.7;
         pnlForm.add(txtHoTen, gbc);
 
-        // Dòng 1: Ngày sinh
+       
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.3;
         pnlForm.add(lblNgaySinh, gbc);
         gbc.gridx = 1; gbc.weightx = 0.7;
         pnlForm.add(txtNgaySinh, gbc);
 
-        // Dòng 2: CMND
+       
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0.3;
         pnlForm.add(lblCMND, gbc);
         gbc.gridx = 1; gbc.weightx = 0.7;
         pnlForm.add(txtCMND, gbc);
 
-        // Dòng 3: Số điện thoại 
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0.3;
         pnlForm.add(lblDienThoai, gbc);
         gbc.gridx = 1; gbc.weightx = 0.7;
         pnlForm.add(txtDienThoai, gbc);
 
-        // Dòng 4: Chức vụ
+        
         gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0.3;
         pnlForm.add(lblChucVu, gbc);
         gbc.gridx = 1; gbc.weightx = 0.7;
         pnlForm.add(cbChucVu, gbc);
 
-        // BUTTONS
         btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus.png");
         btnSua = taoButton("Sửa", new Color(241, 196, 15), "/img/maintenance.png");
         btnXoa = taoButton("Xóa", new Color(231, 76, 60), "/img/bin.png");
@@ -136,11 +161,11 @@ public class QuanLyNhanVien extends JFrame {
         pnlLeft.add(pnlForm, BorderLayout.CENTER);
         pnlLeft.add(pnlButtons, BorderLayout.SOUTH);
 
-        // RIGHT PANEL
+        
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
         pnlRight.setBackground(new Color(245, 247, 250));
 
-        // THÊM CỘT "Số ĐT"
+       
         String[] colHeader = {"Mã NV", "Họ tên", "Ngày sinh", "CMND/CCCD", "Số ĐT", "Chức vụ"};
         modelNV = new DefaultTableModel(colHeader, 0);
         tblNhanVien = new JTable(modelNV);
@@ -153,26 +178,27 @@ public class QuanLyNhanVien extends JFrame {
         scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         pnlRight.add(scroll, BorderLayout.CENTER);
 
-        // FOOTER
+        
         JPanel pnlFooter = new JPanel(new BorderLayout());
         pnlFooter.setBackground(new Color(103, 192, 144));
         pnlFooter.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         btnTroVe = taoButton("Trở về", new Color(41, 128, 185), "/img/loginicon.png");
         btnTroVe.setPreferredSize(new Dimension(130, 45));
+        
         pnlFooter.add(btnTroVe, BorderLayout.WEST);
 
-        // GẮN TẤT CẢ
+        
         pnlMain.add(pnlLeft, BorderLayout.WEST);
         pnlMain.add(pnlRight, BorderLayout.CENTER);
         pnlMain.add(pnlFooter, BorderLayout.SOUTH);
         add(pnlMain);
 
-        // Gắn Controller
+        btnTroVe.addActionListener(this);
         new control.QuanLyNhanVienControl(this);
     }
 
-    // --- GETTERS ---
+    
     public JTable getTblNhanVien() { return tblNhanVien; }
     public DefaultTableModel getModelNV() { return modelNV; }
     public JTextField getTxtHoTen() { return txtHoTen; }
@@ -211,51 +237,62 @@ public class QuanLyNhanVien extends JFrame {
         return new ImageIcon(img);
     }
 
-    private JMenuBar taoMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
-        menuBar.setBackground(new Color(220, 220, 220));
-
-        JMenu mnuHeThong = new JMenu("Hệ Thống");
-        JMenu mnuNghiepVuVe = new JMenu("Nghiệp Vụ Vé");
-        JMenu mnuQly = new JMenu("Quản Lý");
-        JMenu mnuTraCuu = new JMenu("Tra Cứu");
-        JMenu mnuThongKe = new JMenu("Thống Kê");
-        JMenu mnuTroGiup = new JMenu("Trợ Giúp");
-
-        mnuHeThong.setIcon(chinhKichThuoc("/img/heThong3.png", 30, 30));
-        mnuNghiepVuVe.setIcon(chinhKichThuoc("/img/ve2.png", 30, 30));
-        mnuQly.setIcon(chinhKichThuoc("/img/quanLy.png", 30, 30));
-        mnuTraCuu.setIcon(chinhKichThuoc("/img/traCuu.png", 30, 30));
-        mnuThongKe.setIcon(chinhKichThuoc("/img/thongKe.png", 30, 30));
-        mnuTroGiup.setIcon(chinhKichThuoc("/img/troGiup.png", 30, 30));
-
-        mnuHeThong.add(new JMenuItem("Đăng xuất"));
-        mnuHeThong.add(new JMenuItem("Thoát"));
-        mnuQly.add(new JMenuItem("Quản lý nhân viên"));
-        mnuQly.add(new JMenuItem("Quản lý hành khách"));
-        mnuQly.add(new JMenuItem("Quản lý chuyến tàu"));
-        mnuQly.add(new JMenuItem("Quản lý khuyến mại"));
-
-        menuBar.add(mnuHeThong);
-        menuBar.add(mnuNghiepVuVe);
-        menuBar.add(mnuQly);
-        menuBar.add(mnuTraCuu);
-        menuBar.add(mnuThongKe);
-        menuBar.add(mnuTroGiup);
-        menuBar.add(Box.createHorizontalGlue());
-
-        JLabel lblXinChao = new JLabel("Xin Chào, [Tên Nhân Viên] ");
-        lblXinChao.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        JLabel lblNVBV = new JLabel(chinhKichThuoc("/img/nhanVienBanVe.png", 50, 50));
-        menuBar.add(lblXinChao);
-        menuBar.add(lblNVBV);
-
-        return menuBar;
-    }
+//    private JMenuBar taoMenuBar() {
+//        JMenuBar menuBar = new JMenuBar();
+//        menuBar.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+//        menuBar.setBackground(new Color(220, 220, 220));
+//
+//        JMenu mnuHeThong = new JMenu("Hệ Thống");
+//        JMenu mnuNghiepVuVe = new JMenu("Nghiệp Vụ Vé");
+//        JMenu mnuQly = new JMenu("Quản Lý");
+//        JMenu mnuTraCuu = new JMenu("Tra Cứu");
+//        JMenu mnuThongKe = new JMenu("Thống Kê");
+//        JMenu mnuTroGiup = new JMenu("Trợ Giúp");
+//
+//        mnuHeThong.setIcon(chinhKichThuoc("/img/heThong3.png", 30, 30));
+//        mnuNghiepVuVe.setIcon(chinhKichThuoc("/img/ve2.png", 30, 30));
+//        mnuQly.setIcon(chinhKichThuoc("/img/quanLy.png", 30, 30));
+//        mnuTraCuu.setIcon(chinhKichThuoc("/img/traCuu.png", 30, 30));
+//        mnuThongKe.setIcon(chinhKichThuoc("/img/thongKe.png", 30, 30));
+//        mnuTroGiup.setIcon(chinhKichThuoc("/img/troGiup.png", 30, 30));
+//
+//        mnuHeThong.add(new JMenuItem("Đăng xuất"));
+//        mnuHeThong.add(new JMenuItem("Thoát"));
+//        mnuQly.add(new JMenuItem("Quản lý nhân viên"));
+//        mnuQly.add(new JMenuItem("Quản lý hành khách"));
+//        mnuQly.add(new JMenuItem("Quản lý chuyến tàu"));
+//        mnuQly.add(new JMenuItem("Quản lý khuyến mại"));
+//
+//        menuBar.add(mnuHeThong);
+//        menuBar.add(mnuNghiepVuVe);
+//        menuBar.add(mnuQly);
+//        menuBar.add(mnuTraCuu);
+//        menuBar.add(mnuThongKe);
+//        menuBar.add(mnuTroGiup);
+//        menuBar.add(Box.createHorizontalGlue());
+//
+//        JLabel lblXinChao = new JLabel("Xin Chào, [Tên Nhân Viên] ");
+//        lblXinChao.setFont(new Font("Segoe UI", Font.BOLD, 18));
+//        JLabel lblNVBV = new JLabel(chinhKichThuoc("/img/nhanVienBanVe.png", 50, 50));
+//        menuBar.add(lblXinChao);
+//        menuBar.add(lblNVBV);
+//
+//        return menuBar;
+//    }
 
     public static void main(String[] args) {
         LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> new QuanLyNhanVien().setVisible(true));
     }
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		Object src = e.getSource();
+        if (src == btnTroVe) { 
+            this.dispose();
+            new NhanVienQuanLyGUI(nhanVienHienTai).setVisible(true);
+        }
+	}
 }

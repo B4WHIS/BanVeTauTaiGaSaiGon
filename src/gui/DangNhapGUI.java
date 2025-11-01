@@ -164,8 +164,7 @@ public class DangNhapGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.LINE_START;
         pnlForm.add(txtMatKhau, gbc);
-
-        // **KHOẢNG CÁCH TRƯỚC NÚT**
+    
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE;

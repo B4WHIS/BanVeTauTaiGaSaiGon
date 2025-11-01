@@ -298,8 +298,8 @@ public class ChonChoNgoiGUI extends JFrame implements ActionListener {
             JButton btnToa = new JButton(displayLabel);
  
             btnToa.setBackground(MAU_TOA_KHA_DUNG_NHE);
-            btnToa.setForeground(Color.WHITE); // MÀU CHỮ BAN ĐẦU: TRẮNG
-            btnToa.setFont(new Font("Segoe UI", Font.BOLD, 18)); // SỐ ĐẬM
+            btnToa.setForeground(Color.WHITE); 
+            btnToa.setFont(new Font("Segoe UI", Font.BOLD, 18)); 
             btnToa.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             btnToa.setPreferredSize(new Dimension(80, 50));
             btnToa.setActionCommand(toa.getMaToa());
@@ -432,18 +432,17 @@ public class ChonChoNgoiGUI extends JFrame implements ActionListener {
                 if (cho != null) {
                     String trangThai = (cho.getTrangThai() != null) ? cho.getTrangThai().trim() : "Trống";
                     if ("Đã đặt".equalsIgnoreCase(trangThai)) {
-                        // Thay JButton bằng JLabel cho ghế đã đặt
                         JLabel lbl = new JLabel(cho.getMaChoNgoi(), SwingConstants.CENTER);
                         lbl.setPreferredSize(new Dimension(50, 40));
                         lbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
                         lbl.setBackground(MAU_GHE_DA_DAT);
                         lbl.setForeground(Color.WHITE);
-                        lbl.setOpaque(true);  // Bắt buộc để background hiển thị
-                        lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));  // Style giống button
+                        lbl.setOpaque(true);  
+                        lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));  
                         pnlKhuVuc.add(lbl);
                     } else {
-                        // Giữ nguyên JButton cho ghế trống
-                        JButton nut = new JButton(cho.getMaChoNgoi());
+                    	//button ghe trong
+                    	JButton nut = new JButton(cho.getMaChoNgoi());
                         nut.setPreferredSize(new Dimension(50, 40));
                         nut.setFont(new Font("Segoe UI", Font.BOLD, 16));
                         Color mauMacDinh = MAU_GHE_TRONG;
@@ -513,16 +512,15 @@ public class ChonChoNgoiGUI extends JFrame implements ActionListener {
                         String trangThai = (cho.getTrangThai() != null) ? cho.getTrangThai().trim() : "";
                         
                         if ("Đã đặt".equalsIgnoreCase(trangThai)) {
-                            // Thay JButton bằng JLabel cho giường đã đặt
-                            JLabel lbl = new JLabel(cho.getMaChoNgoi(), SwingConstants.CENTER);
+                        	JLabel lbl = new JLabel(cho.getMaChoNgoi(), SwingConstants.CENTER);
                             lbl.setBackground(MAU_GHE_DA_DAT);
                             lbl.setForeground(Color.WHITE);
                             lbl.setOpaque(true);
-                            lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));  // Optional: Style giống button
+                            lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1)); 
                             lbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
                             pnlGiuongGrid.add(lbl);
                         } else {
-                            // Giữ nguyên JButton cho giường trống
+                           
                             JButton nut = new JButton(cho.getMaChoNgoi());
                             Color mauMacDinh = MAU_GHE_TRONG;
                             Color mauDaChon = MAU_GHE_DANG_CHON;

@@ -1,4 +1,5 @@
 package gui;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -16,80 +17,70 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.List;
 
-//check
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
-import control.QuanLyTaiKhoanController;
-import dao.NhanVienDAO;
-import dao.TaiKhoanDAO;
-import entity.NhanVien;
-import entity.TaiKhoan;
+import control.QuanLyGaController;
+import dao.GaDAO;
+import entity.Ga;
 
-public class QuanLyTaiKhoan extends JFrame {
-   
-    private JTable tblTaiKhoan;
-    private DefaultTableModel modelTK;
-    private JTextField txtTenDangNhap;
-    private JPasswordField txtMatKhau;
-    private JComboBox<NhanVien> cbNhanVien;  
+public class QuanLyGa extends JFrame{
+    // Components
+    private JTable tblGa;
+    private DefaultTableModel modelGa;
+    private JTextField txtMaGa, txtTenGa, txtDiaChi;
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
-    private JButton btnLuu;  
+    private JButton btnLuu;
+    // Controller và DAO
+    private QuanLyGaController controller;
+    private GaDAO dao;
 
-    
-    private QuanLyTaiKhoanController controller;
-    private TaiKhoanDAO dao;
-    private NhanVienDAO nhanVienDAO;
-
-    public QuanLyTaiKhoan() {
-        super();  
-        dao = new TaiKhoanDAO();
-        nhanVienDAO = new NhanVienDAO();
-        controller = new QuanLyTaiKhoanController(this);
-        setTitle("Quản lý tài khoản");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+    public QuanLyGa() {
+        super();
+        dao = new GaDAO();
+        controller = new QuanLyGaController(this);
+        setTitle("Quản lý ga");
+        setSize(1200, 800);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 //        setJMenuBar(taoMenuBar());
 
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));
         pnlMain.setBackground(new Color(245, 247, 250));
 
-        JLabel lblTitle = new JLabel("QUẢN LÝ TÀI KHOẢN", SwingConstants.CENTER);
+        // ===== TITLE =====
+        JLabel lblTitle = new JLabel("QUẢN LÝ GA", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setOpaque(true);
-        lblTitle.setBackground(new Color(103,192,144));
+        lblTitle.setBackground(new Color(103, 192, 144));
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
-       
+        // ===== LEFT PANEL =====
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
         pnlLeft.setPreferredSize(new Dimension(450, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
 
-        JLabel lblLeftTitle = new JLabel("THÔNG TIN TÀI KHOẢN", SwingConstants.CENTER);
+        JLabel lblLeftTitle = new JLabel("THÔNG TIN GA", SwingConstants.CENTER);
         lblLeftTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblLeftTitle.setForeground(new Color(103,192,144));
+        lblLeftTitle.setForeground(new Color(103, 192, 144));
         lblLeftTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        
+        // ===== FORM =====
         JPanel pnlForm = new JPanel(new GridBagLayout());
+    
         pnlForm.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
@@ -99,34 +90,31 @@ public class QuanLyTaiKhoan extends JFrame {
         Font lblFont = new Font("Segoe UI", Font.BOLD, 19);
         Font txtFont = new Font("Segoe UI", Font.PLAIN, 20);
 
-        JLabel lblTenDangNhap = new JLabel("Tên đăng nhập:");
-        JLabel lblMatKhau = new JLabel("Mật khẩu:");
-        JLabel lblNhanVien = new JLabel("Nhân viên:");
+        JLabel lblMaGa = new JLabel("Mã ga:");
+        JLabel lblTenGa = new JLabel("Tên ga:");
+        JLabel lblDiaChi = new JLabel("Địa chỉ:");
 
-        JLabel[] labels = {lblTenDangNhap, lblMatKhau, lblNhanVien};
+        JLabel[] labels = {lblMaGa, lblTenGa, lblDiaChi};
         for (JLabel lbl : labels) {
             lbl.setFont(lblFont);
             lbl.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        txtTenDangNhap = new JTextField();  
-        txtTenDangNhap.setEditable(false);
-        txtMatKhau = new JPasswordField();
-        cbNhanVien = new JComboBox<>();  
+        txtMaGa = new JTextField();
+        txtMaGa.setEditable(false);
+        txtTenGa = new JTextField();
+        txtDiaChi = new JTextField();
 
-        Component[] inputFields = {txtTenDangNhap, txtMatKhau, cbNhanVien};
+        Component[] inputFields = {txtMaGa, txtTenGa, txtDiaChi};
         for (Component comp : inputFields) {
-            if (comp instanceof JTextField || comp instanceof JPasswordField) {
-                ((JTextField) comp).setFont(txtFont);
-                ((JTextField) comp).setBorder(BorderFactory.createCompoundBorder(
+            if (comp instanceof JTextField) {
+                JTextField txt = (JTextField) comp;
+                txt.setFont(txtFont);
+                txt.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(150, 150, 150)),
                         BorderFactory.createEmptyBorder(5, 8, 5, 8)
                 ));
-                ((JTextField) comp).setPreferredSize(new Dimension(200, 30));
-            } else if (comp instanceof JComboBox) {
-                JComboBox<?> cb = (JComboBox<?>) comp;
-                cb.setFont(txtFont);
-                cb.setPreferredSize(new Dimension(200, 30));
+                txt.setPreferredSize(new Dimension(200, 30));
             }
         }
 
@@ -139,34 +127,24 @@ public class QuanLyTaiKhoan extends JFrame {
             gbc.gridy = i;
             gbc.weightx = 0.3;
             pnlForm.add(labels[i], gbc);
-
             gbc.gridx = 1;
             gbc.weightx = 0.7;
             pnlForm.add(inputFields[i], gbc);
         }
 
-        
-        cbNhanVien.addActionListener(e -> {
-            NhanVien nv = (NhanVien) cbNhanVien.getSelectedItem();
-            if (nv != null) {
-                txtTenDangNhap.setText(nv.getSoDienThoai());  
-            } else {
-                txtTenDangNhap.setText("");
-            }
-        });
-
-       
+        // ===== MAIN BUTTONS =====
         btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus.png");
         btnSua = taoButton("Sửa", new Color(241, 196, 15), "/img/maintenance.png");
         btnXoa = taoButton("Xóa", new Color(231, 76, 60), "/img/bin.png");
         btnReset = taoButton("Làm mới", new Color(52, 152, 219), "/img/reset.png");
         btnExport = taoButton("Xuất Excel", new Color(155, 89, 182), "/img/export.png");
+
         btnLuu = new JButton("Lưu");
         btnLuu.setBackground(new Color(46, 204, 113));
         btnLuu.setForeground(Color.WHITE);
         btnLuu.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnLuu.setPreferredSize(new Dimension(100, 35));
-        btnLuu.setEnabled(false); 
+        btnLuu.setEnabled(false);
 
         JPanel pnlButtons = new JPanel(new GridLayout(2, 3, 10, 10));
         pnlButtons.setBackground(new Color(245, 247, 250));
@@ -181,47 +159,42 @@ public class QuanLyTaiKhoan extends JFrame {
         pnlLeft.add(pnlForm, BorderLayout.CENTER);
         pnlLeft.add(pnlButtons, BorderLayout.SOUTH);
 
-      
+        // ===== RIGHT PANEL =====
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
         pnlRight.setBackground(new Color(245, 247, 250));
 
-        
-        String[] colHeader = {"Tên đăng nhập", "Mật khẩu", "Tên nhân viên"};
-        modelTK = new DefaultTableModel(colHeader, 0);
-        tblTaiKhoan = new JTable(modelTK);
-        tblTaiKhoan.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        tblTaiKhoan.setRowHeight(28);
-        tblTaiKhoan.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
-        tblTaiKhoan.setSelectionBackground(new Color(173, 216, 230));
+        String[] colHeader = {"Mã ga", "Tên ga", "Địa chỉ"};
+        modelGa = new DefaultTableModel(colHeader, 0);
+        tblGa = new JTable(modelGa);
+        tblGa.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tblGa.setRowHeight(28);
+        tblGa.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
+        tblGa.setSelectionBackground(new Color(173, 216, 230));
 
-        JScrollPane scroll = new JScrollPane(tblTaiKhoan);
+        JScrollPane scroll = new JScrollPane(tblGa);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         pnlRight.add(scroll, BorderLayout.CENTER);
 
-       
+        // ===== FOOTER =====
         JPanel pnlFooter = new JPanel(new BorderLayout());
-        pnlFooter.setBackground(new Color(103,192,144)); 
+        pnlFooter.setBackground(new Color(103, 192, 144));
         pnlFooter.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         btnTroVe = taoButton("Trở về", new Color(41, 128, 185), "/img/loginicon.png");
         btnTroVe.setPreferredSize(new Dimension(130, 45));
         pnlFooter.add(btnTroVe, BorderLayout.WEST);
 
-      
+        // ===== ADD ALL =====
         pnlMain.add(pnlLeft, BorderLayout.WEST);
         pnlMain.add(pnlRight, BorderLayout.CENTER);
         pnlMain.add(pnlFooter, BorderLayout.SOUTH);
         add(pnlMain);
 
-      
+        // Attach listeners
         attachListeners();
-        
-       
-        loadCombosFromDB();
-        loadDataFromDB();
 
-        
-        resetForm();
+        // Load data
+        loadDataFromDB();
     }
     public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
 	    URL iconUrl = GiaoDienChinh.class.getResource(duongDan);
@@ -250,58 +223,25 @@ public class QuanLyTaiKhoan extends JFrame {
         });
         return btn;
     }
-    private void loadCombosFromDB() {
-        cbNhanVien.removeAllItems();
-
-       
-        List<NhanVien> nhanVienList = nhanVienDAO.getAllNhanVien();
-
-        for (NhanVien nv : nhanVienList) {
-            cbNhanVien.addItem(nv);
-        }
-
-        cbNhanVien.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasCellFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasCellFocus);
-                if (value instanceof NhanVien) {
-                    setText(((NhanVien) value).getHoTen());
-                }
-                return this;
-            }
-        });
-
-        if (cbNhanVien.getItemCount() > 0) {
-            cbNhanVien.setSelectedIndex(0);
-            NhanVien selected = (NhanVien) cbNhanVien.getSelectedItem();
-            if (selected != null) {
-                txtTenDangNhap.setText(selected.getSoDienThoai());
-            }
-        } else {
-            txtTenDangNhap.setText("");
-        }
-    }
-
     
+    // Load data từ DB
     private void loadDataFromDB() {
-        modelTK.setRowCount(0);
+        modelGa.setRowCount(0);
         try {
-            List<TaiKhoan> list = dao.getAllTaiKhoan();
-            for (TaiKhoan tk : list) {
-                String tenNV = nhanVienDAO.getTenNhanVienByMa(tk.getNhanVien().getMaNhanVien());
-                String matKhauAn = "*".repeat(tk.getMatKhau().length());  // Ẩn mật khẩu
-                modelTK.addRow(new Object[]{
-                    tk.getTenDangNhap(),
-                    matKhauAn,
-                    tenNV != null ? tenNV : "Không xác định"
+            List<Ga> list = dao.getAllGa();
+            for (Ga ga : list) {
+                modelGa.addRow(new Object[]{
+                    ga.getMaGa(),
+                    ga.getTenGa(),
+                    ga.getDiaChi()
                 });
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Lỗi load dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi load dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-   
+    // Attach listeners
     private void attachListeners() {
         btnThem.addActionListener(controller);
         btnSua.addActionListener(controller);
@@ -309,17 +249,16 @@ public class QuanLyTaiKhoan extends JFrame {
         btnReset.addActionListener(controller);
         btnExport.addActionListener(controller);
         btnTroVe.addActionListener(controller);
-        btnLuu.addActionListener(controller);  
+        btnLuu.addActionListener(controller);
 
-       
-        tblTaiKhoan.getSelectionModel().addListSelectionListener(e -> {
+        tblGa.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 controller.handleTableSelection();
             }
         });
     }
 
-    
+    // ===== GETTERS CHO CONTROLLER =====
     public JButton getBtnThem() { return btnThem; }
     public JButton getBtnSua() { return btnSua; }
     public JButton getBtnXoa() { return btnXoa; }
@@ -327,74 +266,65 @@ public class QuanLyTaiKhoan extends JFrame {
     public JButton getBtnExport() { return btnExport; }
     public JButton getBtnTroVe() { return btnTroVe; }
     public JButton getBtnLuu() { return btnLuu; }
-    public JTable getTblTaiKhoan() { return tblTaiKhoan; }
-    public DefaultTableModel getModelTK() { return modelTK; }
-    public JTextField getTxtTenDangNhap() { return txtTenDangNhap; }
-    public JPasswordField getTxtMatKhau() { return txtMatKhau; }
-    public JComboBox<NhanVien> getCbNhanVien() { return cbNhanVien; }
+    public JTable getTblGa() { return tblGa; }
+    public DefaultTableModel getModelGa() { return modelGa; }
+    public JTextField getTxtMaGa() { return txtMaGa; }
+    public JTextField getTxtTenGa() { return txtTenGa; }
+    public JTextField getTxtDiaChi() { return txtDiaChi; }
 
-    
-    public void loadFormData(TaiKhoan tk) {
-        if (tk != null) {
-            txtTenDangNhap.setText(tk.getTenDangNhap());
-            txtMatKhau.setText(tk.getMatKhau().toString());  
-            cbNhanVien.setSelectedItem(tk.getNhanVien());  
+    // Load form khi chọn dòng
+    public void loadFormData(Ga ga) {
+        if (ga != null) {
+            txtMaGa.setText(ga.getMaGa());
+            txtTenGa.setText(ga.getTenGa());
+            txtDiaChi.setText(ga.getDiaChi());
         }
     }
 
+    // Reset form
     public void resetForm() {
-        txtTenDangNhap.setText("");
-        txtMatKhau.setText("");
-
-        if (cbNhanVien.getItemCount() > 0) {
-            cbNhanVien.setSelectedIndex(0);
-            NhanVien nv = (NhanVien) cbNhanVien.getSelectedItem();
-            if (nv != null) {
-                txtTenDangNhap.setText(nv.getSoDienThoai());
-            }
-        } else {
-            txtTenDangNhap.setText("");
-        }
-
+        txtMaGa.setText("");
+        txtTenGa.setText("");
+        txtDiaChi.setText("");
         btnLuu.setEnabled(false);
-        tblTaiKhoan.clearSelection();
+        tblGa.clearSelection();
         enableFormFields(false);
     }
-    
+
+    // Enable/disable fields
     public void enableFormFields(boolean enable) {
-        cbNhanVien.setEnabled(enable);
-        txtMatKhau.setEnabled(enable);
+        txtTenGa.setEnabled(enable);
+        txtDiaChi.setEnabled(enable);
     }
 
- 
-    public void refreshData() {
-        loadDataFromDB();
-        loadCombosFromDB();  
-        resetForm();
-    }
-    
-    public String getSelectedTenDangNhap() {
-        int selectedRow = tblTaiKhoan.getSelectedRow();
-        if (selectedRow >= 0) {
-            return (String) modelTK.getValueAt(selectedRow, 0);  
+    // Lấy mã ga được chọn
+    public String getSelectedMaGa() {
+        int row = tblGa.getSelectedRow();
+        if (row >= 0) {
+            return (String) modelGa.getValueAt(row, 0);
         }
         return null;
     }
 
-    
+    // Refresh
+    public void refreshData() {
+        loadDataFromDB();
+        resetForm();
+    }
+
+    // Show message
     public void showMessage(String message, String title, int type) {
         JOptionPane.showMessageDialog(this, message, title, type);
     }
 
-    
+    // Main
     public static void main(String[] args) {
         LookAndFeelManager.setNimbusLookAndFeel();
-        new QuanLyTaiKhoan().setVisible(true);
+        new QuanLyGa().setVisible(true);
     }
 
-//	@Override
-//	public void actionPerformed(ActionEvent e) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+//    @Override
+//    public void actionPerformed(ActionEvent e) {
+//        // Không cần
+//    }
 }
