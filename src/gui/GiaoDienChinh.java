@@ -101,7 +101,7 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
         }
     }
     
-    // **METHOD ĐỔI ID → TÊN CHỨC VỤ**
+    
     private String getTenChucVu(int id) {
         switch (id) {
             case 1: return "Nhân viên bán vé";

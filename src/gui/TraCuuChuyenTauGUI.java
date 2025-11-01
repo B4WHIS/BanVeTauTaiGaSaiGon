@@ -42,13 +42,10 @@ import entity.ChuyenTau;
 import entity.NhanVien;
 import entity.ToaTau;
 
-// GUI PHẢI GỌI QUA CONTROL. Đã loại bỏ các DAO khỏi đây.
 public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     
-    // Tách Control ra khỏi GUI [5]
     private TraCuuChuyenTauControl control;
     
-    // Các thành phần UI
     private JPanel pnlChinh;
     private JPanel pnlTraCuu;
     private JLabel lblGaDen;
@@ -72,19 +69,16 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
     private VeDAO veDAO = new VeDAO();
     private ToaTauDAO toaTaudao = new ToaTauDAO();
     
-    // Màu sắc cố định [6]
     private final Color MAU_CHU_DAO = new Color(74, 140, 103);
     private final Color MAU_TIEU_DE_PHU = new Color(229, 115, 115);
     private final Color MAU_NUT_QUAY_LAI = new Color(41, 128, 185);
     private final Color MAU_NUT_LAM_MOI = new Color(150, 150, 150);
     
-    // Định dạng ngày giờ [7]
     private final DateTimeFormatter dinhDangNgayGio = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
     public TraCuuChuyenTauGUI(NhanVien nhanVien) {
         this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");
         
-        // Khởi tạo Control thay vì DAO
         this.control = new TraCuuChuyenTauControl(this);
         
         initializeUI();
@@ -98,7 +92,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         pnlChinh = new JPanel(new BorderLayout());
 
-        // --- Title Panel --- [8]
         pnlTitle = new JPanel(new BorderLayout());
         pnlTitle.setBorder(BorderFactory.createEtchedBorder());
         lblTieuDe = new JLabel("TRA CỨU CHUYẾN TÀU");
@@ -107,7 +100,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         lblTieuDe.setHorizontalAlignment(SwingConstants.CENTER);
         pnlTitle.add(lblTieuDe, BorderLayout.CENTER);
 
-        // --- Search Panel (pnlTraCuu) --- [9]
         pnlThongTinTim = new JPanel(new GridBagLayout());
         pnlTraCuu = new JPanel(new BorderLayout());
         Font fontTieuDe = new Font("Segoe UI", Font.BOLD, 25);
@@ -119,7 +111,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         
-        // Ga đi [10]
         lblGaDi = new JLabel("Ga đi:");
         lblGaDi.setFont(new Font("Segoe UI", Font.BOLD, 20));
         gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
@@ -313,9 +304,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
             this.dispose();
             SwingUtilities.invokeLater(() -> {
                 try {
-                    // Truyền thông tin chuyến tàu và nhân viên hiện tại.
-                    // Tham số thứ 3 (null) có thể là mã phiếu đặt chỗ nếu cần, 
-                    // nhưng vì chúng ta đang BÁN TRỰC TIẾP, tham số này là null.
                     new ChonChoNgoiGUI(ct, nhanVienHienTai, null).setVisible(true);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Lỗi khi mở màn hình chọn chỗ: " + ex.getMessage(),
@@ -370,7 +358,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
              JOptionPane.showMessageDialog(this, e.getMessage(), "Lỗi Dữ liệu",
                     JOptionPane.WARNING_MESSAGE);
         } catch (SQLException e) {
-            // Xử lý lỗi CSDL (JDBC exception)
             JOptionPane.showMessageDialog(this, "Lỗi truy vấn cơ sở dữ liệu.", "Lỗi CSDL",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -381,8 +368,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         // ... Khai báo VeDAO và ToaTauDAO
         String maCT = ct.getMaChuyenTau();
 
-        // 1. Lấy số lượng chỗ ĐÃ ĐẶT THỰC TẾ từ bảng VE
-        // [Chuẩn hóa Luồng DAO: Gọi VeDAO để lấy dữ liệu thật]
         List<String> danhSachChoDaDat = veDAO.getDanhSachChoDaDat(maCT); // Sử dụng VeDAO [2]
         int slChoDaDat = danhSachChoDaDat.size(); 
 
@@ -426,8 +411,6 @@ public class TraCuuChuyenTauGUI extends JFrame implements ActionListener {
         }
     }
     
-    // --- Getters (Nếu cần để Control test/lấy trạng thái) ---
-    // Giữ lại các getters để mô phỏng tương tác ngược lại từ Control nếu cần [28]
     public Component getCbGaDi() { return cbGaDi; }
     public Component getCbGaDen() { return cbGaDen; }
     public Date getDateChooserValue() { return dateChooser.getDate(); }

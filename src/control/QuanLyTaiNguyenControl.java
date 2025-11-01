@@ -42,11 +42,8 @@ public class QuanLyTaiNguyenControl {
         return tau;
     }
 
-    // Cập nhật: Thêm tham số configLoaiToa (Map<IDloaiGhe, soLuongToaChoLoaiDo>) để linh hoạt cấu hình loại toa
-    // Ví dụ: {1: 4, 3: 8} nghĩa là 4 toa ghế cứng, 8 toa giường nằm (tổng = soLuongToa của tàu)
     public boolean themTauMoi(Tau tau, Map<Integer, Integer> configLoaiToa) {
         try {
-            // Validation: Tổng soLuongToa từ config phải khớp với tau.getSoToa()
             int tongSoLuongToa = configLoaiToa.values().stream().mapToInt(Integer::intValue).sum();
             if (tongSoLuongToa != tau.getSoToa()) {
                 throw new BusinessException("Tổng số toa từ config phải bằng số lượng toa của tàu (" + tau.getSoToa() + ")");
@@ -101,9 +98,6 @@ public class QuanLyTaiNguyenControl {
         }
     }
 
-    // Business logic: Tự động tạo toa khi thêm tàu mới theo config (Map<IDloaiGhe, soLuongToa>)
-    // Số lượng chỗ: Ghế cứng/mềm (1,2): 40, Giường nằm (3): 28
-    // HeSoGia: Ghế cứng (1): 1.0, Ghế nệm (2): 1.5, Giường nằm (3): 2.0
     private void taoToaTauTuTauMoi(Tau tau, Map<Integer, Integer> configLoaiToa) {
         int soThuTuHienTai = 1;  // Số thứ tự toa tăng dần
         for (Map.Entry<Integer, Integer> entry : configLoaiToa.entrySet()) {
@@ -192,7 +186,6 @@ public class QuanLyTaiNguyenControl {
 
     public boolean themLichTrinhMoi(LichTrinh lt) {
         try {
-            // Mặc định ga đi là Ga Sài Gòn (GA-01) nếu chưa có
             if (lt.getMaGaDi() == null || lt.getMaGaDi().getMaGa() == null || lt.getMaGaDi().getMaGa().trim().isEmpty()) {
                 Ga gaSaiGon = new Ga();
                 gaSaiGon.setMaGa("GA-01");

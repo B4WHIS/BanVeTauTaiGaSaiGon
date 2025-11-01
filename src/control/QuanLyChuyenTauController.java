@@ -15,10 +15,9 @@ import java.time.format.DateTimeParseException;
 public class QuanLyChuyenTauController implements ActionListener {
     private QuanLyChuyenTau view;
     private ChuyenTauDAO dao;
-    private boolean isAddMode = false;  // Mode: true = add, false = edit
-    private ChuyenTau selectedChuyenTau;  // Lưu chuyến được select để edit
+    private boolean isAddMode = false;
+    private ChuyenTau selectedChuyenTau;
 
-    // DateTimeFormatter giống view
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public QuanLyChuyenTauController(QuanLyChuyenTau view) {
@@ -29,7 +28,7 @@ public class QuanLyChuyenTauController implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("Nút nhấn: " + e.getActionCommand());  // Log nút nào
+        System.out.println("Nút nhấn: " + e.getActionCommand()); 
         if (e.getSource() == view.getBtnThem()) {
             handleThem();
         } else if (e.getSource() == view.getBtnSua()) {

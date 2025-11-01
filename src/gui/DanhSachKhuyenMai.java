@@ -1,23 +1,48 @@
 package gui;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+
+import entity.NhanVien;
 
 public class DanhSachKhuyenMai extends JFrame implements ActionListener {
     private JTable tblKhuyenMai;
     private DefaultTableModel modelKM;
     private JTextField txtMaKM, txtTenKM, txtNgayBatDau, txtNgayKetThuc, txtMucGiamGia, txtDieuKien;
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
-
+    private NhanVien nhanVienHienTai;
+    
     public DanhSachKhuyenMai() {
         setTitle("Quản lý khuyến mãi");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setJMenuBar(taoMenuBar());
+//        setJMenuBar(taoMenuBar());
 
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));
         pnlMain.setBackground(new Color(245, 247, 250));
@@ -139,6 +164,7 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
         btnTroVe.setPreferredSize(new Dimension(120, 40));
         pnlFooter.add(btnTroVe, BorderLayout.WEST);
 
+       btnTroVe.addActionListener(this);
        
         pnlMain.add(pnlLeft, BorderLayout.WEST);
         pnlMain.add(pnlRight, BorderLayout.CENTER);
@@ -146,48 +172,48 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
         add(pnlMain);
     }
 
-    private JMenuBar taoMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
-        menuBar.setBackground(new Color(230, 230, 230));
-
-        JMenu mnuHeThong = new JMenu("Hệ Thống");
-        JMenu mnuNghiepVuVe = new JMenu("Nghiệp Vụ Vé");
-        JMenu mnuQly = new JMenu("Quản Lý");
-        JMenu mnuTraCuu = new JMenu("Tra Cứu");
-        JMenu mnuThongKe = new JMenu("Thống Kê");
-        JMenu mnuTroGiup = new JMenu("Trợ Giúp");
-
-        mnuHeThong.setIcon(chinhKichThuoc("/img/heThong3.png", 24, 24));
-        mnuNghiepVuVe.setIcon(chinhKichThuoc("/img/ve2.png", 24, 24));
-        mnuQly.setIcon(chinhKichThuoc("/img/quanLy.png", 24, 24));
-        mnuTraCuu.setIcon(chinhKichThuoc("/img/traCuu.png", 24, 24));
-        mnuThongKe.setIcon(chinhKichThuoc("/img/thongKe.png", 24, 24));
-        mnuTroGiup.setIcon(chinhKichThuoc("/img/troGiup.png", 24, 24));
-
-        mnuHeThong.add(new JMenuItem("Đăng xuất"));
-        mnuHeThong.add(new JMenuItem("Thoát"));
-        mnuQly.add(new JMenuItem("Quản lý nhân viên"));
-        mnuQly.add(new JMenuItem("Quản lý hành khách"));
-        mnuQly.add(new JMenuItem("Quản lý chuyến tàu"));
-        mnuQly.add(new JMenuItem("Quản lý khuyến mãi"));
-
-        menuBar.add(mnuHeThong);
-        menuBar.add(mnuNghiepVuVe);
-        menuBar.add(mnuQly);
-        menuBar.add(mnuTraCuu);
-        menuBar.add(mnuThongKe);
-        menuBar.add(mnuTroGiup);
-        menuBar.add(Box.createHorizontalGlue());
-
-        JLabel lblXinChao = new JLabel("Xin Chào, [Tên Nhân Viên]");
-        lblXinChao.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        JLabel lblNVBV = new JLabel(chinhKichThuoc("/img/nhanVienBanVe.png", 40, 40));
-        menuBar.add(lblXinChao);
-        menuBar.add(lblNVBV);
-
-        return menuBar;
-    }
+//    private JMenuBar taoMenuBar() {
+//        JMenuBar menuBar = new JMenuBar();
+//        menuBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
+//        menuBar.setBackground(new Color(230, 230, 230));
+//
+//        JMenu mnuHeThong = new JMenu("Hệ Thống");
+//        JMenu mnuNghiepVuVe = new JMenu("Nghiệp Vụ Vé");
+//        JMenu mnuQly = new JMenu("Quản Lý");
+//        JMenu mnuTraCuu = new JMenu("Tra Cứu");
+//        JMenu mnuThongKe = new JMenu("Thống Kê");
+//        JMenu mnuTroGiup = new JMenu("Trợ Giúp");
+//
+//        mnuHeThong.setIcon(chinhKichThuoc("/img/heThong3.png", 24, 24));
+//        mnuNghiepVuVe.setIcon(chinhKichThuoc("/img/ve2.png", 24, 24));
+//        mnuQly.setIcon(chinhKichThuoc("/img/quanLy.png", 24, 24));
+//        mnuTraCuu.setIcon(chinhKichThuoc("/img/traCuu.png", 24, 24));
+//        mnuThongKe.setIcon(chinhKichThuoc("/img/thongKe.png", 24, 24));
+//        mnuTroGiup.setIcon(chinhKichThuoc("/img/troGiup.png", 24, 24));
+//
+//        mnuHeThong.add(new JMenuItem("Đăng xuất"));
+//        mnuHeThong.add(new JMenuItem("Thoát"));
+//        mnuQly.add(new JMenuItem("Quản lý nhân viên"));
+//        mnuQly.add(new JMenuItem("Quản lý hành khách"));
+//        mnuQly.add(new JMenuItem("Quản lý chuyến tàu"));
+//        mnuQly.add(new JMenuItem("Quản lý khuyến mãi"));
+//
+//        menuBar.add(mnuHeThong);
+//        menuBar.add(mnuNghiepVuVe);
+//        menuBar.add(mnuQly);
+//        menuBar.add(mnuTraCuu);
+//        menuBar.add(mnuThongKe);
+//        menuBar.add(mnuTroGiup);
+//        menuBar.add(Box.createHorizontalGlue());
+//
+//        JLabel lblXinChao = new JLabel("Xin Chào, [Tên Nhân Viên]");
+//        lblXinChao.setFont(new Font("Segoe UI", Font.BOLD, 16));
+//        JLabel lblNVBV = new JLabel(chinhKichThuoc("/img/nhanVienBanVe.png", 40, 40));
+//        menuBar.add(lblXinChao);
+//        menuBar.add(lblNVBV);
+//
+//        return menuBar;
+//    }
 
     private JButton taoButton(String text, Color bg, String iconPath) {
         JButton btn = new JButton(text, chinhKichThuoc(iconPath, 20, 20));
@@ -214,7 +240,11 @@ public class DanhSachKhuyenMai extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+    	Object src = e.getSource();
+        if (src == btnTroVe) { 
+            this.dispose();
+            new NhanVienQuanLyGUI(nhanVienHienTai).setVisible(true);
+        }
     }
 
     public static void main(String[] args) {

@@ -91,7 +91,7 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
         ImageIcon icDangXuat = chinhKichThuoc("/img/export.png", 55, 55);
         btnDangXuat.setIcon(icDangXuat);
         
-        // **THÊM NÚT VÀO PANEL**
+        
         pnlChucNang.add(btnDatVe);
         pnlChucNang.add(btnHuyVe);
         pnlChucNang.add(btnDoiVe);
@@ -99,14 +99,14 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
         pnlChucNang.add(btnDangXuat);
         pnlChucNang.setPreferredSize(new Dimension(350, 70));
         
-        // **THÊM HOVER EFFECT**
+   
         addHoverEffect(btnDatVe, mauDatVe);
         addHoverEffect(btnHuyVe, mauHuyVe);
         addHoverEffect(btnDoiVe, mauDoiVe);
         addHoverEffect(btnTimChuyenTau, mauTimChuyen);
         addHoverEffect(btnDangXuat, mauDangXuat);
         
-        // **GẮN SỰ KIỆN**
+       
         btnDatVe.addActionListener(this);
         btnHuyVe.addActionListener(this);
         btnDoiVe.addActionListener(this);
@@ -142,7 +142,7 @@ public class NhanVienBanVeGUI extends GiaoDienChinh implements ActionListener {
         	if (command.equals("ĐẶT VÉ") || e.getSource() == btnDatVe) {
         	    new TraCuuChuyenTauGUI(this.nhanVien).setVisible(true);
         	} else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
-                new GiaoDienHuyVe().setVisible(true); 
+                new TraCuuVeTauGUI().setVisible(true); 
             } else if (command.equals("ĐỔI VÉ") || e.getSource() == btnDoiVe) {
                 new TraCuuVeTauGUI().setVisible(true);
             } else if (command.equals("TÌM CHUYẾN") || e.getSource() == btnTimChuyenTau) {

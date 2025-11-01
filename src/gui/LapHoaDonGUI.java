@@ -110,6 +110,7 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
         gbc.insets = new Insets(8, 10, 8, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        
         JPanel pnlInfo = new JPanel(new GridLayout(6, 1, 6, 6));
         pnlInfo.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         pnlInfo.add(createInfoLabel("Người thanh toán: " + safe(nguoiThanhToan.getHoTen())));
@@ -201,7 +202,7 @@ public class LapHoaDonGUI extends JFrame implements ActionListener {
         pnlFooter.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 12));
         
         
-        JPanel pnlLeftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 10)); // FlowLayout.LEFT sát lề
+        JPanel pnlLeftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 10)); 
         pnlLeftButtons.setOpaque(false);
         pnlLeftButtons.add(btnTroVe); 
         

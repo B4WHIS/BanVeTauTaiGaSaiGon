@@ -55,7 +55,7 @@ public class DangNhapGUI extends JFrame {
 
     public DangNhapGUI() throws IOException {
         setTitle("Đăng nhập");
-        setSize(1400, 950);
+        setSize(1400, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -164,8 +164,7 @@ public class DangNhapGUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.LINE_START;
         pnlForm.add(txtMatKhau, gbc);
-
-        // **KHOẢNG CÁCH TRƯỚC NÚT**
+    
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE;

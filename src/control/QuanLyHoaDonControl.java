@@ -51,8 +51,7 @@ public class QuanLyHoaDonControl {
             hd.setNgayLap(LocalDateTime.now());
             hd.setTongTien(tongSauVAT); 
             
-            // 4. Thêm vào DB → SQL sinh maHoaDon
-            String maHoaDon = hoaDonDAO.insert(hd, conn); // <== GIẢ ĐỊNH HOA DON DAO ĐÃ SỬA
+            String maHoaDon = hoaDonDAO.insert(hd, conn); // 
             hd.setMaHoaDon(maHoaDon);
 
             // 5. Thêm chi tiết
@@ -61,11 +60,9 @@ public class QuanLyHoaDonControl {
                 cthd.setHoaDon(hd);
                 cthd.setVe(ve);
                 cthd.setDonGia(ve.getGiaThanhToan());
-                chiTietDAO.insert(cthd, conn); // <== GIẢ ĐỊNH CHI TIET HOA DON DAO ĐÃ SỬA
+                chiTietDAO.insert(cthd, conn); //
             }
             for (Ve ve : dsVe) {
-                // ve đã có maVe (do datVe trả về)
-                // LsvDao phải được sửa để có phương thức updateMaHoaDonByMaVe
                 LichSuVeDAO lsvDao = new LichSuVeDAO(); 
                 lsvDao.updateMaHoaDonByMaVe(ve.getMaVe(), maHoaDon, conn);
             }

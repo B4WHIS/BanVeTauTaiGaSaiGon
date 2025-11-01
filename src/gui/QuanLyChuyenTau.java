@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
@@ -39,34 +40,30 @@ import dao.ChuyenTauDAO;
 import dao.LichTrinhDAO;
 import dao.TauDAO;
 import entity.ChuyenTau;
+import entity.NhanVien;
 
-public class QuanLyChuyenTau extends GiaoDienChinh {
-    // Components
+public class QuanLyChuyenTau extends GiaoDienChinh implements ActionListener{
+    
     private JTable tblChuyenTau;
     private DefaultTableModel modelCT;
     private JTextField txtMaChuyenTau, txtGiaChuyen;
-    private JComboBox<String> cbTenTau, cbTenLichTrinh, cbTrangThai;  // Đổi tên để rõ ràng: hiển thị tên
+    private JComboBox<String> cbTenTau, cbTenLichTrinh, cbTrangThai; 
     private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
-    private JButton btnLuu;  // Nút Lưu (cho add/update)
-    
-    // SỬA: Thay JTextField thời gian bằng JDateChooser (date + time qua format)
+    private JButton btnLuu; 
     private JDateChooser dcThoiGianKhoiHanh, dcThoiGianDen;
 
-    // Date formatter for display
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");  // THÊM: Để format Date từ JDateChooser
-
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm"); 
     // Controller
     private QuanLyChuyenTauController controller;
-    private ChuyenTauDAO dao;  // DAO để load data
+    private ChuyenTauDAO dao; 
     private LichTrinhDAO lichTrinhDAO;
     private TauDAO tauDAO;
-    
-    // THÊM: Timer để tự động update trạng thái mỗi 1 phút (60000 ms)
+    private NhanVien nhanVienHienTai;
     private Timer autoUpdateTimer;
 
     public QuanLyChuyenTau() {
-        super();  // Gọi constructor cha
+        super();  
         dao = new ChuyenTauDAO();
         lichTrinhDAO= new LichTrinhDAO();
         tauDAO = new TauDAO();
@@ -76,12 +73,12 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        setJMenuBar(taoMenuBar());
+//        setJMenuBar(taoMenuBar());
 
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));
         pnlMain.setBackground(new Color(245, 247, 250));
 
-        // ===== TITLE =====
+        // TITLE
         JLabel lblTitle = new JLabel("QUẢN LÝ CHUYẾN TÀU", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(Color.WHITE);
@@ -90,7 +87,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         lblTitle.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
-        // ===== LEFT PANEL ====
+        // LEFT PANEL 
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
         pnlLeft.setPreferredSize(new Dimension(450, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
@@ -100,7 +97,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         lblLeftTitle.setForeground(new Color(103,192,144));
         lblLeftTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        // ===== FORM =====
+        //  FORM 
         JPanel pnlForm = new JPanel(new GridBagLayout());
         pnlForm.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180)),
@@ -125,12 +122,12 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
             lbl.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        txtMaChuyenTau = new JTextField();  // Read-only, computed by DB
+        txtMaChuyenTau = new JTextField(); 
         txtMaChuyenTau.setEditable(false);
-        cbTenTau = new JComboBox<>();  // Hiển thị tên tàu
-        cbTenLichTrinh = new JComboBox<>();  // Hiển thị tên lịch trình
+        cbTenTau = new JComboBox<>();  
+        cbTenLichTrinh = new JComboBox<>();  
         
-        // SỬA: Khởi tạo JDateChooser với format datetime (date + time spinner)
+        
         dcThoiGianKhoiHanh = new JDateChooser();
         dcThoiGianKhoiHanh.setDateFormatString("yyyy-MM-dd HH:mm");
         dcThoiGianKhoiHanh.setFont(txtFont);
@@ -145,9 +142,8 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         cbTrangThai = new JComboBox<>(new String[]{
                 "Chưa khởi hành", "Đang khởi hành", "Đã hoàn thành", "Đã hủy"
         });
-        cbTrangThai.setSelectedIndex(0);  // Mặc định "Chưa khởi hành"
-        
-        // SỬA: Cập nhật inputFields để bao gồm JDateChooser
+        cbTrangThai.setSelectedIndex(0); 
+       
         Component[] inputFields = {txtMaChuyenTau, cbTenTau, cbTenLichTrinh, dcThoiGianKhoiHanh, dcThoiGianDen, txtGiaChuyen, cbTrangThai};
         for (Component comp : inputFields) {
             if (comp instanceof JTextField) {
@@ -162,7 +158,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
                 cb.setFont(txtFont);
                 cb.setPreferredSize(new Dimension(200, 30));
             } else if (comp instanceof JDateChooser) {
-                // JDateChooser đã set font và size ở trên
+               
             }
         }
 
@@ -188,10 +184,10 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         btnLuu.setForeground(Color.WHITE);
         btnLuu.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnLuu.setPreferredSize(new Dimension(100, 35));
-        btnLuu.setEnabled(false);  // Ban đầu disable
+        btnLuu.setEnabled(false);  
    
 
-        // ===== MAIN BUTTONS =====
+        //  MAIN BUTTONS 
         btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus.png");
         btnSua = taoButton("Sửa", new Color(241, 196, 15), "/img/maintenance.png");
         btnXoa = taoButton("Xóa", new Color(231, 76, 60), "/img/bin.png");
@@ -206,17 +202,17 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         pnlButtons.add(btnReset);
         pnlButtons.add(btnLuu);
         pnlButtons.add(btnExport);
-        pnlButtons.add(new JLabel(" "));  // Placeholder để cân bằng
+        pnlButtons.add(new JLabel(" "));  
 
         pnlLeft.add(lblLeftTitle, BorderLayout.NORTH);
         pnlLeft.add(pnlForm, BorderLayout.CENTER);
         pnlLeft.add(pnlButtons, BorderLayout.SOUTH);
 
-        // ===== RIGHT PANEL =====
+        //RIGHT PANEL
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
         pnlRight.setBackground(new Color(245, 247, 250));
 
-        // Cập nhật header: Hiển thị tên tàu và tên lịch trình
+        // 
         String[] colHeader = {"Mã chuyến", "Thời gian KH", "Thời gian Đến", "Tên tàu", "Tên lịch trình", "Giá chuyến", "Trạng thái"};
         modelCT = new DefaultTableModel(colHeader, 0);
         tblChuyenTau = new JTable(modelCT);
@@ -229,7 +225,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         pnlRight.add(scroll, BorderLayout.CENTER);
 
-        // ===== FOOTER =====
+        // FOOTER 
         JPanel pnlFooter = new JPanel(new BorderLayout());
         pnlFooter.setBackground(new Color(103,192,144)); 
         pnlFooter.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -237,27 +233,27 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         btnTroVe = taoButton("Trở về", new Color(41, 128, 185), "/img/loginicon.png");
         btnTroVe.setPreferredSize(new Dimension(130, 45));
         pnlFooter.add(btnTroVe, BorderLayout.WEST);
-
-        // ===== ADD ALL =====
+        btnTroVe.addActionListener(this);
+        // ADD ALL 
         pnlMain.add(pnlLeft, BorderLayout.WEST);
         pnlMain.add(pnlRight, BorderLayout.CENTER);
         pnlMain.add(pnlFooter, BorderLayout.SOUTH);
         add(pnlMain);
 
-        // Attach listeners
+       
         attachListeners();
         
-        // Load combos và data từ DB
+      
         loadCombosFromDB();
         loadDataFromDB();
         
-        // THÊM: Khởi tạo Timer tự động update trạng thái
+       
         autoUpdateTimer = new Timer(60000, e -> {
-            dao.updateTrangThaiTuThoiGian();  // Update DB
-            loadDataFromDB();  // Refresh table
+            dao.updateTrangThaiTuThoiGian();  
+            loadDataFromDB();  
             System.out.println("Auto-update trạng thái lúc: " + LocalDateTime.now());
         });
-        autoUpdateTimer.start();  // Bắt đầu timer
+        autoUpdateTimer.start();  
     }
     public JButton taoButton2(String text, Color bg, String iconPath) {
         JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
@@ -273,9 +269,9 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         });
         return btn;
     }
-    // Load combo boxes từ DB - Hiển thị tên
+   
     private void loadCombosFromDB() {
-        // Load cbTenTau với tên tàu
+        
         cbTenTau.removeAllItems();
         List<String> tenTauList = dao.getAllTenTau();
         for (String tenTau : tenTauList) {
@@ -283,7 +279,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         }
         if (!tenTauList.isEmpty()) cbTenTau.setSelectedIndex(0);
 
-        // Load cbTenLichTrinh với tên lịch trình
+       
         cbTenLichTrinh.removeAllItems();
         List<String> tenLichTrinhList = dao.getAllTenLichTrinh();
         for (String tenLichTrinh : tenLichTrinhList) {
@@ -292,20 +288,20 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         if (!tenLichTrinhList.isEmpty()) cbTenLichTrinh.setSelectedIndex(0);
     }
 
-    // Load data từ DB - Hiển thị tên tàu và tên lịch trình trong table
+    
     private void loadDataFromDB() {
         modelCT.setRowCount(0);
         try {
             List<ChuyenTau> list = dao.getAllChuyenTau();
             for (ChuyenTau ct : list) {
-                // Lấy tên từ mã
+                
                 String tenTau = tauDAO.getTenTauByMaTau(ct.getMaTau());
                 String tenLichTrinh = lichTrinhDAO.getTenLichTrinhByMaLichTrinh(ct.getMaLichTrinh());
                 modelCT.addRow(new Object[]{
                     ct.getMaChuyenTau(),
                     ct.getThoiGianKhoiHanh().format(dateTimeFormatter),
                     ct.getThoiGianDen().format(dateTimeFormatter),
-                    tenTau != null ? tenTau : ct.getMaTau(),  // Fallback to mã nếu không lấy được tên
+                    tenTau != null ? tenTau : ct.getMaTau(), 
                     tenLichTrinh != null ? tenLichTrinh : ct.getMaLichTrinh(),
                     ct.getGiaChuyen(),
                     ct.getTrangThai()
@@ -316,7 +312,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         }
     }
 
-    // Attach listeners to controller
+  
     private void attachListeners() {
         btnThem.addActionListener(controller);
         btnSua.addActionListener(controller);
@@ -324,9 +320,9 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         btnReset.addActionListener(controller);
         btnExport.addActionListener(controller);
         btnTroVe.addActionListener(controller);
-        btnLuu.addActionListener(controller);  // Listener cho nút Lưu
+        btnLuu.addActionListener(controller); 
 
-        // Thêm listener cho table selection
+       
         tblChuyenTau.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 controller.handleTableSelection();
@@ -334,7 +330,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         });
     }
 
-    // ===== GETTERS CHO CONTROLLER =====
+   
     public JButton getBtnThem() { return btnThem; }
     public JButton getBtnSua() { return btnSua; }
     public JButton getBtnXoa() { return btnXoa; }
@@ -348,7 +344,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
     public JComboBox<String> getCbTenTau() { return cbTenTau; }
     public JComboBox<String> getCbTenLichTrinh() { return cbTenLichTrinh; }
     
-    // SỬA: Getter cho JDateChooser - Trả về string formatted cho controller
+   
     public String getTxtThoiGianKhoiHanh() {
         Date date = dcThoiGianKhoiHanh.getDate();
         if (date == null) return "yyyy-MM-dd HH:mm";
@@ -364,17 +360,17 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
     public JTextField getTxtGiaChuyen() { return txtGiaChuyen; }
     public JComboBox<String> getCbTrangThai() { return cbTrangThai; }
 
-    // SỬA: Method để chỉ load data vào form (không enable btnLuu hay fields) - Gọi từ controller cho select row (view-only)
+    
     public void loadFormData(ChuyenTau ct) {
         if (ct != null) {
             txtMaChuyenTau.setText(ct.getMaChuyenTau());
-            // Set tên tàu và lịch trình vào combo
+            
             String tenTau = tauDAO.getTenTauByMaTau(ct.getMaTau());
             if (tenTau != null) cbTenTau.setSelectedItem(tenTau);
             String tenLichTrinh = lichTrinhDAO.getTenLichTrinhByMaLichTrinh(ct.getMaLichTrinh());
             if (tenLichTrinh != null) cbTenLichTrinh.setSelectedItem(tenLichTrinh);
             
-            // SỬA: Set date cho JDateChooser từ LocalDateTime
+           
             try {
                 Date khDate = Date.from(ct.getThoiGianKhoiHanh().atZone(java.time.ZoneId.systemDefault()).toInstant());
                 dcThoiGianKhoiHanh.setDate(khDate);
@@ -386,63 +382,63 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
             
             txtGiaChuyen.setText(ct.getGiaChuyen().toString());
             cbTrangThai.setSelectedItem(ct.getTrangThai());
-            // KHÔNG enable btnLuu hay fields ở đây
+           
         }
     }
 
-    // SỬA: Method để cập nhật form từ dữ liệu selected row (gọi từ controller cho edit) - Chỉ load data, controller sẽ enable
+    
     public void updateForm(ChuyenTau ct) {
-        loadFormData(ct);  // Gọi method mới để load data
-        // KHÔNG enable tự động ở đây nữa
+        loadFormData(ct); 
+        
     }
 
-    // Method để reset form (cho add mode)
+    
     public void resetForm() {
         txtMaChuyenTau.setText("");
         cbTenTau.setSelectedIndex(0);
         cbTenLichTrinh.setSelectedIndex(0);
-        dcThoiGianKhoiHanh.setDate(null);  // SỬA: Clear JDateChooser
+        dcThoiGianKhoiHanh.setDate(null);  
         dcThoiGianDen.setDate(null);
         txtGiaChuyen.setText("");
         cbTrangThai.setSelectedIndex(0);
         btnLuu.setEnabled(false);
         tblChuyenTau.clearSelection();
-        // Disable form fields ban đầu
+        
         enableFormFields(false);
     }
 
-    // SỬA: Làm public để controller gọi được
+    
     public void enableFormFields(boolean enable) {
         cbTenTau.setEnabled(enable);
         cbTenLichTrinh.setEnabled(enable);
-        dcThoiGianKhoiHanh.setEnabled(enable);  // SỬA: Enable JDateChooser
+        dcThoiGianKhoiHanh.setEnabled(enable);  
         dcThoiGianDen.setEnabled(enable);
         txtGiaChuyen.setEnabled(enable);
         cbTrangThai.setEnabled(enable);
     }
 
-    // Method để refresh data - THÊM: Update trạng thái trước refresh
+    
     public void refreshData() {
-        dao.updateTrangThaiTuThoiGian();  // Update DB trước
-        loadDataFromDB();  // Refresh table
+        dao.updateTrangThaiTuThoiGian();  
+        loadDataFromDB();  
         resetForm();
     }
 
-    // Method để lấy selected maChuyenTau từ table
+   
     public String getSelectedMaChuyenTau() {
         int selectedRow = tblChuyenTau.getSelectedRow();
         if (selectedRow >= 0) {
-            return (String) modelCT.getValueAt(selectedRow, 0);  // Cột 0: Mã chuyến
+            return (String) modelCT.getValueAt(selectedRow, 0);  
         }
         return null;
     }
 
-    // Method để show message
+    
     public void showMessage(String message, String title, int type) {
         JOptionPane.showMessageDialog(this, message, title, type);
     }
 
-    // THÊM: Override dispose để stop timer khi đóng form
+   
     @Override
     public void dispose() {
         if (autoUpdateTimer != null) {
@@ -451,7 +447,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
         super.dispose();
     }
 
-    // Main method để chạy ứng dụng
+    
     public static void main(String[] args) {
         	LookAndFeelManager.setNimbusLookAndFeel();
             new QuanLyChuyenTau().setVisible(true);
@@ -461,6 +457,10 @@ public class QuanLyChuyenTau extends GiaoDienChinh {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
+		Object src = e.getSource();
+        if (src == btnTroVe) { 
+            this.dispose();
+            new NhanVienQuanLyGUI(nhanVienHienTai).setVisible(true);
+        }
 	}
 }

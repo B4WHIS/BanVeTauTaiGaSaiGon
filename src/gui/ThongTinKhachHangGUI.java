@@ -55,7 +55,7 @@ import entity.Ve;
 
 public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
 
-    /* ====================== CONSTANTS & COLORS ====================== */
+ 
     private final Color MAU_CHU_DAO = new Color(74, 140, 103);
     private final Color MAU_NEN_TIEU_DE = new Color(225, 242, 232);
     private static final Font FONT_NHAN = new Font("Segoe UI", Font.BOLD, 14);
@@ -64,7 +64,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
     private BigDecimal tongTienCanThanhToan = BigDecimal.ZERO;
     private Color MAU_NUT_QUAY_LAI = new Color(0, 128, 255);
     
-    /* ====================== UI COMPONENTS ====================== */
+    
     private JTextField txtHoTen, txtSoDienThoai, txtCmndCccd;
     private JDateChooser chonNgaySinh;
     private JComboBox<String> hopChonUuDai;
@@ -76,7 +76,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
 
     private JLabel lblTongTien;
 
-    /* ====================== DATA / CONTROL ====================== */
+   
     private ChuyenTau chuyenTauDuocChon;
     private List<ChoNgoi> danhSachChoNgoi;
     private NhanVien nhanVienLap;
@@ -87,11 +87,11 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
     private final QuanLyVeControl dieuKhienVe;
     private final UuDaiDAO daoLoaiUuDai;
 
-    /* ====================== STATE FOR EDIT ====================== */
+    
     private boolean dangSua = false;
     private int dongDangSua = -1;
 
-    /* ====================== CONSTRUCTOR ====================== */
+   
     public ThongTinKhachHangGUI(ChuyenTau ct, List<ChoNgoi> gheDaChon, NhanVien nv) {
         this.chuyenTauDuocChon = ct;
         this.danhSachChoNgoi = gheDaChon != null ? gheDaChon : new ArrayList<>();
@@ -133,7 +133,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
-    /* ====================== LAYOUT HELPERS ====================== */
+    
     private GridBagConstraints taoGBC(int x, int y, int fill, int anchor, double weightx, Insets insets) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x; gbc.gridy = y; gbc.fill = fill; gbc.anchor = anchor;
@@ -157,7 +157,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         return nut;
     }
 
-    /* ====================== UI INITIALISATION ====================== */
+   
     private void khoiTaoThanhPhan() {
         // ----- UI components -----
         txtHoTen = new JTextField(20);
@@ -172,32 +172,32 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
         bangDanhSach = new JTable(moHinhBang);
         bangDanhSach.setRowHeight(30);
 
-     // BẮT ĐẦU: LISTENER MỚI - HIỂN THỊ DỮ LIỆU + BẬT NÚT
+     
         bangDanhSach.getSelectionModel().addListSelectionListener(e -> {
             if (e.getValueIsAdjusting()) return;
 
             int row = bangDanhSach.getSelectedRow();
             if (row == -1) return;
 
-            // Kiểm tra tình trạng
+           
             String tinhTrang = moHinhBang.getValueAt(row, 7).toString();
             if ("ĐÃ NHẬP".equals(tinhTrang)) {
-                // BẬT NÚT SỬA + CHỌN NGƯỜI TT
+                
                 nutSuaHanhKhach.setEnabled(true);
                 nutChonNguoiThanhToan.setEnabled(true);
 
-                // LẤY HÀNH KHÁCH TỪ DANH SÁCH
+               
                 HanhKhach hk = danhSachHanhKhachDaNhap.get(row);
                 if (hk == null) return;
 
-                // HIỂN THỊ LÊN FORM
+                
                 txtHoTen.setText(hk.getHoTen());
                 chonNgaySinh.setDate(java.util.Date.from(
                         hk.getNgaySinh().atStartOfDay(ZoneId.systemDefault()).toInstant()));
                 txtSoDienThoai.setText(hk.getSoDT() != null ? hk.getSoDT() : "");
                 txtCmndCccd.setText(hk.getCmndCccd() != null ? hk.getCmndCccd() : "");
 
-                // CHỌN ƯU ĐÃI TRONG COMBOBOX
+                
                 String maUuDai = hk.getMaUuDai();
                 for (int i = 0; i < hopChonUuDai.getItemCount(); i++) {
                     String item = hopChonUuDai.getItemAt(i);
@@ -207,10 +207,10 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
                     }
                 }
             } else {
-                // CHỜ NHẬP → TẮT NÚT SỬA
+               
                 nutSuaHanhKhach.setEnabled(false);
 
-                // KIỂM TRA CÓ ÍT NHẤT 1 DÒNG ĐÃ NHẬP → BẬT NÚT CHỌN NGƯỜI TT
+               
                 boolean coDaNhap = false;
                 for (int i = 0; i < moHinhBang.getRowCount(); i++) {
                     if ("ĐÃ NHẬP".equals(moHinhBang.getValueAt(i, 7))) {
@@ -220,7 +220,7 @@ public class ThongTinKhachHangGUI extends JFrame implements ActionListener {
                 }
                 nutChonNguoiThanhToan.setEnabled(coDaNhap);
 
-                // NẾU ĐANG SỬA → HỎI HỦY
+                
                 if (dangSua) {
                     int confirm = JOptionPane.showConfirmDialog(
                             ThongTinKhachHangGUI.this,
