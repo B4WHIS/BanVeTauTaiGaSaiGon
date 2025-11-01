@@ -304,7 +304,7 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
             this.dispose();
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new GiaoDienChonCho(ct, nhanVienHienTai, null).setVisible(true);
+                    new GiaoDienChonCho(ct, nhanVienHienTai).setVisible(true);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Lỗi khi mở màn hình chọn chỗ: " + ex.getMessage(),
                             "Lỗi", JOptionPane.ERROR_MESSAGE);

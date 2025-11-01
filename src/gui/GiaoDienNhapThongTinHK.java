@@ -112,7 +112,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Danh sách chỗ ngồi không hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new GiaoDienChonCho(chuyenTauDuocChon, nhanVienLap, null).setVisible(true);
+                    new GiaoDienChonCho(chuyenTauDuocChon, nhanVienLap).setVisible(true);
                     dispose();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this, "Lỗi khi quay lại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -714,7 +714,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
         } else if (src == nutQuayLai) {
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new GiaoDienChonCho(chuyenTauDuocChon, nhanVienLap, null).setVisible(true);
+                    new GiaoDienChonCho(chuyenTauDuocChon, nhanVienLap).setVisible(true);
                     dispose();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this, "Lỗi quay lại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -724,4 +724,6 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
             xuLyLamMoiForm();
         }
     }
+    
+    
 }
