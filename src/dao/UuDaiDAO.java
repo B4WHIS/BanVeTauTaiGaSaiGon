@@ -115,11 +115,44 @@ public class UuDaiDAO {
 // }
 // return danhSachLoaiUD;
 // }
-    // Phương thức lấy tất cả loại ưu đãi (dựa trên cấu trúc DAO nguồn [23, 24], sử dụng mock data để chạy)
+    
+    public Map<Integer, String> layTatCaLoaiUuDai2() throws SQLException {
+        Map<Integer, String> map = new HashMap<>();
+        String sql = "SELECT IDLoaiUD, tenLoai FROM LoaiUuDai";
+        try (	Connection conn = connectDB.getConnection();
+        		PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("IDLoaiUD");
+                String ten = rs.getString("tenLoai");
+                map.put(id, ten);
+            }
+        }
+        return map;
+    }
+    public UuDai layUuDaiTheoMa(String maUuDai) throws SQLException {
+        String sql = "SELECT maUuDai, IDLoaiUuDai, mucGiamGia, dieuKienApDung FROM UuDai WHERE maUuDai = ?";
+        try (Connection conn = connectDB.getConnection();
+        		PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, maUuDai);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String ma = rs.getString("maUuDai");
+                    int idLoai = rs.getInt("IDLoaiUuDai");
+                    BigDecimal giam = rs.getBigDecimal("mucGiamGia");
+                    String dk = rs.getString("dieuKienApDung");
+                    return new UuDai(ma, idLoai, giam, dk);
+                }
+            }
+        }
+        return null;
+    }
+    
+    
+    
     public Map<String, String> layTatCaLoaiUuDai() throws SQLException {
         Map<String, String> uuDaiMap = new HashMap<>();
        
-        // Cần join UuDai với LoaiUuDai để lấy tên loại (tenLoai) và các thông tin chi tiết khác
         String sql = """
             SELECT
                 UD.maUuDai,
@@ -128,7 +161,7 @@ public class UuDaiDAO {
                 UD.dieuKienApDung
             FROM UuDai UD
             JOIN LoaiUuDai LG ON UD.IDloaiUuDai = LG.IDloaiUD
-        """; // [1] đã được sửa SQL
+        """; 
        
         try (Connection conn = connectDB.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -136,25 +169,18 @@ public class UuDaiDAO {
            
             while (rs.next()) {
                 String maUuDai = rs.getString("maUuDai");
-                String tenLoai = rs.getString("tenLoai"); // Tên loại ưu đãi (từ bảng LoaiUuDai)
-                BigDecimal mucGiam = rs.getBigDecimal("mucGiamGia");
-                String dieuKien = rs.getString("dieuKienApDung");
-                // Format chuỗi hiển thị theo yêu cầu của giao diện (ví dụ: Trẻ em (ID: UD-01, Giảm: 100%, DK: Dưới 6 tuổi))
-                String tenHienThi = String.format("%s (ID: %s, Giảm: %.0f%%, DK: %s)",
-                                                 tenLoai, maUuDai, mucGiam.doubleValue(), dieuKien);
+                String tenLoai = rs.getString("tenLoai"); 
+                String tenHienThi = tenLoai;
                
                 uuDaiMap.put(maUuDai, tenHienThi);
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi tải danh sách Ưu đãi: " + e.getMessage()); // Log lỗi
-            throw e; // Ném lỗi để GUI xử lý thông báo [4]
+            System.err.println("Lỗi tải danh sách Ưu đãi: " + e.getMessage()); 
+            throw e; 
         }
         return uuDaiMap;
     }
-   
-    /**
-     * [Hợp nhất] Thêm Loại Ưu đãi mới (chỉ cần tenLoai vì ID là Identity trong DB [3])
-     */
+
     public boolean themLoaiUuDai(String tenLoai) throws SQLException {
         String sql = "INSERT INTO LoaiUuDai (tenLoai) VALUES (?)";
         try (Connection con = connectDB.getConnection();
@@ -165,9 +191,7 @@ public class UuDaiDAO {
             throw e;
         }
     }
-    /**
-     * [Hợp nhất] Cập nhật Loại Ưu đãi
-     */
+
     public boolean capNhatLoaiUuDai(int idLoaiUD, String tenLoaiMoi) throws SQLException {
         String sql = "UPDATE LoaiUuDai SET tenLoai = ? WHERE IDloaiUD = ?";
         try (Connection con = connectDB.getConnection();
@@ -179,9 +203,7 @@ public class UuDaiDAO {
             throw e;
         }
     }
-    /**
-     * [Hợp nhất] Xóa Loại Ưu đãi theo ID
-     */
+  
     public boolean xoaLoaiUuDai(int idLoaiUD) throws SQLException {
         String sql = "DELETE FROM LoaiUuDai WHERE IDloaiUD = ?";
         try (Connection con = connectDB.getConnection();
@@ -189,7 +211,6 @@ public class UuDaiDAO {
             ps.setInt(1, idLoaiUD);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            // Ràng buộc Khóa ngoại từ bảng UuDai (FK_UuDai_LoaiUuDai) [4]
             throw new SQLException("Không thể xóa Loại Ưu đãi do có Ưu đãi đang tham chiếu.", e);
         }
     }
@@ -221,7 +242,6 @@ public class UuDaiDAO {
         if ("Không áp dụng".equals(tenHienThi)) {
             return BigDecimal.ONE;
         }
-        // Extract maUuDai from tenHienThi (e.g., "ID: UD-01" -> "UD-01")
         String maUuDai = tenHienThi.replaceAll(".*ID: (.*?),.*", "$1");
         UuDai uuDai = timUuDaiTheoMa(maUuDai);
         if (uuDai != null) {
@@ -253,7 +273,6 @@ public class UuDaiDAO {
                 BigDecimal mucGiam = rs.getBigDecimal("mucGiamGia");
                 String dieuKien = rs.getString("dieuKienApDung");
                 
-                // Định dạng chuỗi hiển thị
                 String tenHienThi = String.format("%s (ID: %s, Giảm: %.0f%%, DK: %s)",
                         tenLoai, maUuDai, mucGiam.doubleValue(), dieuKien);
                 danhSachTenUuDai.add(tenHienThi);
@@ -267,8 +286,7 @@ public class UuDaiDAO {
     }
     
     public String getTenLoaiByID(int idLoaiUD) throws SQLException {
-        // IDloaiUD là cột khóa chính của bảng LoaiUuDai [3]
-        String sql = "SELECT tenLoai FROM LoaiUuDai WHERE IDloaiUD = ?";
+    	String sql = "SELECT tenLoai FROM LoaiUuDai WHERE IDloaiUD = ?";
         
         try (Connection conn = connectDB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -277,7 +295,6 @@ public class UuDaiDAO {
             
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Trả về tên loại, ví dụ: "Trẻ em", "Người lớn (Mặc định)" [4]
                     return rs.getString("tenLoai").trim(); 
                 }
             }

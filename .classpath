@@ -17,5 +17,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/NHTB/Downloads/pdfbox-app-3.0.6.jar"/>
+	<classpathentry kind="lib" path="src/thuVien/poi-3.17.jar"/>
+	<classpathentry kind="lib" path="src/thuVien/poi-ooxml-3.17.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
