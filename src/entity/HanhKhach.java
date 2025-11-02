@@ -9,26 +9,29 @@ public class HanhKhach {
     private String soDT;
     private LocalDate ngaySinh;
     private String maUuDai;
+    private String trangThai;
 
-    public HanhKhach(String hoTen, LocalDate ngaySinh, String soDT, String cmndCccd, String maUuDai) {
-        
-        this.hoTen = hoTen; 
+    public HanhKhach(String maHK, String hoTen, String soCMND, String soDienThoai, LocalDate ngaySinh, String trangThai) {
+        this.maKH = maHK;
+        this.hoTen = hoTen;
+        this.cmndCccd = soCMND;
+        this.soDT = soDienThoai;
         this.ngaySinh = ngaySinh;
-        this.soDT = soDT;
-        this.cmndCccd = cmndCccd;
-        this.maUuDai = maUuDai;
+        this.trangThai = trangThai;
+        
     }
     public HanhKhach() {
 
     }
-    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
+    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai, String trangThai) {
         super();
-        this.maKH = maKH; // Cho phép null tạm thời
+        this.maKH = maKH; 
         setHoTen(hoTen);
         setCmndCccd(cmndCccd);
         setSoDT(soDT);
         setNgaySinh(ngaySinh);
         setMaUuDai(maUuDai);
+        setTrangThai(trangThai);
     }
 //    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
 //		super();
@@ -43,7 +46,19 @@ public class HanhKhach {
 	public HanhKhach(String maKH) {
 		setMaKH(maKH);
 	}
+	
 
+	
+	public HanhKhach(Object object, String hoTen2, LocalDate ngaySinh2, String sdt, String cmnd, String string) {
+		// TODO Auto-generated constructor stub
+        super();
+        this.maKH = maKH; // Cho phép null tạm thời
+        setHoTen(hoTen);
+        setCmndCccd(cmndCccd);
+        setSoDT(soDT);
+        setNgaySinh(ngaySinh);
+        setMaUuDai(maUuDai);
+	}
 	public String getMaUuDai() {
         return maUuDai;
     }
@@ -125,6 +140,7 @@ public class HanhKhach {
 	}
 
    
-
+    public String getTrangThai() { return trangThai; }
+    public void setTrangThai(String trangThai) { this.trangThai = trangThai; }
   
 }
