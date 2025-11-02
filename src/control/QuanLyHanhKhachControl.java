@@ -1,20 +1,24 @@
 package control;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 import dao.HanhKhachDAO;
+import dao.UuDaiDAO;
 import entity.HanhKhach;
 
 public class QuanLyHanhKhachControl {
-    private HanhKhachDAO hanhKhachDAO;
-
+    private HanhKhachDAO hanhKhachDAO = new HanhKhachDAO();
+	private UuDaiDAO udDao = new UuDaiDAO();
+	private UuDaiDAO loaiUdDao = new UuDaiDAO();
+	
     public QuanLyHanhKhachControl() {
         hanhKhachDAO = new HanhKhachDAO();
     }
 
     public List<HanhKhach> layDanhSachHanhKhachHoatDong() throws SQLException {
-        return hanhKhachDAO.getAllHanhKhachHoatDong();
+        return hanhKhachDAO.layDanhSachHanhKhachHoatDong();
     }
 
     public boolean themHanhKhach(HanhKhach hk) throws SQLException {
@@ -36,8 +40,8 @@ public class QuanLyHanhKhachControl {
     public List<HanhKhach> timKiemHanhKhach(String tuKhoa) throws SQLException {
         return hanhKhachDAO.timKiemHanhKhach(tuKhoa);
     }
-    public List<HanhKhach> timHanhKhach(String ten, String cmnd, String sdt) throws SQLException {
-        return hanhKhachDAO.timHanhKhachTheoDieuKien(ten, cmnd, sdt);
+    public List<HanhKhach> timHanhKhach(String ten, String cmnd, String sdt, LocalDate ngaySinh, String maUuDai) throws SQLException {
+        return hanhKhachDAO.timHanhKhachTheoDieuKien(ten, cmnd, sdt, ngaySinh, maUuDai);
     }
     
     public boolean anHanhKhach(String maHK) throws Exception {
@@ -61,5 +65,15 @@ public class QuanLyHanhKhachControl {
             throw new Exception("Lỗi CSDL khi ẩn hành khách: " + e.getMessage());
         }
     }
+
+	public HanhKhach layHanhKhachTheoMa(String maHK) throws SQLException {
+		// TODO Auto-generated method stub
+		return hanhKhachDAO.layHanhKhachTheoMa(maHK);
+	}
+
+
+    
+
+
 
 }

@@ -3,11 +3,12 @@ package control;
 import connectDB.connectDB;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 
 public class QuanLyLoaiChucVuControl {
 
-    // ==== LOAD DỮ LIỆU ====
     public void loadData(DefaultTableModel model) {
         model.setRowCount(0);
         String sql = "SELECT IDloaiCV, tenLoai FROM LoaiChucVu ORDER BY IDloaiCV";
@@ -27,7 +28,6 @@ public class QuanLyLoaiChucVuControl {
         }
     }
 
-    // ==== THÊM DỮ LIỆU (TỰ ĐỘNG TẠO ID) ====
     public boolean themLoaiChucVu(String tenLoai) {
      
         if (kiemTraTrungTen(tenLoai)) {
@@ -129,4 +129,9 @@ public class QuanLyLoaiChucVuControl {
         }
         return false;
     }
+
+	public List<Object[]> timLoaiChucVu(String ten) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
