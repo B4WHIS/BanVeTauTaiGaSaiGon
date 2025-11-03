@@ -1,32 +1,45 @@
 package control;
 
-import connectDB.connectDB;
-import javax.swing.table.DefaultTableModel;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+import connectDB.connectDB;
 
 public class QuanLyLoaiChucVuControl {
 
-    public void loadData(DefaultTableModel model) {
-        model.setRowCount(0);
-        String sql = "SELECT IDloaiCV, tenLoai FROM LoaiChucVu ORDER BY IDloaiCV";
-        try (Connection con = connectDB.getConnection();
-             Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+	public void loadData(DefaultTableModel model) {
+	    model.setRowCount(0); 
+	    String sql = "SELECT IDloaiCV, tenLoai FROM LoaiChucVu ORDER BY IDloaiCV";
+	    try (Connection con = connectDB.getConnection();
+	         Statement stmt = con.createStatement();
+	         ResultSet rs = stmt.executeQuery(sql)) {
 
-            while (rs.next()) {
-                int id = rs.getInt("IDloaiCV");
-                String ten = rs.getString("tenLoai");
-                model.addRow(new Object[]{id, ten});
-            }
+	        boolean coDuLieu = false;
+	        while (rs.next()) {
+	            coDuLieu = true;
+	            int id = rs.getInt("IDloaiCV");
+	            String ten = rs.getString("tenLoai");
+	            model.addRow(new Object[]{id, ten});
+	        }
 
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Lỗi khi tải dữ liệu: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+	        if (!coDuLieu) {
+	            model.addRow(new Object[]{"", "Chưa có loại chức vụ nào."});
+	        }
+
+	    } catch (SQLException e) {
+	        model.setRowCount(0);
+	        model.addRow(new Object[]{"", "Lỗi tải dữ liệu: " + e.getMessage()});
+	        e.printStackTrace();
+	    }
+	}
 
     public boolean themLoaiChucVu(String tenLoai) {
      
@@ -130,8 +143,31 @@ public class QuanLyLoaiChucVuControl {
         return false;
     }
 
-	public List<Object[]> timLoaiChucVu(String ten) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public List<Object[]> timLoaiChucVu(String ten) {
+        List<Object[]> ketQua = new ArrayList<>();
+        String sql = "SELECT IDloaiCV, tenLoai FROM LoaiChucVu WHERE tenLoai LIKE ? ORDER BY IDloaiCV";
+
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + ten + "%");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("IDloaiCV");
+                    String tenLoai = rs.getString("tenLoai");
+                    ketQua.add(new Object[]{id, tenLoai});
+                }
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, 
+                "Lỗi khi tìm loại chức vụ: " + e.getMessage(), 
+                "Lỗi", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
+        return ketQua;
+    }
+    
 }

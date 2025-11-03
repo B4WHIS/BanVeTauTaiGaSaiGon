@@ -8,6 +8,7 @@ import dao.ChoNgoiDAO;
 import dao.GaDAO;
 import dao.TauDAO;
 import dao.ToaTauDAO;
+import dao.VeDAO;
 import entity.ChoNgoi;
 import entity.ToaTau;
 
@@ -17,12 +18,13 @@ public class ChonChoNgoiControl {
     private ChoNgoiDAO choNgoiDAO;
     private TauDAO tauDao;
     private GaDAO gaDAO;
-    
+    private VeDAO veDAO;
     public ChonChoNgoiControl() {
         this.toaTauDAO = new ToaTauDAO();
         this.choNgoiDAO = new ChoNgoiDAO();
         this.tauDao = new TauDAO(); 
         this.gaDAO = new GaDAO();
+        this.veDAO = new VeDAO();
     }
     
     public List<ToaTau> layDanhSachToa(String maTau) throws SQLException {
@@ -61,5 +63,9 @@ public class ChonChoNgoiControl {
 
              return !"Đã đặt".equalsIgnoreCase(trangThai); 
          }).count();
+    }
+    public boolean isChoNgoiBooked(String maChoNgoi, String maChuyenTau) throws SQLException {
+        // Chuẩn hóa luồng: Control gọi DAO
+        return veDAO.isChoNgoiBookedForChuyenTau(maChoNgoi, maChuyenTau);
     }
 }

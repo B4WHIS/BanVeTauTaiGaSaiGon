@@ -2,6 +2,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -51,7 +52,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
     private JPanel pnlChinh;
     private JPanel pnlHienThiCho;
     private JPanel pnlChuaNutToa;
-    private JButton nutDatVe;
+    private JButton btnTiepTuc;
     private JButton nutTroVe;
     private List<ChoNgoi> danhSachGheDuocChon = new ArrayList<>();
     private String currentMaToa = null;
@@ -59,6 +60,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
     private JLabel lblGioDi;
     private JTextArea txtDanhSachChoNgoi;
     private final DateTimeFormatter DTF_FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+	private JButton btnTroVe;
 
     public GiaoDienChonCho(ChuyenTau chuyentau, NhanVien nv) throws SQLException {
 
@@ -107,24 +109,19 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         JPanel pnlRight = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         pnlRight.setOpaque(false);
         
-        nutDatVe = new JButton("Tiếp Tục");
-        nutDatVe.setBackground(new Color(74, 140, 103));
-        nutDatVe.setForeground(Color.WHITE);
-        nutDatVe.setFont(new Font("Segoe UI", Font.BOLD, 17));
-        nutDatVe.setPreferredSize(new Dimension(250, 40));
-        nutDatVe.setEnabled(false);
-        ImageIcon iconDatVe = chinhKichThuoc("/images/datve_icon.png", 30, 30);
-        if (iconDatVe != null) {
-            nutDatVe.setIcon(iconDatVe);
-        }
-        nutTroVe = new JButton("Trở Về");
-        nutTroVe.setFont(new Font("Segoe UI", Font.BOLD, 17));
-        nutTroVe.setBackground(new Color(0, 128, 255));
-        nutTroVe.setForeground(Color.WHITE);
-        nutTroVe.setPreferredSize(new Dimension(150, 40));
+        btnTiepTuc = taoButton("Tiếp tục", new Color(74, 140, 103), "");
+        btnTiepTuc.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        btnTiepTuc.setPreferredSize(new Dimension(160, 60));
+        btnTiepTuc.setEnabled(false);
         
-        pnlLeft.add(nutTroVe);
-        pnlRight.add(nutDatVe);
+       
+        btnTroVe = taoButton("Trở về", new Color(41, 128, 185), "");
+        btnTroVe.setForeground(Color.WHITE);
+        btnTroVe.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        btnTroVe.setPreferredSize(new Dimension(160, 60));
+        
+        pnlLeft.add(btnTroVe);
+        pnlRight.add(btnTiepTuc);
         
         pnlChan.add(pnlLeft, BorderLayout.WEST);
         pnlChan.add(pnlRight, BorderLayout.EAST);
@@ -133,8 +130,9 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         
         
         add(pnlChinh);
-        nutDatVe.addActionListener(this);
-        nutTroVe.addActionListener(this);
+        btnTiepTuc.addActionListener(this);
+        btnTroVe.addActionListener(this);
+        
         if (this.chuyenTauDuocChon.getMaTau() != null) {
             taiDanhSachToa(this.chuyenTauDuocChon.getMaTau());
         }
@@ -143,10 +141,27 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
-    @Override
+    
+    private JButton taoButton(String text, Color bg, String iconPath) {
+        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
+        btn.setBackground(bg);
+        btn.setForeground(Color.BLACK);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(java.awt.event.MouseEvent e) { btn.setBackground(bg); }
+        });
+
+        return btn;
+    }
+	@Override
     public void actionPerformed(ActionEvent e) {
         Object nguon = e.getSource();
-        if (nguon == nutDatVe) {
+        if (nguon == btnTiepTuc) {
             if (danhSachGheDuocChon.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn chỗ ngồi.", "Cảnh báo",
                         JOptionPane.WARNING_MESSAGE);
@@ -214,16 +229,31 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
 
         // Phần hướng dẫn cho Toa
         JPanel pnlToa = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        pnlToa.setBorder(BorderFactory.createTitledBorder(
-            new LineBorder(Color.GRAY, 1), "Hướng dẫn màu Toa"));
+        TitledBorder borderHD = BorderFactory.createTitledBorder(
+                new LineBorder(Color.BLACK, 2),
+                "Hướng dẫn màu toa",
+                TitledBorder.CENTER,
+                TitledBorder.TOP,
+                new Font("Segoe UI", Font.BOLD, 16),
+                Color.BLACK
+            );
+        pnlToa.setBorder(borderHD);
         pnlToa.add(taoItemMau(new Color(57, 129, 188), Color.BLACK, "Toa còn chỗ"));
         pnlToa.add(taoItemMau(new Color(169, 182, 69), Color.BLACK, "Toa đang chọn"));
         pnlToa.add(taoItemMau(new Color(207, 92, 54), Color.BLACK, "Toa đầy (hết chỗ)"));
 
         // Phần hướng dẫn cho Ghế
+        
         JPanel pnlGhe = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        pnlGhe.setBorder(BorderFactory.createTitledBorder(
-            new LineBorder(Color.GRAY, 1), "Hướng dẫn màu Ghế"));
+        TitledBorder borderHD2 = BorderFactory.createTitledBorder(
+                new LineBorder(Color.BLACK, 2),
+                "Hướng dẫn màu ghế",
+                TitledBorder.CENTER,
+                TitledBorder.TOP,
+                new Font("Segoe UI", Font.BOLD, 16),
+                Color.BLACK
+            );
+        pnlGhe.setBorder(borderHD2);
         pnlGhe.add(taoItemMau(Color.WHITE, Color.BLACK, "Ghế trống"));
         pnlGhe.add(taoItemMau(new Color(169, 182, 69), Color.BLACK, "Ghế đang chọn"));
         pnlGhe.add(taoItemMau(new Color(207, 92, 54), Color.BLACK, "Ghế đã đặt"));
@@ -403,154 +433,163 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
     }
     
     private JPanel taoPanelGhe(ToaTau toa, List<ChoNgoi> danhSachCho, String loaiCho) {
-        // Tạo panel chính cho toa
         JPanel panelToa = new JPanel(new BorderLayout());
-
-        // Tên hiển thị trên border
+        
         String displayMaToa = String.format("%02d",
-                Integer.parseInt(toa.getMaToa().substring(toa.getMaToa().length() - 2)));
+            Integer.parseInt(toa.getMaToa().substring(toa.getMaToa().length() - 2)));
         TitledBorder titledBorder = BorderFactory.createTitledBorder(
-                new LineBorder(new Color(74, 140, 103), 2),
-                displayMaToa + " - " + loaiCho,
-                TitledBorder.CENTER,
-                TitledBorder.TOP,
-                new Font("Segoe UI", Font.BOLD, 18),
-                new Color(74, 140, 103)
+            new LineBorder(new Color(74, 140, 103), 2),
+            displayMaToa + " - " + loaiCho,
+            TitledBorder.CENTER,
+            TitledBorder.TOP,
+            new Font("Segoe UI", Font.BOLD, 18),
+            new Color(74, 140, 103)
         );
         panelToa.setBorder(titledBorder);
-
-        // Panel chứa toàn bộ khu vực
+        
         JPanel pnlKhuVucTong = new JPanel(new GridLayout(2, 2, 10, 10));
         pnlKhuVucTong.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        // Sắp xếp danh sách ghế theo mã
+        
         List<ChoNgoi> danhSachChoSorted = danhSachCho.stream()
-                .filter(cho -> cho != null && cho.getMaChoNgoi() != null)
-                .sorted((c1, c2) -> c1.getMaChoNgoi().compareTo(c2.getMaChoNgoi()))
-                .collect(Collectors.toList());
-
+            .filter(cho -> cho != null && cho.getMaChoNgoi() != null)
+            .sorted((c1, c2) -> c1.getMaChoNgoi().compareTo(c2.getMaChoNgoi()))
+            .collect(Collectors.toList());
+            
         if (danhSachChoSorted.isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                    "Không tìm thấy ghế nào trong toa " + toa.getMaToa(),
-                    "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                "Không tìm thấy ghế nào trong toa " + toa.getMaToa(),
+                "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return panelToa;
         }
-
-        // Tạm chia mỗi toa có tối đa 40 ghế, chia đều 4 khu vực
-        int soGheToiDa = Math.min(danhSachChoSorted.size(), 40);
+        
+        final String maChuyenTauHienTai = chuyenTauDuocChon.getMaChuyenTau();
+        
+        int soGheToiDa = Math.min(danhSachChoSorted.size(), 40); 
         int soGheMoiKhu = soGheToiDa / 4;
-        int index = 0;
+        int index = 0; 
 
-        for (int k = 0; k < 4; k++) {
-            JPanel pnlKhuVuc = new JPanel(new GridLayout(2, 5, 5, 5)); // mỗi khu 2 hàng, 5 cột
+        for (int k = 0; k < 4; k++) { // 4 khu vực [6]
+            JPanel pnlKhuVuc = new JPanel(new GridLayout(2, 5, 5, 5));
             pnlKhuVuc.setBorder(BorderFactory.createTitledBorder(
-                    new LineBorder(Color.GRAY, 1),
-                    "Khu vực " + (k + 1),
-                    TitledBorder.LEADING,
-                    TitledBorder.TOP,
-                    new Font("Segoe UI", Font.ITALIC, 14),
-                    Color.DARK_GRAY
+                new LineBorder(Color.GRAY, 1),
+                "Khu vực " + (k + 1),
+                TitledBorder.LEADING,
+                TitledBorder.TOP,
+                new Font("Segoe UI", Font.ITALIC, 14),
+                Color.DARK_GRAY
             ));
-
+            
             for (int i = 0; i < soGheMoiKhu && index < soGheToiDa; i++, index++) {
                 ChoNgoi cho = danhSachChoSorted.get(index);
                 if (cho != null) {
-                    String trangThai = (cho.getTrangThai() != null) ? cho.getTrangThai().trim() : "Trống";
-                    if ("Đã đặt".equalsIgnoreCase(trangThai)) {
+                    
+                    boolean isBookedDynamically = false;
+                    try {
+                        isBookedDynamically = control.isChoNgoiBooked(cho.getMaChoNgoi(), maChuyenTauHienTai);
+                    } catch (SQLException ex) {
+                        System.err.println("Lỗi CSDL khi kiểm tra chỗ ngồi " + cho.getMaChoNgoi() + ": " + ex.getMessage());
+                        isBookedDynamically = false;
+                    }
+
+                    if (isBookedDynamically) { 
                         JLabel lbl = new JLabel(cho.getMaChoNgoi(), SwingConstants.CENTER);
                         lbl.setPreferredSize(new Dimension(50, 40));
                         lbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
-                        lbl.setBackground(new Color(207, 92, 54));
+                        lbl.setBackground(new Color(207, 92, 54)); // Màu đỏ
                         lbl.setForeground(Color.WHITE);
                         lbl.setOpaque(true);
                         lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                         pnlKhuVuc.add(lbl);
                     } else {
                         JButton nut = new JButton(cho.getMaChoNgoi());
-                        nut.setPreferredSize(new Dimension(50, 40));
-                        nut.setFont(new Font("Segoe UI", Font.BOLD, 16));
+                        nut.setPreferredSize(new Dimension(50, 40)); 
+                        nut.setFont(new Font("Segoe UI", Font.BOLD, 16)); 
+
                         Color mauMacDinh = Color.WHITE;
-                        Color mauDaChon = new Color(169, 182, 69);
-
+                        Color mauDaChon = new Color(169, 182, 69); 
+                        
                         boolean isSelected = danhSachGheDuocChon.stream().anyMatch(c ->
-                                c.getMaChoNgoi().equals(cho.getMaChoNgoi()) &&
-                                c.getToaTau().getMaToa().equals(cho.getToaTau().getMaToa()));
-
-                        nut.setBackground(isSelected ? mauDaChon : mauMacDinh);
-                        nut.addActionListener(new TrinhLangNgheChonGhe(cho, nut, mauMacDinh, mauDaChon));
+                            c.getMaChoNgoi().equals(cho.getMaChoNgoi()) &&
+                            c.getToaTau().getMaToa().equals(cho.getToaTau().getMaToa())); 
+                            
+                        nut.setBackground(isSelected ? mauDaChon : mauMacDinh); 
+                        nut.addActionListener(new TrinhLangNgheChonGhe(cho, nut, mauMacDinh, mauDaChon)); 
                         pnlKhuVuc.add(nut);
                     }
                 }
             }
-
-            pnlKhuVucTong.add(pnlKhuVuc);
+            pnlKhuVucTong.add(pnlKhuVuc); 
         }
-
-        panelToa.add(new JScrollPane(pnlKhuVucTong), BorderLayout.CENTER);
+        panelToa.add(new JScrollPane(pnlKhuVucTong), BorderLayout.CENTER); 
         return panelToa;
     }
 
     private JPanel taoPanelGiuong(ToaTau toa, List<ChoNgoi> danhSachCho) {
-        // Tạo panel chính của toa
+        // Tạo panel chính của toa [10]
         JPanel panelToa = new JPanel(new BorderLayout());
-
-        // Hiển thị mã toa trên tiêu đề
+        // Hiển thị mã toa trên tiêu đề [11]
         String displayMaToa = String.format("%02d",
-                Integer.parseInt(toa.getMaToa().substring(toa.getMaToa().length() - 2)));
+            Integer.parseInt(toa.getMaToa().substring(toa.getMaToa().length() - 2)));
         TitledBorder titledBorder = BorderFactory.createTitledBorder(
-                new LineBorder(new Color(74, 140, 103), 2),
-                displayMaToa + " - GIƯỜNG NẰM",
-                TitledBorder.CENTER,
-                TitledBorder.TOP,
-                new Font("Segoe UI", Font.BOLD, 18),
-                new Color(74, 140, 103)
+            new LineBorder(new Color(74, 140, 103), 2),
+            displayMaToa + " - GIƯỜNG NẰM",
+            TitledBorder.CENTER,
+            TitledBorder.TOP,
+            new Font("Segoe UI", Font.BOLD, 18),
+            new Color(74, 140, 103)
         );
         panelToa.setBorder(titledBorder);
-
-        // Giả định: 1 khoang có 4 giường (2 tầng x 2 giường mỗi tầng)
-        int giuongMoiTangMoiKhoang = 2;
-        int tongGiuongMoiKhoang = giuongMoiTangMoiKhoang * 2;
-        int soKhoang = (int) Math.ceil((double) danhSachCho.size() / tongGiuongMoiKhoang);
-
-        // Panel tổng
+        
+        // ... (Thiết lập logic chia khoang [12-14])
+        int giuongMoiTangMoiKhoang = 2; 
+        int tongGiuongMoiKhoang = giuongMoiTangMoiKhoang * 2; 
+        int soKhoang = (int) Math.ceil((double) danhSachCho.size() / tongGiuongMoiKhoang); 
+        
         JPanel pnlTong = new JPanel(new BorderLayout());
-
-        // Label hiển thị tầng bên trái
+        // Thêm Labels tầng [12, 13]
         JPanel pnlTangLabels = new JPanel(new GridLayout(2, 1));
-        JLabel lblT2 = new JLabel("Tầng 2", SwingConstants.CENTER);
-        lblT2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        JLabel lblT1 = new JLabel("Tầng 1", SwingConstants.CENTER);
-        lblT1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        // ... (Code thêm lblT2, lblT1 vào pnlTangLabels [13])
+        JLabel lblT2 = new JLabel("Tầng 2", SwingConstants.CENTER); lblT2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JLabel lblT1 = new JLabel("Tầng 1", SwingConstants.CENTER); lblT1.setFont(new Font("Segoe UI", Font.BOLD, 12));
         pnlTangLabels.add(lblT2);
         pnlTangLabels.add(lblT1);
         pnlTong.add(pnlTangLabels, BorderLayout.WEST);
-
-        // Panel chứa toàn bộ khoang
+        
         JPanel pnlKhoang = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints(); 
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
         gbc.insets = new Insets(10, 10, 10, 10);
+        int idx = 0; 
 
-        int idx = 0;
+        // Lấy mã chuyến tàu để kiểm tra trạng thái động
+        final String maChuyenTauHienTai = chuyenTauDuocChon.getMaChuyenTau();
 
-        // Duyệt qua từng khoang
+        // Duyệt qua từng khoang [14]
         for (int k = 0; k < soKhoang; k++) {
             JPanel pnlMotKhoang = new JPanel(new BorderLayout());
             pnlMotKhoang.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1), "Khoang " + (k + 1)));
-
-            JPanel pnlGiuongGrid = new JPanel(new GridLayout(2, 2, 6, 6)); // 2 tầng, mỗi tầng 2 giường
-
-            // Tạo giường theo từng tầng
+            JPanel pnlGiuongGrid = new JPanel(new GridLayout(2, 2, 6, 6)); 
+            
+            // Tạo giường theo từng tầng [15]
             for (int tang = 1; tang >= 0; tang--) {
                 for (int vt = 0; vt < giuongMoiTangMoiKhoang; vt++) {
-                    ChoNgoi cho = (idx < danhSachCho.size()) ? danhSachCho.get(idx) : null;
-
+                    ChoNgoi cho = (idx < danhSachCho.size()) ? danhSachCho.get(idx) : null; 
                     if (cho != null) {
-                        String trangThai = (cho.getTrangThai() != null) ? cho.getTrangThai().trim() : "Trống";
-
-                        if ("Đã đặt".equalsIgnoreCase(trangThai)) {
+                        // OLD LOGIC: String trangThai = (cho.getTrangThai() != null) ? cho.getTrangThai().trim() : "Trống";
+                        
+                        boolean isBookedDynamically = false;
+                        try {
+                            // *** FIX LỖI TẠI ĐÂY: GỌI QUA CONTROL VÀ DAO để kiểm tra trạng thái ĐỘNG ***
+                            isBookedDynamically = control.isChoNgoiBooked(cho.getMaChoNgoi(), maChuyenTauHienTai);
+                        } catch (SQLException ex) {
+                            System.err.println("Lỗi CSDL khi kiểm tra giường " + cho.getMaChoNgoi() + ": " + ex.getMessage());
+                            isBookedDynamically = false;
+                        }
+                        
+                        if (isBookedDynamically) { // Sử dụng trạng thái động
+                            // Giường Đã Đặt (Màu đỏ) [15, 16]
                             JLabel lbl = new JLabel(cho.getMaChoNgoi(), SwingConstants.CENTER);
                             lbl.setBackground(new Color(207, 92, 54));
                             lbl.setForeground(Color.WHITE);
@@ -559,44 +598,44 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
                             lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                             pnlGiuongGrid.add(lbl);
                         } else {
+                            // Giường Trống (Tạo JButton để chọn) [16, 17]
                             JButton nut = new JButton(cho.getMaChoNgoi());
                             nut.setFont(new Font("Segoe UI", Font.BOLD, 16));
+
                             Color mauMacDinh = Color.WHITE;
-                            Color mauDaChon = new Color(169, 182, 69);
-
+                            Color mauDaChon = new Color(169, 182, 69); 
+                            
+                            // Kiểm tra trạng thái đang chọn tạm thời
                             boolean isSelected = danhSachGheDuocChon.stream().anyMatch(c ->
-                                    c.getMaChoNgoi().equals(cho.getMaChoNgoi()) &&
-                                    c.getToaTau().getMaToa().equals(cho.getToaTau().getMaToa()));
-
+                                c.getMaChoNgoi().equals(cho.getMaChoNgoi()) &&
+                                c.getToaTau().getMaToa().equals(cho.getToaTau().getMaToa())); 
+                                
                             nut.setBackground(isSelected ? mauDaChon : mauMacDinh);
-                            nut.addActionListener(new TrinhLangNgheChonGhe(cho, nut, mauMacDinh, mauDaChon));
+                            nut.addActionListener(new TrinhLangNgheChonGhe(cho, nut, mauMacDinh, mauDaChon)); 
                             pnlGiuongGrid.add(nut);
                         }
                     } else {
-                        // Nếu hết dữ liệu giường thì tạo ô trống
+                        // Nếu hết dữ liệu giường thì tạo ô trống [18]
                         JLabel lbl = new JLabel(String.format("%02d", idx + 1), SwingConstants.CENTER);
                         lbl.setBackground(Color.LIGHT_GRAY);
                         lbl.setOpaque(true);
                         pnlGiuongGrid.add(lbl);
                     }
-                    idx++;
+                    idx++; 
                 }
             }
-
-            pnlMotKhoang.add(pnlGiuongGrid, BorderLayout.CENTER);
-
+            pnlMotKhoang.add(pnlGiuongGrid, BorderLayout.CENTER); 
             gbc.gridx = k;
             gbc.weightx = 1.0;
-            pnlKhoang.add(pnlMotKhoang, gbc);
+            pnlKhoang.add(pnlMotKhoang, gbc); 
         }
-
-        // Scroll ngang cho nhiều khoang
+        // Scroll ngang cho nhiều khoang [19]
         JScrollPane scroll = new JScrollPane(pnlKhoang);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-
         pnlTong.add(scroll, BorderLayout.CENTER);
-        panelToa.add(pnlTong, BorderLayout.CENTER);
+
+        panelToa.add(pnlTong, BorderLayout.CENTER); 
         return panelToa;
     }
 
@@ -647,7 +686,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
                 nut.setBackground(mauMacDinh);
             }
             capNhatDanhSachChoNgoiDaChon();
-            nutDatVe.setEnabled(!danhSachGheDuocChon.isEmpty());
+            btnTiepTuc.setEnabled(!danhSachGheDuocChon.isEmpty());
         }
     }
     public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
@@ -659,9 +698,9 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         return new ImageIcon(img);
     }
 
-    public static void main(String[] args) throws SQLException {
-    	ChuyenTau ct2 = new ChuyenTau();
-     	NhanVien nv = new NhanVien();
-     	new GiaoDienChonCho(ct2, nv).setVisible(true);
-    }
+//    public static void main(String[] args) throws SQLException {
+//    	ChuyenTau ct2 = new ChuyenTau();
+//     	NhanVien nv = new NhanVien();
+//     	new GiaoDienChonCho(ct2, nv).setVisible(true);
+//    }
 }
