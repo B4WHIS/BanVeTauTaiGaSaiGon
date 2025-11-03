@@ -265,7 +265,7 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
                 thatBai.add(maVe + ": " + ex.getMessage());
             }
         }
-
+// chau chau
         // Cập nhật nhãn tổng kết
         lblTongTien.setText("Tổng tiền vé: " + String.format("%,.0f", tongVe) + " VNĐ");
         lblTongPhi.setText ("Tổng phí hủy: " + String.format("%,.0f", tongPhi) + " VNĐ");
