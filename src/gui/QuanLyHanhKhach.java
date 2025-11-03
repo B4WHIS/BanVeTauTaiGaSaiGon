@@ -70,7 +70,8 @@ public class QuanLyHanhKhach extends JFrame implements ActionListener, MouseList
 
     public QuanLyHanhKhach() {
         setTitle("Quản lý hành khách");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(1500, 1000);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

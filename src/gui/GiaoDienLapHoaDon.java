@@ -66,7 +66,7 @@ public class GiaoDienLapHoaDon extends JFrame implements ActionListener {
     private JButton btnInVe;
  
     
-    
+
     public GiaoDienLapHoaDon(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nhanVienLap, GiaoDienThanhToan previous) {
         if (danhSachVe == null || danhSachVe.isEmpty()) {
             throw new IllegalArgumentException("Danh sách vé không được rỗng.");

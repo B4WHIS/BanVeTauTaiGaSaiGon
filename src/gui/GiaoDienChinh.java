@@ -12,10 +12,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -26,10 +28,13 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import entity.HanhKhach;
 import entity.NhanVien;
+import entity.Ve;
 
 public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     
@@ -53,7 +58,13 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     protected JLabel lblNgay;
     protected JLabel lblGio;
     protected JLabel lblNgayHienTai;
-    
+    protected NhanVien nhanvien;
+    protected List<String> mavelist;
+	protected List<Object[]> dsve;
+	protected List<Ve> danhSachVe; 
+	HanhKhach hanhkhach;
+	NhanVien nv;
+	
 
     public GiaoDienChinh(NhanVien nhanVien) {
         this.nhanVien = nhanVien;
@@ -182,7 +193,17 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		JMenuItem ItemThoat = new JMenuItem("Thoát");
 		mnuHeThong.add(ItemDX);
 		mnuHeThong.add(ItemThoat);
-		
+		//sự kiện cho dx và thoát
+		ItemDX.addActionListener(e -> {
+		    try {
+				new GiaoDienDangNhap().setVisible(true);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		});
+		ItemThoat.addActionListener(e->{
+			dispose();
+		});
 		JMenuItem ItemDatVe = new JMenuItem("Đặt vé");
 		JMenuItem ItemHuyVe= new JMenuItem("Hủy vé");
 		JMenuItem ItemDoiVe= new JMenuItem("Đổi vé");
@@ -191,6 +212,40 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		mnuNghiepVuVe.add(ItemHuyVe);
 		mnuNghiepVuVe.add(ItemDoiVe);
 		mnuNghiepVuVe.add(ItemLapHoaDon);
+		
+		ItemDatVe.addActionListener(e-> {
+			try {
+				new GiaoDienTraCuuChuyentau(nhanVien).setVisible(true);
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		});
+		ItemHuyVe.addActionListener(e->{
+			new GiaoDienHuyVe(dsve, mavelist);
+			dispose();
+		});
+		
+		ItemDoiVe.addActionListener(e->{
+			try {
+				new GiaoDienTraCuuVeTau().setVisible(true);
+			} catch (Exception e5) {
+				e5.printStackTrace();
+			}
+		});
+		
+		ItemLapHoaDon.addActionListener(e-> {
+			try {
+				
+				HanhKhach nguoiThanhToan = hanhkhach  ;
+				NhanVien nhanVienLap = nv;
+				GiaoDienThanhToan previous = null;
+				new GiaoDienLapHoaDon(danhSachVe,nguoiThanhToan,nhanVienLap ,previous).setVisible(true);
+			} catch (Exception e4) {
+				e4.printStackTrace();
+			}
+		});
+		
+
 		
 		JMenuItem Item_QLNV = new JMenuItem("Quản lý nhân viên");
 		JMenuItem Item_QLHK = new JMenuItem("Quản lý hành khách");
@@ -201,6 +256,22 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		mnuQly.add(Item_QLCT);
 		mnuQly.add(Item_QLKM);
 		
+		Item_QLNV.addActionListener(e->{
+			new QuanLyNhanVien().setVisible(true);
+			dispose();
+		});
+		Item_QLHK.addActionListener(e-> {
+			new QuanLyHanhKhach().setVisible(true);
+			dispose();
+		});
+		Item_QLCT.addActionListener(e-> {
+			new QuanLyChuyenTau().setVisible(true);
+			dispose();
+		});
+		Item_QLKM.addActionListener(e->{
+			new QuanLykhuyenMai().setVisible(true);
+			
+		});
 		
 		JMenuItem ItemTimVe = new JMenuItem("Tìm vé");
 		JMenuItem ItemChuyenTau = new JMenuItem("Tìm Chuyến tàu");
@@ -209,12 +280,27 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		mnuTraCuu.add(ItemChuyenTau);
 		mnuTraCuu.add(ItemTimKhachHang);
 		
-		JMenuItem ItemTkDoanhThu = new JMenuItem("Thống kê doanh thu");
-		JMenuItem ItemTkSoLuongHanhKhach = new JMenuItem("Thống kê hành khách");
-		JMenuItem ItemTkVeDoiHuy = new JMenuItem("Thống kê vé đổi/hủy");
-		mnuThongKe.add(ItemTkDoanhThu);
-		mnuThongKe.add(ItemTkSoLuongHanhKhach);
-		mnuThongKe.add(ItemTkVeDoiHuy);
+		ItemTimVe.addActionListener(e->{
+			new GiaoDienTraCuuVeTau().setVisible(true);
+			dispose();
+			});
+		ItemChuyenTau.addActionListener(e->{
+			new GiaoDienTraCuuChuyentau(nhanVien).setVisible(true);
+		});
+		ItemTimKhachHang.addActionListener(e-> {
+			new QuanLyHanhKhach().setVisible(true);
+			dispose();
+		});
+		
+		//thống kê 
+		JMenuItem ItemTkDoanhThu = new JMenuItem("Thống kê Doanh thu");
+		mnuThongKe.add(ItemTkDoanhThu);	
+		ItemTkDoanhThu.addActionListener(e-> {
+			new GiaoDienThongKe().setVisible(true);
+			dispose();
+		});
+		
+		
 		
 		JMenuItem ItemHdsd = new JMenuItem("Hướng dẫn sử dụng");
 		JMenuItem ItemThongtinApp = new JMenuItem("Thông tin ứng dụng");
@@ -251,7 +337,6 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		
 		ItemDatVe.addActionListener(this); 
 		ItemHuyVe.addActionListener(this);
-		ItemDoiVe.addActionListener(this);
 		ItemLapHoaDon.addActionListener(this);
 		
 		
@@ -337,6 +422,7 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 				String chuoiGio = gioHienTai.format(dinhDangGio);
 				
 				lblGioThuc.setText(chuoiGio);
+				
 			}
 		});
 		dongHo.start();	

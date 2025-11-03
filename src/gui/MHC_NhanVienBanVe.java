@@ -51,7 +51,7 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
         Color mauTimChuyen = new Color(155, 93, 224); 
         Color mauDangXuat = Color.orange; 
         
-        // **NÚT ĐẶT VÉ**
+        
         btnDatVe = new JButton("ĐẶT VÉ");
         btnDatVe.setBackground(Color.white);
         btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
@@ -59,7 +59,7 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
         ImageIcon icDatVe = chinhKichThuoc("/img/tickets_icon.png", 60, 60);
         btnDatVe.setIcon(icDatVe);
         
-        // **NÚT HỦY VÉ**
+      
         btnHuyVe = new JButton("HỦY VÉ");
         btnHuyVe.setBackground(Color.white);
         btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
@@ -67,7 +67,7 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
         ImageIcon icHuyve = chinhKichThuoc("/img/cancel2.png", 55, 55);
         btnHuyVe.setIcon(icHuyve);
 
-        // **NÚT ĐỔI VÉ**
+
         btnDoiVe = new JButton("ĐỔI VÉ");
         btnDoiVe.setBackground(Color.white);
         btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
@@ -75,7 +75,7 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
         ImageIcon icDoiVe = chinhKichThuoc("/img/exchange.png", 55, 55);
         btnDoiVe.setIcon(icDoiVe);
         
-        // **NÚT TÌM CHUYẾN**
+
         btnTimChuyenTau = new JButton("TÌM CHUYẾN");
         btnTimChuyenTau.setBackground(Color.white);
         btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 35));
@@ -163,6 +163,7 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
                     this.dispose();
                 }
             }
+        	
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Không thể mở giao diện: " + ex.getMessage(), "Lỗi Hệ thống", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();

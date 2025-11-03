@@ -77,10 +77,8 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
     private final DateTimeFormatter dinhDangNgayGio = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
     public GiaoDienTraCuuChuyentau(NhanVien nhanVien) {
-        this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");
-        
-        this.control = new TraCuuChuyenTauControl(this);
-        
+        this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");      
+        this.control = new TraCuuChuyenTauControl(this); 
         initializeUI();
         loadGaDataToComboBox();
     }
