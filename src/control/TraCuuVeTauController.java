@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import connectDB.connectDB;
+import entity.NhanVien;
 import gui.GiaoDienHuyVe;
 import gui.GiaoDienTraCuuVeTau;
 
@@ -23,8 +24,9 @@ public class TraCuuVeTauController implements ActionListener {
  private final GiaoDienTraCuuVeTau view;
  private final QuanLyVeControl quanLyVeControl;
  private final DefaultTableModel tableModel;
+ private NhanVien nhanVien;
 
- public TraCuuVeTauController(GiaoDienTraCuuVeTau view) {
+ public TraCuuVeTauController(GiaoDienTraCuuVeTau view, NhanVien nv) {
      this.view = view;
      this.quanLyVeControl = new QuanLyVeControl();
      this.tableModel = view.getTableModel();
@@ -174,7 +176,7 @@ public class TraCuuVeTauController implements ActionListener {
      }
 
      // MỞ GIAO DIỆN HỦY VÉ
-     GiaoDienHuyVe huyVeGUI = new GiaoDienHuyVe(danhSachVe, danhSachMaVe);
+     GiaoDienHuyVe huyVeGUI = new GiaoDienHuyVe(danhSachVe, danhSachMaVe, nhanVien);
      huyVeGUI.setVisible(true);
      view.dispose(); // Đóng tra cứu
  }

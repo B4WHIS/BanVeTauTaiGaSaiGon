@@ -6,12 +6,24 @@ public class LichTrinh {
 	private Ga maGaDi;
 	private Ga maGaDen;
 	private double khoangCach;
+	private String trangThai;
 	
 	public LichTrinh() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+
+	public LichTrinh(String maLichTrinh, String tenLichTrinh, Ga maGaDi, Ga maGaDen, double khoangCach, String trangThai) throws Exception {
+		super();
+	setMaGaDen(maGaDen);
+	setMaGaDi(maGaDi);
+	setTenLichTrinh(tenLichTrinh);
+	setMaLichTrinh(maLichTrinh);
+	setKhoangCach(khoangCach);
+	setTrangThai(trangThai);
 	
+	}
+
 	public LichTrinh(String maLichTrinh, String tenLichTrinh, Ga maGaDi, Ga maGaDen, double khoangCach) throws Exception {
 		super();
 	setMaGaDen(maGaDen);
@@ -19,9 +31,19 @@ public class LichTrinh {
 	setTenLichTrinh(tenLichTrinh);
 	setMaLichTrinh(maLichTrinh);
 	setKhoangCach(khoangCach);
-	
+	this.trangThai = "Hoạt động";
 	}
 	
+	public String getTrangThai() {
+		return trangThai;
+	}
+
+
+	public void setTrangThai(String trangThai) {
+		this.trangThai = trangThai;
+	}
+
+
 	public double getKhoangCach() {
 		return khoangCach;
 	}

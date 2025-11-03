@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -26,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -242,18 +244,37 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 			}
 		}
 
-		ItemDX.addActionListener(this);
-		ItemThoat.addActionListener(this);
-		
-		ItemTimVe.addActionListener(this);
-		ItemChuyenTau.addActionListener(this);
-		ItemTimKhachHang.addActionListener(this);
-		
-		ItemDatVe.addActionListener(this); 
-		ItemHuyVe.addActionListener(this);
-		ItemDoiVe.addActionListener(this);
-		ItemLapHoaDon.addActionListener(this);
-		
+		// === CÀI ĐẶT SỰ KIỆN CHO TỪNG JMenuITEM ===
+		ItemDX.addActionListener(e -> {
+			try {
+				dangXuat();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		ItemThoat.addActionListener(e -> thoatUngDung());
+
+		ItemDatVe.addActionListener(e -> moGiaoDienDatVe());
+		ItemHuyVe.addActionListener(e -> moGiaoDienHuyVe());
+		ItemDoiVe.addActionListener(e -> moGiaoDienDoiVe());
+		ItemLapHoaDon.addActionListener(e -> moGiaoDienLapHoaDon());
+
+		Item_QLNV.addActionListener(e -> moQuanLyNhanVien());
+		Item_QLHK.addActionListener(e -> moQuanLyHanhKhach());
+		Item_QLCT.addActionListener(e -> moQuanLyChuyenTau());
+		Item_QLKM.addActionListener(e -> moQuanLyKhuyenMai());
+
+		ItemTimVe.addActionListener(e -> moGiaoDienTraCuuVeTau());
+		ItemChuyenTau.addActionListener(e -> moGiaoDienTimChuyenTau());
+		ItemTimKhachHang.addActionListener(e -> moGiaoDienTimKhachHang());
+
+		ItemTkDoanhThu.addActionListener(e -> moThongKeDoanhThu());
+		ItemTkSoLuongHanhKhach.addActionListener(e -> moThongKeHanhKhach());
+		ItemTkVeDoiHuy.addActionListener(e -> moThongKeVeDoiHuy());
+
+		ItemHdsd.addActionListener(e -> moHuongDanSuDung());
+		ItemThongtinApp.addActionListener(e -> moThongTinUngDung());
 		
 		
 		
@@ -273,6 +294,92 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		return menuBar;
 		
 	}
+ // === CÁC HÀM MỞ GIAO DIỆN ===
+    private void moGiaoDienDatVe() {
+        new GiaoDienTraCuuChuyentau(nhanVien).setVisible(true);
+    }
+
+    private void moGiaoDienHuyVe() {
+        new GiaoDienTraCuuVeTau().setVisible(true); // Sẽ cần truyền danh sách vé sau
+    }
+
+    private void moGiaoDienDoiVe() {
+        new GiaoDienTraCuuVeTau().setVisible(true);
+    }
+
+    private void moGiaoDienLapHoaDon() {
+      //  new GiaoDienLapHoaDon().setVisible(true);
+    }
+
+    private void moQuanLyNhanVien() {
+        new QuanLyNhanVien().setVisible(true);
+    }
+
+    private void moQuanLyHanhKhach() {
+        new QuanLyHanhKhach().setVisible(true);
+    }
+
+    private void moQuanLyChuyenTau() {
+        new QuanLyChuyenTau().setVisible(true);
+    }
+
+    private void moQuanLyKhuyenMai() {
+        new QuanLykhuyenMai().setVisible(true);
+    }
+
+    private void moGiaoDienTraCuuVeTau() {
+        new GiaoDienTraCuuVeTau().setVisible(true);
+    }
+
+    private void moGiaoDienTimChuyenTau() {
+        new GiaoDienTraCuuChuyentau(nhanVien).setVisible(true);
+    }
+
+    private void moGiaoDienTimKhachHang() {
+        new QuanLyHanhKhach().setVisible(true);
+    }
+
+    private void moThongKeDoanhThu() {
+        new GiaoDienThongKe().setVisible(true);
+    }
+
+    private void moThongKeHanhKhach() {
+        new GiaoDienThongKe().setVisible(true);
+    }
+
+    private void moThongKeVeDoiHuy() {
+        new GiaoDienThongKe().setVisible(true);
+    }
+
+    private void moHuongDanSuDung() {
+        JOptionPane.showMessageDialog(this, 
+            "Hướng dẫn sử dụng:\n- Sử dụng menu để điều hướng.\n- Nhấn F11 để toàn màn hình.", 
+            "Hướng dẫn", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void moThongTinUngDung() {
+        JOptionPane.showMessageDialog(this, 
+            "Ứng dụng Quản lý Bán Vé Tàu\nPhiên bản: 1.0\nNhóm phát triển: xAI Team", 
+            "Thông tin ứng dụng", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // === HỆ THỐNG ===
+    private void dangXuat() throws IOException {
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc muốn đăng xuất?", "Đăng xuất", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            dispose();
+            new GiaoDienDangNhap().setVisible(true); // Giả sử có form đăng nhập
+        }
+    }
+
+    private void thoatUngDung() {
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Thoát ứng dụng?", "Thoát", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }
     public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
 	    URL iconUrl = GiaoDienChinh.class.getResource(duongDan);
 	    if (iconUrl == null) {
@@ -308,7 +415,7 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
         return btn;
     }
 
-	public static JButton taoButton(String text, Color bg, String iconPath) {
+	public JButton taoButton(String text, Color bg, String iconPath) {
 	        ImageIcon icon = chinhKichThuoc(iconPath, 24, 24);
 	        JButton btn = new JButton(text, icon != null ? icon : null);
 	        btn.setBackground(bg);
