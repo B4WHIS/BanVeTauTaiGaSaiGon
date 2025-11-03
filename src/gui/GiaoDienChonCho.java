@@ -13,6 +13,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
@@ -48,25 +50,30 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
     private ChuyenTau chuyenTauDuocChon;
     private NhanVien nhanVienHienTai;
     private ChonChoNgoiControl control;
-    private Map<String, ToaTau> mapMaToa = new HashMap<>();
     private JPanel pnlChinh;
     private JPanel pnlHienThiCho;
     private JPanel pnlChuaNutToa;
     private JButton btnTiepTuc;
     private JButton nutTroVe;
-    private List<ChoNgoi> danhSachGheDuocChon = new ArrayList<>();
     private String currentMaToa = null;
     private JLabel lblThongTinChuyen;
     private JLabel lblGioDi;
     private JTextArea txtDanhSachChoNgoi;
     private final DateTimeFormatter DTF_FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 	private JButton btnTroVe;
+    private List<ChoNgoi> danhSachGheDuocChon = new ArrayList<>();
+    private Map<String, ToaTau> mapMaToa = new HashMap<>();
 
     public GiaoDienChonCho(ChuyenTau chuyentau, NhanVien nv) throws SQLException {
 
         this.chuyenTauDuocChon = chuyentau;
         this.nhanVienHienTai = nv;
         this.control = new ChonChoNgoiControl();
+        
+        capNhatThongTinChuyenTau();
+        setTitle("CHỌN CHỖ");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         pnlChuaNutToa = new JPanel();
         pnlChuaNutToa.setLayout(new FlowLayout(FlowLayout.CENTER, 12, 8));
@@ -81,13 +88,15 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         );
         pnlChuaNutToa.setBorder(border);
         
-        JPanel pnlBacTren = new JPanel(new BorderLayout());
-        pnlBacTren.add(pnlChuaNutToa, BorderLayout.CENTER);
+        JPanel pnlTren = new JPanel(new BorderLayout());
+        pnlTren.add(pnlChuaNutToa, BorderLayout.CENTER);
         pnlChinh = new JPanel(new BorderLayout());
-        pnlChinh.add(pnlBacTren, BorderLayout.NORTH);
+        pnlChinh.add(pnlTren, BorderLayout.NORTH);
+        
         JPanel pnlTrungTam = new JPanel(new BorderLayout(10, 10));
         pnlHienThiCho = new JPanel(new BorderLayout());
         pnlHienThiCho.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
         JLabel lblKhoiTao = new JLabel("Chọn toa để hiển thị chỗ ngồi.", SwingConstants.CENTER);
         pnlHienThiCho.add(lblKhoiTao, BorderLayout.CENTER);
         
@@ -136,28 +145,10 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         if (this.chuyenTauDuocChon.getMaTau() != null) {
             taiDanhSachToa(this.chuyenTauDuocChon.getMaTau());
         }
-        capNhatThongTinChuyenTauTinh();
-        setTitle("CHỌN CHỖ NGỒI");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
     }
     
-    private JButton taoButton(String text, Color bg, String iconPath) {
-        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
-        btn.setBackground(bg);
-        btn.setForeground(Color.BLACK);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { btn.setBackground(bg.darker()); }
-            public void mouseExited(java.awt.event.MouseEvent e) { btn.setBackground(bg); }
-        });
-
-        return btn;
-    }
+    
 	@Override
     public void actionPerformed(ActionEvent e) {
         Object nguon = e.getSource();
@@ -182,7 +173,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
             });
         } else if (nguon == nutTroVe) {
             SwingUtilities.invokeLater(() -> {
-                new GiaoDienTraCuuChuyentau(nhanVienHienTai).setVisible(true);
+                new GiaoDienTraCuuChuyentau(null, nhanVienHienTai).setVisible(true);
                 this.dispose();
             });
         }
@@ -284,7 +275,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         return pnlItem;
     }
 
-    private void capNhatThongTinChuyenTauTinh() {
+    private void capNhatThongTinChuyenTau() {
         // Cập nhật thông tin chuyến tàu và hiển thị
         if (chuyenTauDuocChon != null) {
             String maCT = chuyenTauDuocChon.getMaChuyenTau();
@@ -505,15 +496,12 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
                         nut.setPreferredSize(new Dimension(50, 40)); 
                         nut.setFont(new Font("Segoe UI", Font.BOLD, 16)); 
 
-                        Color mauMacDinh = Color.WHITE;
-                        Color mauDaChon = new Color(169, 182, 69); 
-                        
                         boolean isSelected = danhSachGheDuocChon.stream().anyMatch(c ->
                             c.getMaChoNgoi().equals(cho.getMaChoNgoi()) &&
                             c.getToaTau().getMaToa().equals(cho.getToaTau().getMaToa())); 
                             
-                        nut.setBackground(isSelected ? mauDaChon : mauMacDinh); 
-                        nut.addActionListener(new TrinhLangNgheChonGhe(cho, nut, mauMacDinh, mauDaChon)); 
+                        nut.setBackground(isSelected ? new Color(169, 182, 69) : Color.WHITE); 
+                        nut.addActionListener(new ClickChonGhe(cho, nut, Color.WHITE, new Color(169, 182, 69))); 
                         pnlKhuVuc.add(nut);
                     }
                 }
@@ -525,9 +513,9 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
     }
 
     private JPanel taoPanelGiuong(ToaTau toa, List<ChoNgoi> danhSachCho) {
-        // Tạo panel chính của toa [10]
-        JPanel panelToa = new JPanel(new BorderLayout());
-        // Hiển thị mã toa trên tiêu đề [11]
+        
+    	JPanel panelToa = new JPanel(new BorderLayout());
+
         String displayMaToa = String.format("%02d",
             Integer.parseInt(toa.getMaToa().substring(toa.getMaToa().length() - 2)));
         TitledBorder titledBorder = BorderFactory.createTitledBorder(
@@ -540,19 +528,22 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         );
         panelToa.setBorder(titledBorder);
         
-        // ... (Thiết lập logic chia khoang [12-14])
         int giuongMoiTangMoiKhoang = 2; 
         int tongGiuongMoiKhoang = giuongMoiTangMoiKhoang * 2; 
         int soKhoang = (int) Math.ceil((double) danhSachCho.size() / tongGiuongMoiKhoang); 
         
         JPanel pnlTong = new JPanel(new BorderLayout());
-        // Thêm Labels tầng [12, 13]
         JPanel pnlTangLabels = new JPanel(new GridLayout(2, 1));
-        // ... (Code thêm lblT2, lblT1 vào pnlTangLabels [13])
-        JLabel lblT2 = new JLabel("Tầng 2", SwingConstants.CENTER); lblT2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        JLabel lblT1 = new JLabel("Tầng 1", SwingConstants.CENTER); lblT1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+
+        JLabel lblT2 = new JLabel("Tầng 2", SwingConstants.CENTER);
+        lblT2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        
+        JLabel lblT1 = new JLabel("Tầng 1", SwingConstants.CENTER);
+        lblT1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        
         pnlTangLabels.add(lblT2);
         pnlTangLabels.add(lblT1);
+        
         pnlTong.add(pnlTangLabels, BorderLayout.WEST);
         
         JPanel pnlKhoang = new JPanel(new GridBagLayout());
@@ -563,33 +554,27 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         gbc.insets = new Insets(10, 10, 10, 10);
         int idx = 0; 
 
-        // Lấy mã chuyến tàu để kiểm tra trạng thái động
-        final String maChuyenTauHienTai = chuyenTauDuocChon.getMaChuyenTau();
+        String maChuyenTauHienTai = chuyenTauDuocChon.getMaChuyenTau();
 
-        // Duyệt qua từng khoang [14]
         for (int k = 0; k < soKhoang; k++) {
             JPanel pnlMotKhoang = new JPanel(new BorderLayout());
             pnlMotKhoang.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1), "Khoang " + (k + 1)));
             JPanel pnlGiuongGrid = new JPanel(new GridLayout(2, 2, 6, 6)); 
             
-            // Tạo giường theo từng tầng [15]
             for (int tang = 1; tang >= 0; tang--) {
                 for (int vt = 0; vt < giuongMoiTangMoiKhoang; vt++) {
                     ChoNgoi cho = (idx < danhSachCho.size()) ? danhSachCho.get(idx) : null; 
                     if (cho != null) {
-                        // OLD LOGIC: String trangThai = (cho.getTrangThai() != null) ? cho.getTrangThai().trim() : "Trống";
                         
                         boolean isBookedDynamically = false;
                         try {
-                            // *** FIX LỖI TẠI ĐÂY: GỌI QUA CONTROL VÀ DAO để kiểm tra trạng thái ĐỘNG ***
                             isBookedDynamically = control.isChoNgoiBooked(cho.getMaChoNgoi(), maChuyenTauHienTai);
                         } catch (SQLException ex) {
                             System.err.println("Lỗi CSDL khi kiểm tra giường " + cho.getMaChoNgoi() + ": " + ex.getMessage());
                             isBookedDynamically = false;
                         }
                         
-                        if (isBookedDynamically) { // Sử dụng trạng thái động
-                            // Giường Đã Đặt (Màu đỏ) [15, 16]
+                        if (isBookedDynamically) { 
                             JLabel lbl = new JLabel(cho.getMaChoNgoi(), SwingConstants.CENTER);
                             lbl.setBackground(new Color(207, 92, 54));
                             lbl.setForeground(Color.WHITE);
@@ -598,24 +583,21 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
                             lbl.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                             pnlGiuongGrid.add(lbl);
                         } else {
-                            // Giường Trống (Tạo JButton để chọn) [16, 17]
                             JButton nut = new JButton(cho.getMaChoNgoi());
                             nut.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
                             Color mauMacDinh = Color.WHITE;
                             Color mauDaChon = new Color(169, 182, 69); 
                             
-                            // Kiểm tra trạng thái đang chọn tạm thời
                             boolean isSelected = danhSachGheDuocChon.stream().anyMatch(c ->
                                 c.getMaChoNgoi().equals(cho.getMaChoNgoi()) &&
                                 c.getToaTau().getMaToa().equals(cho.getToaTau().getMaToa())); 
                                 
                             nut.setBackground(isSelected ? mauDaChon : mauMacDinh);
-                            nut.addActionListener(new TrinhLangNgheChonGhe(cho, nut, mauMacDinh, mauDaChon)); 
+                            nut.addActionListener(new ClickChonGhe(cho, nut, mauMacDinh, mauDaChon)); 
                             pnlGiuongGrid.add(nut);
                         }
                     } else {
-                        // Nếu hết dữ liệu giường thì tạo ô trống [18]
                         JLabel lbl = new JLabel(String.format("%02d", idx + 1), SwingConstants.CENTER);
                         lbl.setBackground(Color.LIGHT_GRAY);
                         lbl.setOpaque(true);
@@ -629,7 +611,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
             gbc.weightx = 1.0;
             pnlKhoang.add(pnlMotKhoang, gbc); 
         }
-        // Scroll ngang cho nhiều khoang [19]
+
         JScrollPane scroll = new JScrollPane(pnlKhoang);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -640,7 +622,6 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
     }
 
     private GridBagConstraints taoGBC(int x, int y, int fill, int anchor, double weightx, Insets insets) {
-        // Tạo GridBagConstraints chung
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x;
         gbc.gridy = y;
@@ -655,12 +636,12 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         return taoGBC(x, y, GridBagConstraints.NONE, GridBagConstraints.WEST, 0.0, insets);
     }
     
-    class TrinhLangNgheChonGhe implements ActionListener {
+    class ClickChonGhe implements ActionListener {
         private ChoNgoi cho;
         private JButton nut;
         private Color mauMacDinh;
         private Color mauDaChon;
-        public TrinhLangNgheChonGhe(ChoNgoi cho, JButton nut, Color mauMacDinh, Color mauDaChon) {
+        public ClickChonGhe(ChoNgoi cho, JButton nut, Color mauMacDinh, Color mauDaChon) {
             this.cho = cho;
             this.nut = nut;
             this.mauMacDinh = mauMacDinh;
@@ -690,12 +671,27 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         }
     }
     public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
-        // Chỉnh kích thước icon
         URL iconUrl = GiaoDienChonCho.class.getResource(duongDan);
         if (iconUrl == null) return null;
         ImageIcon icon = new ImageIcon(iconUrl);
         Image img = icon.getImage().getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
+    }
+    private JButton taoButton(String text, Color bg, String iconPath) {
+        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
+        btn.setBackground(bg);
+        btn.setForeground(Color.BLACK);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+        });
+
+        return btn;
     }
 
 //    public static void main(String[] args) throws SQLException {
