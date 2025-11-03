@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -21,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import control.QuanLyVeControl;
@@ -176,21 +178,45 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
 
     private JPanel taoDieuHuong() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
-        JButton btnQuay = new JButton("Quay lại");
-        JButton btnTiep = new JButton("Tiếp theo");
 
-        btnQuay.addActionListener(e -> cardLayout.previous(jpPhai));
-        btnTiep.addActionListener(e -> {
-            String current = cardLayout.toString();
-            if (jpPhai.getComponent(1).isVisible()) { 
-                thucHienHuyVe();
-            } else {
+        JButton btnQuayLai = new JButton("Quay lại");
+        JButton btnTiepTheo = new JButton("Tiếp theo");   // nút duy nhất bên phải
+
+        // ---------- NÚT QUAY LẠI ----------
+        btnQuayLai.addActionListener(e -> {
+            // Bước 1: quay về giao diện tra cứu
+            dispose();                                          // đóng cửa sổ hủy vé
+            SwingUtilities.invokeLater(() -> new GiaoDienTraCuuVeTau().setVisible(true));
+        });
+
+        // ---------- NÚT TIẾP THEO / HOÀN TẤT ----------
+        btnTiepTheo.addActionListener(e -> {
+            // Kiểm tra đang ở panel nào
+            Component current = jpPhai.getComponent(0);   // Step1 luôn là component[0]
+            if (current.isVisible()) {
+                // Đang ở Bước 1 → chuyển sang Bước 2
                 cardLayout.next(jpPhai);
+            } else if (jpPhai.getComponent(1).isVisible()) {
+                // Đang ở Bước 2 → chuyển sang Bước 3 và đổi tên nút thành "Hoàn tất"
+                cardLayout.next(jpPhai);
+                btnTiepTheo.setText("Hoàn tất");
+            } else {
+                // Đang ở Bước 3 → thực hiện hủy vé
+                thucHienHuyVe();
+
+                // Sau khi hiện thông báo, tự động quay lại giao diện tra cứu (đợi 2 giây để người dùng đọc)
+                new Thread(() -> {
+                    try { Thread.sleep(2000); } catch (InterruptedException ex) { Thread.currentThread().interrupt(); }
+                    SwingUtilities.invokeLater(() -> {
+                        dispose();
+                        new GiaoDienTraCuuVeTau().setVisible(true);
+                    });
+                }).start();
             }
         });
 
-        panel.add(btnQuay);
-        panel.add(btnTiep);
+        panel.add(btnQuayLai);
+        panel.add(btnTiepTheo);
         return panel;
     }
 
@@ -218,47 +244,40 @@ public class GiaoDienHuyVe extends GiaoDienChinh {
     }
     private void thucHienHuyVe() {
         List<String> thanhCong = new ArrayList<>();
-        List<String> thatBai = new ArrayList<>();
-        BigDecimal tongVe = BigDecimal.ZERO; 
-
-        BigDecimal tongPhi = BigDecimal.ZERO;
+        List<String> thatBai   = new ArrayList<>();
+        BigDecimal tongVe   = BigDecimal.ZERO;
+        BigDecimal tongPhi  = BigDecimal.ZERO;
         BigDecimal tongHoan = BigDecimal.ZERO;
-        
-       
-        for (String maVe : maVeList) { 
-            try {
-             
-                LichSuVe ls = veControl.xuLyHuyVe(maVe, "Hủy từ giao diện", nhanVien); 
-                
-                
-                BigDecimal phi = ls.getPhiXuLy() != null ? ls.getPhiXuLy() : BigDecimal.ZERO; 
-                BigDecimal hoan = ls.getTienHoan() != null ? ls.getTienHoan() : BigDecimal.ZERO; 
-                BigDecimal tienVe = hoan.add(phi);
-                
-                thanhCong.add(maVe);
 
-                tongVe = tongVe.add(tienVe); 
-                tongPhi = tongPhi.add(phi);
+        for (String maVe : maVeList) {
+            try {
+                LichSuVe ls = veControl.xuLyHuyVe(maVe, "Hủy từ giao diện", nhanVien);
+
+                BigDecimal phi   = ls.getPhiXuLy() != null ? ls.getPhiXuLy() : BigDecimal.ZERO;
+                BigDecimal hoan  = ls.getTienHoan() != null ? ls.getTienHoan() : BigDecimal.ZERO;
+                BigDecimal tienVe = hoan.add(phi);
+
+                thanhCong.add(maVe);
+                tongVe   = tongVe.add(tienVe);
+                tongPhi  = tongPhi.add(phi);
                 tongHoan = tongHoan.add(hoan);
             } catch (Exception ex) {
-                thatBai.add(maVe + ": " + ex.getMessage()); 
+                thatBai.add(maVe + ": " + ex.getMessage());
             }
         }
 
-        
+        // Cập nhật nhãn tổng kết
         lblTongTien.setText("Tổng tiền vé: " + String.format("%,.0f", tongVe) + " VNĐ");
-        lblTongPhi.setText("Tổng phí hủy: " + String.format("%,.0f", tongPhi) + " VNĐ");
+        lblTongPhi.setText ("Tổng phí hủy: " + String.format("%,.0f", tongPhi) + " VNĐ");
         lblTongHoan.setText("Tổng hoàn: " + String.format("%,.0f", tongHoan) + " VNĐ");
 
-        
+        // Thông báo kết quả
         String msg = "<html><b>Hủy thành công: " + thanhCong.size() + " vé</b><br>";
         if (!thatBai.isEmpty()) {
             msg += "<b>Thất bại:</b><br>" + String.join("<br>", thatBai) + "<br>";
         }
         msg += "<b>Tổng hoàn: " + String.format("%,.0f", tongHoan) + " VNĐ</b></html>";
-
         JOptionPane.showMessageDialog(this, msg, "Kết quả hủy vé", JOptionPane.INFORMATION_MESSAGE);
-        cardLayout.show(jpPhai, "Step3");
     }
 
     public static void main(String[] args) {
