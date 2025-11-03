@@ -61,6 +61,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
     private JTextArea txtDanhSachChoNgoi;
     private final DateTimeFormatter DTF_FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 	private JButton btnTroVe;
+	private JFrame parentFrame;
     private List<ChoNgoi> danhSachGheDuocChon = new ArrayList<>();
     private Map<String, ToaTau> mapMaToa = new HashMap<>();
 
@@ -70,7 +71,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         this.nhanVienHienTai = nv;
         this.control = new ChonChoNgoiControl();
         
-        capNhatThongTinChuyenTau();
+        
         setTitle("CHỌN CHỖ");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -145,6 +146,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         if (this.chuyenTauDuocChon.getMaTau() != null) {
             taiDanhSachToa(this.chuyenTauDuocChon.getMaTau());
         }
+        capNhatThongTinChuyenTau();
 
     }
     
