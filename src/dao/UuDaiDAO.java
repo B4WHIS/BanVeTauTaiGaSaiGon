@@ -1,6 +1,7 @@
 package dao;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,50 +15,43 @@ import connectDB.connectDB;
 import entity.UuDai;
 
 public class UuDaiDAO {
+	
 	private UuDai getUuDaiTuResultSet(ResultSet rs) throws SQLException {
-		try {
-			String maUuDai = rs.getString("maUuDai");
-			int IDloaiUuDai = rs.getInt("IDloaiUuDai");
-			BigDecimal mucGiamGia = rs.getBigDecimal("mucGiamGia");
-			String dieuKienApDung = rs.getString("dieuKienApDung");
-			UuDai ud = new UuDai(maUuDai, IDloaiUuDai, mucGiamGia, dieuKienApDung);
-			return ud;
-		} catch (Exception ex) {
-			throw new SQLException("Lỗi khi tạo đối tượng UuDai từ ResultSet: " + ex.getMessage(), ex);
-		}
-	}
+        String maUuDai = rs.getString("maUuDai");
+        int idLoaiUuDai = rs.getInt("IDloaiUuDai");
+        BigDecimal mucGiamGia = rs.getBigDecimal("mucGiamGia");
+        String dieuKienApDung = rs.getString("dieuKienApDung");
+        return new UuDai(maUuDai, idLoaiUuDai, mucGiamGia, dieuKienApDung);
+    }
+	
 
 // DOC
-	public List<UuDai> layTatCaUuDai() {
-		List<UuDai> danhSachUD = new ArrayList<>();
+    public List<UuDai> layTatCaUuDai() {
+        List<UuDai> ds = new ArrayList<>();
+        String sql = "SELECT maUuDai, IDloaiUuDai, mucGiamGia, dieuKienApDung FROM UuDai";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) ds.add(getUuDaiTuResultSet(rs));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ds;
+    }
 
-		String sql = "SELECT maUuDai, IDloaiUuDai, mucGiamGia, dieuKienApDung FROM UuDai";
-		try (Connection con = connectDB.getConnection();
-				PreparedStatement pstmt = con.prepareStatement(sql);
-				ResultSet rs = pstmt.executeQuery()) {
-			while (rs.next()) {
-				danhSachUD.add(getUuDaiTuResultSet(rs));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return danhSachUD;
-	}
-
-	public UuDai timUuDaiTheoMa(String maUD) {
-		String sql = "SELECT maUuDai, IDloaiUuDai, mucGiamGia, dieuKienApDung FROM UuDai WHERE maUuDai = ?";
-		try (Connection con = connectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, maUD);
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					return getUuDaiTuResultSet(rs);
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public UuDai timUuDaiTheoMa(String maUD) {
+        String sql = "SELECT maUuDai, IDloaiUuDai, mucGiamGia, dieuKienApDung FROM UuDai WHERE maUuDai = ?";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, maUD);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return getUuDaiTuResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 // them
 	public boolean themUuDai(UuDai ud) throws SQLException {
@@ -249,39 +243,98 @@ public class UuDaiDAO {
 		throw new SQLException("Không tìm thấy ưu đãi với tên: " + tenHienThi);
 	}
 
+//	public List<String> getAllTenUuDai() throws SQLException {
+//		List<String> danhSachTenUuDai = new ArrayList<>();
+//
+//		String sql = """
+//				    SELECT
+//				        UD.maUuDai,
+//				        LG.tenLoai,
+//				        UD.mucGiamGia,
+//				        UD.dieuKienApDung
+//				    FROM UuDai UD
+//				    JOIN LoaiUuDai LG ON UD.IDloaiUuDai = LG.IDloaiUD
+//				""";
+//
+//		try (Connection conn = connectDB.getConnection();
+//				PreparedStatement stmt = conn.prepareStatement(sql);
+//				ResultSet rs = stmt.executeQuery()) {
+//
+//			while (rs.next()) {
+//				String maUuDai = rs.getString("maUuDai");
+//				String tenLoai = rs.getString("tenLoai");
+//				BigDecimal mucGiam = rs.getBigDecimal("mucGiamGia");
+//				String dieuKien = rs.getString("dieuKienApDung");
+//
+//				String tenHienThi = String.format("%s (ID: %s, Giảm: %.0f%%, DK: %s)", tenLoai, maUuDai,
+//						mucGiam.doubleValue(), dieuKien);
+//				danhSachTenUuDai.add(tenHienThi);
+//			}
+//		} catch (SQLException e) {
+//			System.err.println("Lỗi tải danh sách tên ưu đãi: " + e.getMessage());
+//			throw new SQLException("Không thể tải danh sách tên ưu đãi: " + e.getMessage(), e);
+//		}
+//
+//		return danhSachTenUuDai;
+//	}
+	
+	private String layMaUuDaiTuTenFull(String tenFull) {
+	    if (tenFull == null || tenFull.isEmpty() || tenFull.contains("--- Chọn")) {
+	        return null; // KHÔNG GÁN UD-01 → BẮT LỖI SỚM
+	    }
+
+	    try {
+	        int start = tenFull.indexOf("(ID: ") + 5;
+	        int end = tenFull.indexOf(")", start);
+	        if (start >= 5 && end > start) {
+	            String ma = tenFull.substring(start, end).trim();
+	            if (ma.matches("UD-\\d+")) {
+	                return ma;
+	            }
+	        }
+	    } catch (Exception e) {
+	        // Log lỗi để biết tại sao
+	        System.err.println("Lỗi trích xuất mã ưu đãi từ: " + tenFull);
+	        e.printStackTrace();
+	    }
+
+	    return null; // Trả về null → buộc xử lý lỗi
+	}
+	
+	// TRONG UuDaiDAO.java
 	public List<String> getAllTenUuDai() throws SQLException {
-		List<String> danhSachTenUuDai = new ArrayList<>();
+	    List<String> list = new ArrayList<>();
+	    String sql = """
+	        SELECT UD.maUuDai, L.tenLoai, UD.mucGiamGia
+	        FROM UuDai UD
+	        JOIN LoaiUuDai L ON UD.IDloaiUuDai = L.IDloaiUD
+	        ORDER BY UD.maUuDai
+	        """;
 
-		String sql = """
-				    SELECT
-				        UD.maUuDai,
-				        LG.tenLoai,
-				        UD.mucGiamGia,
-				        UD.dieuKienApDung
-				    FROM UuDai UD
-				    JOIN LoaiUuDai LG ON UD.IDloaiUuDai = LG.IDloaiUD
-				""";
+	    try (Connection con = connectDB.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
 
-		try (Connection conn = connectDB.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				ResultSet rs = stmt.executeQuery()) {
+	        while (rs.next()) {
+	            String ma = rs.getString("maUuDai").trim();
+	            String tenLoai = rs.getString("tenLoai").trim();
+	            BigDecimal giam = rs.getBigDecimal("mucGiamGia");
 
-			while (rs.next()) {
-				String maUuDai = rs.getString("maUuDai");
-				String tenLoai = rs.getString("tenLoai");
-				BigDecimal mucGiam = rs.getBigDecimal("mucGiamGia");
-				String dieuKien = rs.getString("dieuKienApDung");
+	            String mucGiamStr;
+	            if (giam == null || giam.compareTo(BigDecimal.ZERO) == 0) {
+	                mucGiamStr = "Nguyên giá";
+	            } else if (giam.compareTo(new BigDecimal("100")) == 0) {
+	                mucGiamStr = "Miễn phí";
+	            } else {
+	                mucGiamStr = "Giảm " + giam.setScale(0, RoundingMode.HALF_UP) + "%";
+	            }
 
-				String tenHienThi = String.format("%s (ID: %s, Giảm: %.0f%%, DK: %s)", tenLoai, maUuDai,
-						mucGiam.doubleValue(), dieuKien);
-				danhSachTenUuDai.add(tenHienThi);
-			}
-		} catch (SQLException e) {
-			System.err.println("Lỗi tải danh sách tên ưu đãi: " + e.getMessage());
-			throw new SQLException("Không thể tải danh sách tên ưu đãi: " + e.getMessage(), e);
-		}
-
-		return danhSachTenUuDai;
+	            // ĐẢM BẢO CÓ KHOẢNG TRẮNG SAU "ID:"
+	            String hienThi = mucGiamStr + " - " + tenLoai + " (ID: " + ma + ")";
+	            list.add(hienThi);
+	        }
+	    }
+	    return list;
 	}
 
 	public String getTenLoaiByID(int idLoaiUD) throws SQLException {

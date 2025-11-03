@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import connectDB.connectDB;
@@ -21,7 +20,6 @@ import dao.UuDaiDAO;
 import dao.VeDAO;
 import entity.ChuyenTau;
 import entity.HanhKhach;
-import entity.KhuyenMai;
 import entity.LichSuVe;
 import entity.NhanVien;
 import entity.Tau;
@@ -61,31 +59,38 @@ public class QuanLyVeControl {
         this.nvlap = new NhanVien();
     }
 
-    public BigDecimal tinhGiaVeCuoiCung(BigDecimal giaVeGoc, String maUuDai, KhuyenMai kmDinhKem) throws Exception {
-        if (giaVeGoc == null || giaVeGoc.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new Exception("Giá vé gốc không hợp lệ.");
-        }
+    public BigDecimal tinhGiaVeCuoiCung(BigDecimal giaGoc, String maUuDai, String maKhuyenMai) throws SQLException {
+        System.out.println("=== TÍNH GIÁ VÉ ===");
+        System.out.println("Giá gốc: " + giaGoc);
+        System.out.println("Mã ưu đãi: " + maUuDai);
 
-        BigDecimal giaThanhToan = giaVeGoc;
+        BigDecimal giaSauGiam = giaGoc;
 
-        // 1. Áp dụng Ưu đãi
-        UuDai ud = udDao.timUuDaiTheoMa(maUuDai);
-        if (ud != null) {
-            BigDecimal mucGiamPT = ud.getMucGiamGia().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP);
-            BigDecimal soTienGiam = giaVeGoc.multiply(mucGiamPT);
-            giaThanhToan = giaVeGoc.subtract(soTienGiam);
-        }
-
-        // 2. Áp dụng Khuyến mãi (nếu hợp lệ)
-        if (kmDinhKem != null && kmDinhKem.getMaKhuyenMai() != null) {
-            KhuyenMai km = kmDao.TimKhuyenMaiTheoMa(kmDinhKem.getMaKhuyenMai());
-            if (km != null && km.getNgayKetThuc().isAfter(LocalDate.now())) {
-                BigDecimal giamKM = km.getMucGiamGia().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP);
-                giaThanhToan = giaThanhToan.subtract(giaThanhToan.multiply(giamKM));
+        if (maUuDai != null && !maUuDai.trim().isEmpty()) {
+            UuDaiDAO udDAO = new UuDaiDAO();
+            UuDai ud = udDAO.layUuDaiTheoMa(maUuDai);
+            
+            if (ud != null) {
+                System.out.println("Tìm thấy ưu đãi: " + ud.getMaUuDai() + " | Giảm: " + ud.getMucGiamGia() + "%");
+                BigDecimal mucGiam = ud.getMucGiamGia();
+                if (mucGiam != null && mucGiam.compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal giam = giaGoc.multiply(mucGiam).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+                    giaSauGiam = giaGoc.subtract(giam);
+                    System.out.println("Tiền giảm: " + giam + " | Giá sau giảm: " + giaSauGiam);
+                } else {
+                    System.out.println("Mức giảm = 0 → giữ nguyên giá");
+                }
+            } else {
+                System.out.println("KHÔNG TÌM THẤY ưu đãi với mã: " + maUuDai);
             }
+        } else {
+            System.out.println("Không có mã ưu đãi → giữ nguyên giá");
         }
 
-        return giaThanhToan.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal ketQua = giaSauGiam.setScale(0, RoundingMode.HALF_UP);
+        System.out.println("GIÁ CUỐI CÙNG: " + ketQua);
+        System.out.println("===================\n");
+        return ketQua;
     }
 
     /**

@@ -224,4 +224,36 @@ public class HanhKhachDAO {
         ps.close(); 
         return ds;
     }
+    public String themHanhKhach2(HanhKhach hk) throws SQLException {
+        String sql = "INSERT INTO HanhKhach (hoTen, cmndCccd, soDienThoai, ngaySinh, maUuDai, TrangThai) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, hk.getHoTen());
+            ps.setString(2, hk.getCmndCccd());
+            ps.setString(3, hk.getSoDT());
+            ps.setDate(4, Date.valueOf(hk.getNgaySinh()));
+
+            // BẮT BUỘC maUuDai KHÔNG ĐƯỢC RỖNG
+            String maUD = hk.getMaUuDai();
+            System.out.println("DEBUG: maUD vào DAO = " + maUD);
+            if (maUD == null || maUD.trim().isEmpty()) {
+                throw new IllegalArgumentException("maUuDai không được để trống khi thêm hành khách");
+            }
+            ps.setString(5, maUD.trim());
+
+            ps.setString(6, hk.getTrangThai() != null ? hk.getTrangThai() : "Hoạt động");
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int id = generatedKeys.getInt(1);
+                        String generatedMaHK = "HK-" + String.format("%05d", id);
+                        hk.setMaKH(generatedMaHK);
+                        return generatedMaHK;
+                    }
+                }
+            }
+            return null;
+        }
+    }
 }
