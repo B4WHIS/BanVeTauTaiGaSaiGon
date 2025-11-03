@@ -193,7 +193,12 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
             this.dispose();
         } 
         else if (src == btnQuanLyLichTrinh) {
-            new QuanLyLichTrinh().setVisible(true);
+            try {
+				new QuanLyLichTrinh().setVisible(true);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
             this.dispose();
         } else if (src == btnLoaiChucVu) {
             new QuanLyLoaiChucVu().setVisible(true);

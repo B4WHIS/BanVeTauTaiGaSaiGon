@@ -415,7 +415,7 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
         return btn;
     }
 
-	public static JButton taoButton(String text, Color bg, String iconPath) {
+	public JButton taoButton(String text, Color bg, String iconPath) {
 	        ImageIcon icon = chinhKichThuoc(iconPath, 24, 24);
 	        JButton btn = new JButton(text, icon != null ? icon : null);
 	        btn.setBackground(bg);

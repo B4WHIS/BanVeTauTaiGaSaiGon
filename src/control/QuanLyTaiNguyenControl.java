@@ -67,7 +67,7 @@ public class QuanLyTaiNguyenControl {
         }
     }
 
-    public boolean xoaTau(String maTau) {
+    public boolean xoaTau(String maTau) throws Exception {
         Tau tau = layTauTheoMa(maTau);
         // Kiểm tra ràng buộc: Không xóa nếu có chuyến tàu đang dùng
         if (!lichTrinhDAO.getAllLichTrinh().stream().anyMatch(lt -> lt.getMaLichTrinh().contains(maTau))) {  // Giả sử kiểm tra
@@ -156,11 +156,11 @@ public class QuanLyTaiNguyenControl {
     }
 
     // ========== QUẢN LÝ LỊCH TRÌNH ==========
-    public List<LichTrinh> layTatCaLichTrinh() {
+    public List<LichTrinh> layTatCaLichTrinh() throws Exception {
         return lichTrinhDAO.getAllLichTrinh();
     }
 
-    public LichTrinh layLichTrinhTheoMa(String maLichTrinh) {
+    public LichTrinh layLichTrinhTheoMa(String maLichTrinh) throws Exception {
         LichTrinh lt = lichTrinhDAO.getLichTrinhByMaLichTrinh(maLichTrinh);
         if (lt == null) {
             throw new BusinessException("Không tìm thấy lịch trình với mã: " + maLichTrinh);
@@ -169,14 +169,14 @@ public class QuanLyTaiNguyenControl {
     }
 
     // Phương thức mới: Lấy lịch trình theo tên (tìm kiếm chứa tên)
-    public List<LichTrinh> layLichTrinhTheoTen(String tenLichTrinh) {
+    public List<LichTrinh> layLichTrinhTheoTen(String tenLichTrinh) throws Exception {
         return lichTrinhDAO.getAllLichTrinh().stream()
                 .filter(lt -> lt.getTenLichTrinh().toLowerCase().contains(tenLichTrinh.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
     // Phương thức phức tạp: Lấy lịch trình theo ga đi/đến và khoảng cách (ví dụ: > 100km)
-    public List<LichTrinh> layLichTrinhTheoGaVaKhoangCach(String maGaDi, String maGaDen, double khoangCachMin) {
+    public List<LichTrinh> layLichTrinhTheoGaVaKhoangCach(String maGaDi, String maGaDen, double khoangCachMin) throws Exception {
         return lichTrinhDAO.getAllLichTrinh().stream()
                 .filter(lt -> lt.getMaGaDi().getMaGa().equals(maGaDi)
                         && lt.getMaGaDen().getMaGa().equals(maGaDen)
