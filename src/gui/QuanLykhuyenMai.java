@@ -271,7 +271,7 @@ public class QuanLykhuyenMai extends JFrame {
         btnExport.addActionListener(e -> showMessage("Chức năng Xuất Excel đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE));
 
         // === TRỞ VỀ ===
-        btnTroVe.addActionListener(e -> dispose());
+        btnTroVe.addActionListener(e -> new MHC_NhanVienQuanLy().setVisible(true));
 
         // === CLICK TABLE ===
         tblKhuyenMai.addMouseListener(new MouseAdapter() {

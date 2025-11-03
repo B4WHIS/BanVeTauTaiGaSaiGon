@@ -412,12 +412,7 @@ public class QuanLyGa extends JFrame implements ActionListener, MouseListener {
     }
 
     private void xyLyTroVe() {
-        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn thoát khỏi màn hình quản lý ga?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            this.dispose();
-            // Quay về màn hình chính (giả sử có nhân viên)
             new MHC_NhanVienQuanLy(nhanVienHienTai).setVisible(true);
-        }
     }
 
     private void xuLyLamMoi() {
@@ -453,7 +448,6 @@ public class QuanLyGa extends JFrame implements ActionListener, MouseListener {
 
     public static void main(String[] args) {
         LookAndFeelManager.setNimbusLookAndFeel();
-        SwingUtilities.invokeLater(() -> new QuanLyGa().setVisible(true));
     }
 
     @Override
