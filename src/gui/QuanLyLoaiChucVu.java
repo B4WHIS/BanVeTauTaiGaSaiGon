@@ -14,13 +14,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -35,7 +35,7 @@ import javax.swing.table.DefaultTableModel;
 
 import control.QuanLyLoaiChucVuControl;
 
-public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
+public class QuanLyLoaiChucVu extends JFrame implements ActionListener, MouseListener {
     private JTable tblLoaiCV;
     private DefaultTableModel modelCV;
     private JTextField txtMaLoaiCV, txtTenLoaiCV;
@@ -86,8 +86,8 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         Font txtFont = new Font("Segoe UI", Font.PLAIN, 20);
 
         // Labels
-        JLabel lblMa = new JLabel("Mã Loại CV:");
-        JLabel lblTen = new JLabel("Tên Loại CV:");
+        JLabel lblMa = new JLabel("Mã Loại:");
+        JLabel lblTen = new JLabel("Tên Loại:");
         JLabel[] labels = {lblMa, lblTen};
         for (JLabel lbl : labels) {
             lbl.setFont(lblFont);
@@ -96,7 +96,7 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
 
         // Text fields
         txtMaLoaiCV = new JTextField();
-        txtMaLoaiCV.setEditable(false);  // KHÔNG CHO NHẬP TAY
+        txtMaLoaiCV.setEditable(false); 
         txtMaLoaiCV.setBackground(new Color(230, 230, 230));
         txtTenLoaiCV = new JTextField();
         JTextField[] textFields = {txtMaLoaiCV, txtTenLoaiCV};
@@ -148,7 +148,7 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
         pnlRight.setBackground(Color.WHITE);
 
-        String[] colHeader = {"Mã Loại CV", "Tên Loại CV"};
+        String[] colHeader = {"Mã Loại Chức Vụ", "Tên Loại Chức Vụ"};
         modelCV = new DefaultTableModel(colHeader, 0);
         tblLoaiCV = new JTable(modelCV);
         tblLoaiCV.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -156,23 +156,18 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         tblLoaiCV.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
         tblLoaiCV.setSelectionBackground(new Color(58, 111, 67));
         tblLoaiCV.setSelectionForeground(Color.WHITE);
+        
+        
+        
+        tblLoaiCV.getColumnModel().getColumn(0).setMaxWidth(140);
 
+        tblLoaiCV.getColumnModel().getColumn(1).setPreferredWidth(350);
+        tblLoaiCV.getColumnModel().getColumn(1).setMinWidth(200);
+        
         control.loadData(modelCV);
-        hienThiMaTiepTheo();
 
-        tblLoaiCV.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int r = tblLoaiCV.getSelectedRow();
-                if (r >= 0) {
-                    int modelRow = tblLoaiCV.convertRowIndexToModel(r);
-                    Object maObj = modelCV.getValueAt(modelRow, 0);
-                    Object tenObj = modelCV.getValueAt(modelRow, 1);
-                    txtMaLoaiCV.setText(String.valueOf(maObj));
-                    txtTenLoaiCV.setText(String.valueOf(tenObj));
-                }
-            }
-        });
+        
+        
 
         JScrollPane scroll = new JScrollPane(tblLoaiCV);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
@@ -213,6 +208,7 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         btnTim.addActionListener(this);
         setEnableTextFields(false);
 
+        tblLoaiCV.addMouseListener(this);
         add(pnlMain);
     }
 
@@ -260,6 +256,8 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(this, "Bạn đã chọn chức năng THÊM loại chức vụ. Hãy nhập thông tin rồi nhấn lại nút THÊM để xác nhận.");
                 setEnableTextFields(true);
                 xuLyLamMoi();
+                txtTenLoaiCV.requestFocus();
+                hienThiMaTiepTheo();
             } else {
                 xuLyThemLoaiChucVu();
             }
@@ -290,7 +288,7 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
         } else if (src == btnReset) {
             xuLyLamMoi();
         } else if (src == btnExport) {
-            xuLyXuatExcel();
+           ExcelExporter.exportToExcel(tblLoaiCV, this);
         } else if (src == btnTroVe) {
             // Xử lý trở về tương tự, có thể dispose() hoặc mở màn hình khác
             dispose();
@@ -323,6 +321,14 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
             return;
         }
 
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc chắn muốn sửa loại chức vụ này?", 
+            "Xác nhận sửa", JOptionPane.YES_NO_OPTION);
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return; 
+        }
+
         try {
             int ma = Integer.parseInt(txtMaLoaiCV.getText().trim());
             if (control.suaLoaiChucVu(ma, ten)) {
@@ -340,70 +346,40 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn bản ghi để xóa!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa bản ghi này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            try {
-                int ma = Integer.parseInt(txtMaLoaiCV.getText().trim());
-                if (control.xoaLoaiChucVu(ma)) {
-                    JOptionPane.showMessageDialog(this, "Xóa thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                    resetForm();
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi dữ liệu!", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+
+        JOptionPane.showMessageDialog(this, 
+            "Không thể XÓA được loại chức vụ.", 
+            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
     }
 
     private void xuLyTimLoaiChucVu() {
         String ten = txtTenLoaiCV.getText().trim();
         if (ten.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập ít nhất một thông tin để tìm.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            control.loadData(modelCV);
             return;
         }
 
         List<Object[]> dsTim = control.timLoaiChucVu(ten);
-		modelCV.setRowCount(0);
+        modelCV.setRowCount(0);
 
-		for (Object[] row : dsTim) {
-		    modelCV.addRow(row);
-		}
-
-		if (dsTim.isEmpty()) {
-		    JOptionPane.showMessageDialog(this, "Không tìm thấy loại chức vụ phù hợp.", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
-		}
-    }
-
-    private void xuLyXuatExcel() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Chọn nơi lưu file Excel");
-        int result = fileChooser.showSaveDialog(this);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
-            java.io.File file = new java.io.File(fileChooser.getSelectedFile() + ".csv");
-
-            try (java.io.FileWriter fw = new java.io.FileWriter(file)) {
-                for (int i = 0; i < modelCV.getRowCount(); i++) {
-                    for (int j = 0; j < modelCV.getColumnCount(); j++) {
-                        fw.write(modelCV.getValueAt(i, j).toString() + ",");
-                    }
-                    fw.write("\n");
-                }
-                JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!");
-            } catch (java.io.IOException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Lỗi khi xuất file!");
+        if (dsTim != null && !dsTim.isEmpty()) {
+            for (Object[] row : dsTim) {
+                modelCV.addRow(row);
             }
+        } else {
+            modelCV.addRow(new Object[]{"", "Không tìm thấy loại chức vụ nào phù hợp."});
         }
     }
+
+    
 
     private void xuLyLamMoi() {
         txtMaLoaiCV.setText("");
         txtTenLoaiCV.setText("");
         tblLoaiCV.clearSelection();
         control.loadData(modelCV);
-        hienThiMaTiepTheo();
         chucNangHienTai = "";
-        setEnableTextFields(false);
     }
 
     private void resetForm() {
@@ -411,6 +387,45 @@ public class QuanLyLoaiChucVu extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
+    	LookAndFeelManager.setNimbusLookAndFeel();
         SwingUtilities.invokeLater(() -> new QuanLyLoaiChucVu().setVisible(true));
     }
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+        int r = tblLoaiCV.getSelectedRow();
+        if (r >= 0) {
+            int modelRow = tblLoaiCV.convertRowIndexToModel(r);
+            Object maObj = modelCV.getValueAt(modelRow, 0);
+            Object tenObj = modelCV.getValueAt(modelRow, 1);
+            txtMaLoaiCV.setText(String.valueOf(maObj));
+            txtTenLoaiCV.setText(String.valueOf(tenObj));
+        }
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

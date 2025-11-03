@@ -78,7 +78,7 @@ public class QuanLyHanhKhach extends JFrame implements ActionListener, MouseList
         // Load ưu đãi và loại ưu đãi
         UuDaiDAO udDao = new UuDaiDAO();
         try {
-            mapIdToTenLoai = udDao.layTatCaLoaiUuDai2(); // Sửa tên hàm, xóa "2"
+            mapIdToTenLoai = udDao.layTatCaLoaiUuDai2(); 
             List<UuDai> dsUuDai = udDao.layTatCaUuDai();
 
             cmbUuDai = new JComboBox<>();

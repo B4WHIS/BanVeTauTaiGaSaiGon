@@ -18,7 +18,9 @@ public class QuanLyGaController implements ActionListener {
         this.dao = new GaDAO();
     }
 
-    @Override
+
+
+	@Override
     public void actionPerformed(ActionEvent e) {
         String src = e.getActionCommand();
         if (src.equals("Thêm")) {
