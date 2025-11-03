@@ -49,7 +49,7 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
         Color mauHuyVe = new Color(229, 115, 115); 
         Color mauDoiVe = new Color(93, 156, 236); 
         Color mauTimChuyen = new Color(155, 93, 224); 
-        Color mauDangXuat = Color.orange; 
+        Color mauDangXuat = new Color (123, 84, 47); 
         
         // **NÚT ĐẶT VÉ**
         btnDatVe = new JButton("ĐẶT VÉ");
@@ -83,13 +83,14 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
         ImageIcon icTimChuyen = chinhKichThuoc("/img/search.png", 65, 65);
         btnTimChuyenTau.setIcon(icTimChuyen);
         
-        // **NÚT ĐĂNG XUẤT**
+        // NÚT ĐĂNG XUẤT
         btnDangXuat = new JButton("ĐĂNG XUẤT");
         btnDangXuat.setBackground(Color.white);
         btnDangXuat.setFont(new Font("Segoe UI", Font.BOLD, 30));
         btnDangXuat.setForeground(Color.orange);
         ImageIcon icDangXuat = chinhKichThuoc("/img/export.png", 55, 55);
         btnDangXuat.setIcon(icDangXuat);
+        
         
         
         pnlChucNang.add(btnDatVe);
