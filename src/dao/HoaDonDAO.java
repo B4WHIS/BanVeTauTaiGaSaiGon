@@ -159,5 +159,65 @@ public class HoaDonDAO {
         }
         return maHoaDon;
     }
+    
+    
+    
+    public List<HoaDon> searchHoaDon(String maHD, String tenHanhKhach, String tenNhanVien,
+            java.time.LocalDateTime ngayLap, java.math.BigDecimal tongTien) throws SQLException {
+List<HoaDon> list = new ArrayList<>();
+
+StringBuilder sql = new StringBuilder("""
+SELECT hd.maHoaDon, hd.ngayLap, hd.tongTien,
+hk.maHanhKhach, hk.hoTen AS tenHanhKhach,
+nv.maNhanVien, nv.hoTen AS tenNhanVien
+FROM HoaDon hd
+JOIN HanhKhach hk ON hd.maHanhKhach = hk.maHanhKhach
+JOIN NhanVien nv ON hd.maNhanVien = nv.maNhanVien
+WHERE 1=1
+""");
+
+List<Object> params = new ArrayList<>();
+
+if (maHD != null && !maHD.isEmpty()) {
+sql.append(" AND hd.maHoaDon LIKE ?");
+params.add("%" + maHD + "%");
+}
+if (tenHanhKhach != null && !tenHanhKhach.isEmpty()) {
+sql.append(" AND hk.hoTen LIKE ?");
+params.add("%" + tenHanhKhach + "%");
+}
+if (tenNhanVien != null && !tenNhanVien.isEmpty()) {
+sql.append(" AND nv.hoTen LIKE ?");
+params.add("%" + tenNhanVien + "%");
+}
+if (ngayLap != null) {
+sql.append(" AND CAST(hd.ngayLap AS DATE) = ?");
+params.add(java.sql.Date.valueOf(ngayLap.toLocalDate()));
+}
+if (tongTien != null) {
+sql.append(" AND hd.tongTien = ?");
+params.add(tongTien);
+}
+
+sql.append(" ORDER BY hd.ngayLap DESC");
+
+try (Connection conn = connectDB.getConnection();
+PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+// gán tham số
+for (int i = 0; i < params.size(); i++) {
+ps.setObject(i + 1, params.get(i));
+}
+
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+list.add(getHoaDonFromRS(rs));
+}
+}
+}
+
+return list;
+}
+
 
 }

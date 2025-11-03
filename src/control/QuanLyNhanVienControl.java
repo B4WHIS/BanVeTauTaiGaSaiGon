@@ -1,19 +1,25 @@
+
 package control;
 
 import gui.QuanLyNhanVien;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import java.util.List;
 import java.awt.event.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import connectDB.connectDB;
+import dao.NhanVienDAO;
+import entity.NhanVien;
 
 public class QuanLyNhanVienControl implements ActionListener {
     private QuanLyNhanVien view;
     private DefaultTableModel model;
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	private NhanVienDAO nhanVienDAO;
 
     public QuanLyNhanVienControl(QuanLyNhanVien view) {
         this.view = view;
@@ -34,7 +40,7 @@ public class QuanLyNhanVienControl implements ActionListener {
                 int row = view.getTblNhanVien().getSelectedRow();
                 if (row >= 0) {
                     view.getTxtHoTen().setText(model.getValueAt(row, 1).toString());
-                    view.getTxtNgaySinh().setText(model.getValueAt(row, 2).toString());
+                    view.getDateChooserNgaySinh().setToolTipText(model.getValueAt(row, 2).toString());
                     view.getTxtCMND().setText(model.getValueAt(row, 3).toString());
                     view.getTxtDienThoai().setText(model.getValueAt(row, 4).toString()); // SỐ ĐT
                     view.getCbChucVu().setSelectedItem(model.getValueAt(row, 5)); // CHỨC VỤ
@@ -98,7 +104,7 @@ public class QuanLyNhanVienControl implements ActionListener {
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, view.getTxtHoTen().getText().trim());
-            ps.setDate(2, Date.valueOf(LocalDate.parse(view.getTxtNgaySinh().getText().trim(), dtf)));
+            ps.setDate(2, Date.valueOf(LocalDate.parse(view.getDateChooserNgaySinh().getToolTipText().trim(), dtf)));
             ps.setString(3, view.getTxtCMND().getText().trim());
             String sdt = view.getTxtDienThoai().getText().trim();
             ps.setString(4, sdt.isEmpty() ? null : sdt); // Cho phép NULL
@@ -139,7 +145,7 @@ public class QuanLyNhanVienControl implements ActionListener {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, view.getTxtHoTen().getText().trim());
-            ps.setDate(2, Date.valueOf(LocalDate.parse(view.getTxtNgaySinh().getText().trim(), dtf)));
+            ps.setDate(2, Date.valueOf(LocalDate.parse(view.getDateChooserNgaySinh().getToolTipText().trim(), dtf)));
             ps.setString(3, view.getTxtCMND().getText().trim());
             String sdt = view.getTxtDienThoai().getText().trim();
             ps.setString(4, sdt.isEmpty() ? null : sdt);
@@ -185,7 +191,7 @@ public class QuanLyNhanVienControl implements ActionListener {
 
     private void reset() {
         view.getTxtHoTen().setText("");
-        view.getTxtNgaySinh().setText("dd/MM/yyyy");
+        view.getDateChooserNgaySinh().setToolTipText("dd/MM/yyyy");
         view.getTxtCMND().setText("");
         view.getTxtDienThoai().setText(""); // Reset số điện thoại
         view.getCbChucVu().setSelectedIndex(0);
@@ -194,7 +200,7 @@ public class QuanLyNhanVienControl implements ActionListener {
 
     private boolean validate() {
         String ten = view.getTxtHoTen().getText().trim();
-        String ns = view.getTxtNgaySinh().getText().trim();
+        String ns = view.getDateChooserNgaySinh().getToolTipText().trim();
         String cmnd = view.getTxtCMND().getText().trim();
         String sdt = view.getTxtDienThoai().getText().trim();
 
@@ -239,5 +245,8 @@ public class QuanLyNhanVienControl implements ActionListener {
             e.printStackTrace();
         }
         return 1; // mặc định
+    }
+    public List<NhanVien> searchNhanVien(String hoTen, String soDienThoai, String cmndCccd, Integer idLoaiChucVu) {
+        return nhanVienDAO.searchNhanVien(hoTen, soDienThoai, cmndCccd, idLoaiChucVu);
     }
 }

@@ -81,7 +81,7 @@ public class NhanVienDAO {
             // Lặp qua các dòng kết quả
             while (ketQua.next()) {
                 dsLoaiChucVu.add(new Object[] {
-                    // Sửa tên cột để khớp với schema thực tế (IDloaiCV, tenLoai) [5]
+            
                     ketQua.getInt("IDloaiCV"),
                     ketQua.getString("tenLoai")
                 });
@@ -89,12 +89,10 @@ public class NhanVienDAO {
         
         // Xử lý lỗi SQL nếu có
         } catch (SQLException e) {
-            // Comment: Bắt lỗi khi truy vấn CSDL
             System.err.println("Lỗi truy vấn danh sách Loại Chức Vụ: " + e.getMessage());
             e.printStackTrace(); 
         }
-        
-        // Trả về danh sách kết quả (có thể là danh sách rỗng nếu xảy ra lỗi)
+
         return dsLoaiChucVu;
     }
 
@@ -136,7 +134,7 @@ public class NhanVienDAO {
         return null;
     }
 
-    // === LẤY TẤT CẢ NHÂN VIÊN ===
+    // lấy taart cả nhân viên
     public List<NhanVien> getAllNhanVien() {
         List<NhanVien> list = new ArrayList<>();
         String sql = "SELECT * FROM NhanVien ORDER BY hoTen";
@@ -156,7 +154,6 @@ public class NhanVienDAO {
         return list;
     }
 
-    // Helper: Tạo NhanVien từ ResultSet - Cập nhật để load IDloaiChucVu
     private NhanVien taoNhanVienTuResultSet(ResultSet rs) throws SQLException {
         NhanVien nv = new NhanVien();
         nv.setMaNhanVien(rs.getString("maNhanVien"));
@@ -166,7 +163,57 @@ public class NhanVienDAO {
         if (rs.getString("cmndCccd") != null) {
             nv.setCmndCccd(rs.getString("cmndCccd"));
         }
-        nv.setIDloaiChucVu(rs.getInt("IDloaiChucVu")); // Load IDloaiChucVu
+        nv.setIDloaiChucVu(rs.getInt("IDloaiChucVu")); 
         return nv;
     }
+ // Phương thức tìm kiếm nhân viên theo nhiều tiêu chí
+    public List<NhanVien> searchNhanVien(String hoTen, String soDienThoai, String cmndCccd, Integer idLoaiChucVu) {
+        List<NhanVien> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM NhanVien WHERE 1=1");
+        
+        if (hoTen != null && !hoTen.isEmpty()) {
+            sql.append(" AND hoTen LIKE ?");
+        }
+        if (soDienThoai != null && !soDienThoai.isEmpty()) {
+            sql.append(" AND soDienThoai LIKE ?");
+        }
+        if (cmndCccd != null && !cmndCccd.isEmpty()) {
+            sql.append(" AND cmndCccd LIKE ?");
+        }
+        if (idLoaiChucVu != null) {
+            sql.append(" AND IDloaiChucVu = ?");
+        }
+        
+        sql.append(" ORDER BY hoTen");
+
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+            
+            int index = 1;
+            if (hoTen != null && !hoTen.isEmpty()) {
+                pstmt.setString(index++, "%" + hoTen + "%");
+            }
+            if (soDienThoai != null && !soDienThoai.isEmpty()) {
+                pstmt.setString(index++, "%" + soDienThoai + "%");
+            }
+            if (cmndCccd != null && !cmndCccd.isEmpty()) {
+                pstmt.setString(index++, "%" + cmndCccd + "%");
+            }
+            if (idLoaiChucVu != null) {
+                pstmt.setInt(index++, idLoaiChucVu);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(taoNhanVienTuResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi tìm kiếm nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return list;
+    }
+
 }
