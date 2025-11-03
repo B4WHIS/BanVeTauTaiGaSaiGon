@@ -9,26 +9,29 @@ public class HanhKhach {
     private String soDT;
     private LocalDate ngaySinh;
     private String maUuDai;
+    private String trangThai;
 
-    public HanhKhach(String hoTen, LocalDate ngaySinh, String soDT, String cmndCccd, String maUuDai) {
-        
-        this.hoTen = hoTen; 
+    public HanhKhach(String maHK, String hoTen, String soCMND, String soDienThoai, LocalDate ngaySinh, String trangThai) {
+        this.maKH = maHK;
+        this.hoTen = hoTen;
+        this.cmndCccd = soCMND;
+        this.soDT = soDienThoai;
         this.ngaySinh = ngaySinh;
-        this.soDT = soDT;
-        this.cmndCccd = cmndCccd;
-        this.maUuDai = maUuDai;
+        this.trangThai = trangThai;
+        
     }
     public HanhKhach() {
 
     }
-    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
+    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai, String trangThai) {
         super();
-        this.maKH = maKH; // Cho phép null tạm thời
+        this.maKH = maKH; 
         setHoTen(hoTen);
         setCmndCccd(cmndCccd);
         setSoDT(soDT);
         setNgaySinh(ngaySinh);
         setMaUuDai(maUuDai);
+        setTrangThai(trangThai);
     }
 //    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
 //		super();
@@ -43,24 +46,37 @@ public class HanhKhach {
 	public HanhKhach(String maKH) {
 		setMaKH(maKH);
 	}
+	
 
+	
+	public HanhKhach(String maKH, String hoTen, LocalDate ngaySinh, String soDT, String cmndCccd, String maUuDai) {
+	    super();
+	    this.maKH = maKH;
+	    setHoTen(hoTen);
+	    setCmndCccd(cmndCccd);
+	    setSoDT(soDT);
+	    setNgaySinh(ngaySinh);
+	    setMaUuDai(maUuDai);
+	    this.trangThai = "Hoạt động"; 
+	}
+	
 	public String getMaUuDai() {
         return maUuDai;
     }
 
-    public void setMaUuDai(String maUuDai) {
-        if (maUuDai == null || maUuDai.trim().isEmpty()) {
-            throw new IllegalArgumentException("Mã ưu đãi không được để trống.");
-        }
-        this.maUuDai = maUuDai;
-    }
-    
+	public void setMaUuDai(String maUuDai) {
+	    if (maUuDai != null && !maUuDai.trim().isEmpty()) {
+	        this.maUuDai = maUuDai.trim();
+	    } else {
+	        this.maUuDai = null; // không ném lỗi
+	    }
+	}
+
     public String getMaKH() {
         return maKH;
     }
 
     public void setMaKH(String maKH) {
-        // Ràng buộc DB: HK-XXXXX (2 kí tự đầu cố định, 5 kí tự số) [1]
         if (maKH == null || !maKH.matches("^HK-\\d{5}$")) 
         {
             throw new IllegalArgumentException("Mã khách hàng không hợp lệ! Phải có dạng HK-XXXXX.");
@@ -73,10 +89,12 @@ public class HanhKhach {
     }
 
     public void setHoTen(String hoTen) {
-        if (hoTen == null || hoTen.trim().isEmpty()) {
-            throw new IllegalArgumentException("Họ tên không được để trống.");
+        if (hoTen == null) {
+            throw new IllegalArgumentException("Họ tên đang bị lỗi.");
         }
-        // Biểu thức mới: Cho phép chữ cái tiếng Việt, mỗi từ bắt đầu bằng in hoa, không chứa số
+        if (hoTen.trim().isEmpty()) {
+            throw new IllegalArgumentException("Họ tên không được rỗng.");
+        }
         if (!hoTen.matches("^[A-ZÀ-Ỹ][a-zà-ỹA-ZÀ-Ỹ]*(?:\\s[A-ZÀ-Ỹ][a-zà-ỹA-ZÀ-Ỹ]*)*$")) {
             throw new IllegalArgumentException("Họ tên không hợp lệ! Phải viết hoa chữ cái đầu, không chứa số.");
         }
@@ -125,6 +143,7 @@ public class HanhKhach {
 	}
 
    
-
+    public String getTrangThai() { return trangThai; }
+    public void setTrangThai(String trangThai) { this.trangThai = trangThai; }
   
 }

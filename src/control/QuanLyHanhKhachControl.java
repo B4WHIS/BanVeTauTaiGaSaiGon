@@ -5,63 +5,75 @@ import java.time.LocalDate;
 import java.util.List;
 
 import dao.HanhKhachDAO;
+import dao.UuDaiDAO;
 import entity.HanhKhach;
 
 public class QuanLyHanhKhachControl {
-	private HanhKhachDAO hkDao;
+    private HanhKhachDAO hanhKhachDAO = new HanhKhachDAO();
+	private UuDaiDAO udDao = new UuDaiDAO();
+	private UuDaiDAO loaiUdDao = new UuDaiDAO();
 	
-	public QuanLyHanhKhachControl() {
-		this.hkDao = new HanhKhachDAO();
-	}
-	
-	public boolean themHanhKhach(HanhKhach hk) throws Exception {
-        if (hk.getNgaySinh() == null || hk.getNgaySinh().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Ngày sinh không hợp lệ!");
-        }
-        try {
-            return hkDao.themHanhKhach(hk); 
-        } catch (SQLException e) {
-            if (e.getMessage().contains("duplicate key")) {
-                 throw new Exception("Lỗi: CMND/CCCD hoặc Số điện thoại đã tồn tại trong hệ thống.");
-            }
-            throw new Exception("Lỗi CSDL khi thêm hành khách: " + e.getMessage());
-        }	
-	}
-	public List<HanhKhach> layDanhSachHanhKhach() throws SQLException{
-		return hkDao.layDanhSachHanhKhach();
-	}
-	
-	public boolean capNhatHanhKhach(HanhKhach hk) throws Exception {
-		if(hk.getMaKH() == null) {
-			throw new IllegalArgumentException("Mã khách hàng không được rỗng khi cập nhật.");
-		}
-        if (hk.getNgaySinh() == null || hk.getNgaySinh().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Ngày sinh không hợp lệ!");
-        }
-        try {
-        	return hkDao.capNhatHanhKhach(hk);
-  
-        }catch (SQLException e) {
-			// TODO: handle exception
-            throw new Exception("Lỗi CSDL khi cập nhật hành khách: " + e.getMessage());
-		}
-	}
-    public boolean xoaHanhKhach(String maHK) throws SQLException {
-        return hkDao.xoaHanhKhach(maHK); 
+    public QuanLyHanhKhachControl() {
+        hanhKhachDAO = new HanhKhachDAO();
     }
-    public HanhKhach traCuuTheoCMND(String cmndCccd) throws SQLException {
-        if (cmndCccd == null || (!cmndCccd.matches("^\\d{9}$|^\\d{12}$"))) {
-            throw new IllegalArgumentException("Định dạng CMND/CCCD không hợp lệ!");
-        }
-        return hkDao.layHanhKhachTheoCMND(cmndCccd); 
 
+    public List<HanhKhach> layDanhSachHanhKhachHoatDong() throws SQLException {
+        return hanhKhachDAO.layDanhSachHanhKhachHoatDong();
     }
-    public HanhKhach traCuuTheoSDT(String soDT) throws SQLException {
-        if (soDT == null || !soDT.matches("^0\\d{9}$")) { 
-            throw new IllegalArgumentException("Định dạng Số điện thoại không hợp lệ (phải gồm 10 chữ số)!");
-        }
-        return hkDao.layHanhKhachTheoSDT(soDT); // [17]
+
+    public boolean themHanhKhach(HanhKhach hk) throws SQLException {
+        return hanhKhachDAO.themHanhKhach(hk);
+    }
+
+    public boolean capNhatHanhKhach(HanhKhach hk) throws SQLException {
+        return hanhKhachDAO.capNhatHanhKhach(hk);
+    }
+
+    public boolean xoaMemHanhKhach(String maKH) throws SQLException {
+        return hanhKhachDAO.xoaMemHanhKhach(maKH);
+    }
+
+    public boolean khoiPhucHanhKhach(String maKH) throws SQLException {
+        return hanhKhachDAO.khoiPhucHanhKhach(maKH);
+    }
+
+    public List<HanhKhach> timKiemHanhKhach(String tuKhoa) throws SQLException {
+        return hanhKhachDAO.timKiemHanhKhach(tuKhoa);
+    }
+    public List<HanhKhach> timHanhKhach(String ten, String cmnd, String sdt, LocalDate ngaySinh, String maUuDai) throws SQLException {
+        return hanhKhachDAO.timHanhKhachTheoDieuKien(ten, cmnd, sdt, ngaySinh, maUuDai);
     }
     
-	
+    public boolean anHanhKhach(String maHK) throws Exception {
+        // 1. Kiểm tra ràng buộc nghiệp vụ (Khách hàng này còn vé/phiếu đặt chỗ không?)
+        // Nếu còn, mình phải báo lỗi trước khi ẩn (tương tự logic DELETE cũ)
+
+        // Ví dụ: Giả định có hàm check rang buộc trong DAO/Control
+        // if (coVeLienQuan(maHK)) {
+        //    throw new Exception("Không thể ẩn khách hàng này vì còn vé liên quan.");
+        // }
+
+        try {
+            HanhKhach hkCanAn = hanhKhachDAO.layHanhKhachTheoMa(maHK); // [7]
+            if (hkCanAn == null) return false;
+
+            hkCanAn.setTrangThai("Ngừng hoạt động"); 
+
+            return hanhKhachDAO.capNhatHanhKhach(hkCanAn); 
+
+        } catch (SQLException e) {
+            throw new Exception("Lỗi CSDL khi ẩn hành khách: " + e.getMessage());
+        }
+    }
+
+	public HanhKhach layHanhKhachTheoMa(String maHK) throws SQLException {
+		// TODO Auto-generated method stub
+		return hanhKhachDAO.layHanhKhachTheoMa(maHK);
+	}
+
+
+    
+
+
+
 }
