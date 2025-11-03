@@ -36,13 +36,13 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
         
         btnQuanLyLichTrinh.addActionListener(this);
-       btnQuanLyGa.addActionListener(this);
+   
         btnDatVe.addActionListener(this);
         btnHuyVe.addActionListener(this);
         btnDoiVe.addActionListener(this);
         btnTimChuyenTau.addActionListener(this);
         btnDangXuat.addActionListener(this);
-        btnLoaiChucVu.addActionListener(this);
+ 
     }
 
    
@@ -87,13 +87,7 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
         btnTimChuyenTau.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
         themHieuUngHover(btnTimChuyenTau, new Color(228, 90, 146));
 
-        // === Nút Quản lý khuyến mãi ===
-        btnQuanLyGa = new JButton("QUẢN LÝ GA");
-        btnQuanLyGa.setBackground(Color.white);
-        btnQuanLyGa.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnQuanLyGa.setForeground(new Color(247, 82, 112));
-//        btnQuanLyGa.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
-//        themHieuUngHover(btnQuanLyGa, new Color(228, 90, 146));
+    
         
      // === Nút Quản lý khuyến mãi ===
         btnQuanLyLichTrinh = new JButton("QUẢN LÝ LỊCH TRÌNH");
@@ -103,12 +97,6 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
 //        btnQuanLyGa.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
 //        themHieuUngHover(btnQuanLyLichTrinh, new Color(228, 90, 146));
         
-        btnLoaiChucVu = new JButton("QUẢN LÝ LOẠI CHỨC VỤ");
-        btnLoaiChucVu.setBackground(Color.white);
-        btnLoaiChucVu.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnLoaiChucVu.setForeground(Color.BLACK);
-//        btnQuanLyGa.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
-//        themHieuUngHover(btnQuanLyLichTrinh, new Color(228, 90, 146));
         
         //Nút Đăng xuất
         btnDangXuat = new JButton("ĐĂNG XUẤT");
@@ -126,8 +114,6 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
         pnlChucNang.add(btnDoiVe);
         pnlChucNang.add(btnTimChuyenTau);
         pnlChucNang.add(btnQuanLyLichTrinh);	
-        pnlChucNang.add(btnQuanLyGa);
-        pnlChucNang.add(btnLoaiChucVu);
         pnlChucNang.add(btnDangXuat);
         
         pnlChucNang.setPreferredSize(new Dimension(350, 70));
@@ -188,10 +174,7 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
                 this.dispose();
             }
         }
-        else if (src == btnQuanLyGa) {
-            new QuanLyGa().setVisible(true);
-            this.dispose();
-        } 
+      
         else if (src == btnQuanLyLichTrinh) {
             try {
 				new QuanLyLichTrinh().setVisible(true);
@@ -199,9 +182,6 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-            this.dispose();
-        } else if (src == btnLoaiChucVu) {
-            new QuanLyLoaiChucVu().setVisible(true);
             this.dispose();
         } 
         

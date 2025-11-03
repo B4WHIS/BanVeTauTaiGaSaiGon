@@ -242,11 +242,10 @@ public class QuanLyTaiKhoanController implements ActionListener {
 
    
     private void handleTroVe() {
-        System.out.println("Thoát form.");
-        int confirm = JOptionPane.showConfirmDialog(view, "Bạn có chắc chắn muốn thoát?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
+     
+      
             view.dispose();
-        }
+        
     }
 
 }

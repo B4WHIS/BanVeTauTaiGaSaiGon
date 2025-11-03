@@ -442,11 +442,7 @@ public class QuanLyHanhKhach extends JFrame implements ActionListener, MouseList
     }
 
     private void xyLyTroVe() {
-        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn thoát khỏi màn hình quản lý hành khách?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            this.dispose();
             new MHC_NhanVienQuanLy(nhanVienHienTai).setVisible(true);
-        }
     }
 
     
@@ -640,11 +636,7 @@ public class QuanLyHanhKhach extends JFrame implements ActionListener, MouseList
         }
     }
 
-    public static void main(String[] args) {
-    	LookAndFeelManager.setNimbusLookAndFeel();
-        SwingUtilities.invokeLater(() -> new QuanLyHanhKhach().setVisible(true));
-    }
-
+ 
     @Override
     public void mouseClicked(MouseEvent e) {
         int row = tblHanhKhach.getSelectedRow();

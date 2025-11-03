@@ -154,11 +154,7 @@ public class QuanLyChuyenTauController implements ActionListener {
 
     // Xử lý Trở về
     private void handleTroVe() {
-        System.out.println("Thoát form.");
-        int confirm = JOptionPane.showConfirmDialog(view, "Bạn có chắc chắn muốn thoát?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            view.dispose();
-        }
+            view.dispose(); 
     }
 
     // Xử lý Lưu (add hoặc update) - SỬA: Thêm log chi tiết cho edit mode

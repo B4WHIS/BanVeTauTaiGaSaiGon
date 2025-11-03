@@ -448,11 +448,7 @@ public class QuanLyChuyenTau extends GiaoDienChinh implements ActionListener{
     }
 
     
-    public static void main(String[] args) {
-        	LookAndFeelManager.setNimbusLookAndFeel();
-            new QuanLyChuyenTau().setVisible(true);
-      
-    }
+  
 
 	@Override
 	public void actionPerformed(ActionEvent e) {

@@ -72,7 +72,6 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        
         setJMenuBar(taoMenuBar());
         pnlChinh = new JPanel(new BorderLayout());
         pnlThongTin = taoPanelThongTin();
@@ -198,10 +197,24 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		JMenuItem Item_QLHK = new JMenuItem("Quản lý hành khách");
 		JMenuItem Item_QLCT = new JMenuItem("Quản lý chuyến tàu");
 		JMenuItem Item_QLKM = new JMenuItem("Quản lý khuyến mãi");
+		JMenuItem Item_QLLT = new JMenuItem("Quản lý lịch trình");
+		JMenuItem Item_QLG = new JMenuItem("Quản lý ga");
+		JMenuItem Item_QLHD = new JMenuItem("Quản lý hóa đơn");
+		JMenuItem Item_QLTK = new JMenuItem("Quản lý tài khoản");
+		JMenuItem Item_QLLCV = new JMenuItem("Quản lý loại chức vụ");
+		JMenuItem Item_QLLLG = new JMenuItem("Quản lý loại ghế");
+		
+		
 		mnuQly.add(Item_QLNV);
 		mnuQly.add(Item_QLHK);
 		mnuQly.add(Item_QLCT);
 		mnuQly.add(Item_QLKM);
+		mnuQly.add(Item_QLLT);
+		mnuQly.add(Item_QLG);
+		mnuQly.add(Item_QLHD);
+		mnuQly.add(Item_QLTK);
+		mnuQly.add(Item_QLLCV);
+		mnuQly.add(Item_QLLLG);
 		
 		
 		JMenuItem ItemTimVe = new JMenuItem("Tìm vé");
@@ -264,6 +277,19 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		Item_QLHK.addActionListener(e -> moQuanLyHanhKhach());
 		Item_QLCT.addActionListener(e -> moQuanLyChuyenTau());
 		Item_QLKM.addActionListener(e -> moQuanLyKhuyenMai());
+		Item_QLLT.addActionListener(e -> {
+			try {
+				moGiaoDienLT();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		Item_QLG.addActionListener(e -> moGiaoDienGa());
+		Item_QLHD.addActionListener(e -> moGiaoDienHD());
+		Item_QLTK.addActionListener(e -> moGiaoDienTK());
+		Item_QLLCV.addActionListener(e -> moGiaoDienTK());
+		Item_QLLLG.addActionListener(e -> moGiaoDienGhe());
 
 		ItemTimVe.addActionListener(e -> moGiaoDienTraCuuVeTau());
 		ItemChuyenTau.addActionListener(e -> moGiaoDienTimChuyenTau());
@@ -295,6 +321,25 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
 		
 	}
  // === CÁC HÀM MỞ GIAO DIỆN ===
+    private void moGiaoDienGhe() {
+    	new QuanLyLoaiGhe().setVisible(true);
+    }
+    private void moGiaoDienCV() {
+    	new QuanLyLoaiChucVu().setVisible(true);
+    }
+    private void moGiaoDienTK () {
+    	new QuanLyTaiKhoan().setVisible(true);
+    }
+    private void moGiaoDienHD() {
+    	//new QuanLyHoaDon().setVisible(true);
+    	// chua co
+    }
+    private void moGiaoDienLT() throws Exception {
+    	new QuanLyLichTrinh().setVisible(true);
+    }
+    private void moGiaoDienGa() {
+    	new QuanLyGa().setVisible(true);
+    }
     private void moGiaoDienDatVe() {
         new GiaoDienTraCuuChuyentau(nhanVien).setVisible(true);
     }
@@ -350,6 +395,7 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     private void moThongKeVeDoiHuy() {
         new GiaoDienThongKe().setVisible(true);
     }
+  
 
     private void moHuongDanSuDung() {
         JOptionPane.showMessageDialog(this, 
