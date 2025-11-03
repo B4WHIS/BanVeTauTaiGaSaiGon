@@ -29,6 +29,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import control.TraCuuVeTauController;
+import entity.NhanVien;
 
 public class GiaoDienTraCuuVeTau extends JFrame {
     private JPanel pnlChinh, pnlTitle, pnlTraCuu, pnlKetQua;
@@ -37,6 +38,7 @@ public class GiaoDienTraCuuVeTau extends JFrame {
     private JButton btnTim, btnLamMoi, btnTroVe, btnInVe, btnDoiVe, btnHuyVe;
     private JTable table;
     private DefaultTableModel tableModel;
+    private NhanVien nhanVien;
 
     private final Color COLOR_PRIMARY = new Color(74, 140, 103);
     private final Color COLOR_ACCENT = new Color(93, 156, 236);
@@ -47,6 +49,7 @@ public class GiaoDienTraCuuVeTau extends JFrame {
     private final Font FONT_INPUT = new Font("Segoe UI", Font.PLAIN, 14);
 
     public GiaoDienTraCuuVeTau() {
+    	this.nhanVien = nhanVien;
         setTitle("Tra cứu vé tàu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -229,7 +232,7 @@ public class GiaoDienTraCuuVeTau extends JFrame {
     }
 
     private void setupActions() {
-        TraCuuVeTauController controller = new TraCuuVeTauController(this);
+        TraCuuVeTauController controller = new TraCuuVeTauController(this,nhanVien);
 
         btnTim.addActionListener(controller);
         btnTim.setActionCommand("Tìm");

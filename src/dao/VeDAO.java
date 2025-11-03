@@ -284,6 +284,36 @@ public class VeDAO {
         return dsCho;
     }
     
+    public boolean isChoNgoiBookedForChuyenTau(String maChoNgoi, String maChuyenTau) throws SQLException {
+        // Truy vấn CSDL để kiểm tra sự tồn tại của vé ĐÃ ĐẶT (N'Đã đặt')
+        String sql = "SELECT COUNT(*) FROM Ve WHERE maChoNgoi = ? AND maChuyenTau = ? AND trangThai = N'Đã đặt'";
 
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            // Kết nối và làm việc với dữ liệu thật
+            ps.setString(1, maChoNgoi);
+            ps.setString(2, maChuyenTau);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Trả về true nếu tìm thấy ít nhất 1 vé hợp lệ
+                }
+            }
+        }
+        return false; 
+    }
+
+	public boolean kiemTraChoNgoiDaDuocDat(String maChoNgoi, String maChuyenTau) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM Ve WHERE maChoNgoi = ? AND maChuyenTau = ? AND trangThai = 'Đã đặt'";
+    try (Connection conn = connectDB.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, maChoNgoi);
+        ps.setString(2, maChuyenTau);
+        try (ResultSet rs = ps.executeQuery()) {
+            return rs.next() && rs.getInt(1) > 0;
+        }
+    }
+}
     
 }

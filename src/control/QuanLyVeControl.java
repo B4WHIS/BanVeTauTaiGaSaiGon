@@ -19,7 +19,6 @@ import dao.TauDAO;
 import dao.ThongKeDoanhThuDAO;
 import dao.UuDaiDAO;
 import dao.VeDAO;
-import entity.ChoNgoi;
 import entity.ChuyenTau;
 import entity.HanhKhach;
 import entity.KhuyenMai;
@@ -64,27 +63,29 @@ public class QuanLyVeControl {
 
     public BigDecimal tinhGiaVeCuoiCung(BigDecimal giaVeGoc, String maUuDai, KhuyenMai kmDinhKem) throws Exception {
         if (giaVeGoc == null || giaVeGoc.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new Exception("Giá vé gốc không hợp lệ."); // [5, 6]
-        }
-        BigDecimal giaThanhToan = giaVeGoc;
-        
-        // 1. Áp dụng Ưu đãi
-        UuDai ud = udDao.timUuDaiTheoMa(maUuDai); // Giả định tồn tại udDao
-        if (ud != null) {
-            BigDecimal mucGiamGiaPT = ud.getMucGiamGia().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP); // [7]
-            BigDecimal soTienGiam = giaVeGoc.multiply(mucGiamGiaPT);
-            giaThanhToan = giaVeGoc.subtract(soTienGiam); 
+            throw new Exception("Giá vé gốc không hợp lệ.");
         }
 
-        // 2. Áp dụng Khuyến Mãi (Nếu Khuyến mãi hợp lệ)
+        BigDecimal giaThanhToan = giaVeGoc;
+
+        // 1. Áp dụng Ưu đãi
+        UuDai ud = udDao.timUuDaiTheoMa(maUuDai);
+        if (ud != null) {
+            BigDecimal mucGiamPT = ud.getMucGiamGia().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP);
+            BigDecimal soTienGiam = giaVeGoc.multiply(mucGiamPT);
+            giaThanhToan = giaVeGoc.subtract(soTienGiam);
+        }
+
+        // 2. Áp dụng Khuyến mãi (nếu hợp lệ)
         if (kmDinhKem != null && kmDinhKem.getMaKhuyenMai() != null) {
-            KhuyenMai kmKhaDung = kmDao.TimKhuyenMaiTheoMa(kmDinhKem.getMaKhuyenMai()); // Giả định tồn tại kmDao
-            if (kmKhaDung != null && kmKhaDung.getNgayKetThuc().isAfter(LocalDate.now())) { // Kiểm tra ngày kết thúc [8, 9]
-                BigDecimal mucGiamGiaKM = kmKhaDung.getMucGiamGia().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP);
-                giaThanhToan = giaThanhToan.subtract(giaThanhToan.multiply(mucGiamGiaKM)); // [7, 9]
+            KhuyenMai km = kmDao.TimKhuyenMaiTheoMa(kmDinhKem.getMaKhuyenMai());
+            if (km != null && km.getNgayKetThuc().isAfter(LocalDate.now())) {
+                BigDecimal giamKM = km.getMucGiamGia().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP);
+                giaThanhToan = giaThanhToan.subtract(giaThanhToan.multiply(giamKM));
             }
         }
-        return giaThanhToan.setScale(2, BigDecimal.ROUND_HALF_UP);
+
+        return giaThanhToan.setScale(2, RoundingMode.HALF_UP);
     }
 
     /**
@@ -94,95 +95,64 @@ public class QuanLyVeControl {
      * @throws Exception nếu xảy ra lỗi CSDL hoặc lỗi nghiệp vụ.
      */
     public String datVe(Ve veMoi, HanhKhach hkMoi, NhanVien nvlap) throws Exception {
-        HanhKhach finalHK = hkMoi;
-        String maChoNgoi = veMoi.getMaChoNgoi().getMaChoNgoi();
         if (nvlap == null || nvlap.getMaNhanVien() == null || nvlap.getMaNhanVien().trim().isEmpty()) {
-            throw new IllegalArgumentException("Thông tin Nhân viên lập không hợp lệ hoặc thiếu Mã Nhân Viên.");
+            throw new IllegalArgumentException("Nhân viên lập không hợp lệ.");
         }
-        
-        ChoNgoi choNgoiHienTai = cnDao.getChoNgoiByMa(maChoNgoi);
-        
-        String maVeVuaThem = null;
-        Connection conn = null;
-        
-        if (choNgoiHienTai == null || !"Trống".equalsIgnoreCase(choNgoiHienTai.getTrangThai().trim())) {
-            throw new Exception("Chỗ ngồi " + maChoNgoi + " không còn trống hoặc không tồn tại.");
-        }
-        veMoi.setTrangThai("Đã đặt"); 
-        try {
-            // 2.0 LẤY KẾT NỐI VÀ VÔ HIỆU HÓA AUTO-COMMIT
-            conn = connectDB.getConnection();
-            conn.setAutoCommit(false); // Bắt đầu giao dịch [4, 6]
 
-            // Set maNhanVien cho veMoi trước khi insert (FIX cho lỗi NULL ở column maNhanVien)
+        String maChoNgoi = veMoi.getMaChoNgoi().getMaChoNgoi();
+        String maChuyenTau = veMoi.getMaChuyenTau().getMaChuyenTau();
+
+        // KIỂM TRA TRẠNG THÁI ĐỘNG: ĐÃ CÓ VÉ NÀO ĐẶT CHỖ NÀY TRONG CHUYẾN NÀY CHƯA?
+        if (veDao.kiemTraChoNgoiDaDuocDat(maChoNgoi, maChuyenTau)) {
+            throw new Exception("Chỗ ngồi " + maChoNgoi + " không còn trống.");
+        }
+
+        Connection conn = null;
+        String maVeVuaThem = null;
+
+        try {
+            conn = connectDB.getConnection();
+            conn.setAutoCommit(false);
+
+            veMoi.setTrangThai("Đã đặt");
             veMoi.setMaNhanVien(nvlap);
 
-            // 2.1. Cập nhật trạng thái chỗ ngồi thành 'Đã đặt' (Cần DAO nhận Connection)
-            // GIẢ ĐỊNH: cnDao.updateTrangThai(maChoNgoi, "Đã đặt", conn);
             if (!cnDao.updateTrangThai(maChoNgoi, "Đã đặt", conn)) {
-                throw new SQLException("Lỗi cập nhật trạng thái chỗ ngồi: " + maChoNgoi);
+                throw new SQLException("Cập nhật trạng thái chỗ ngồi thất bại.");
             }
-            
-            maVeVuaThem = veDao.themVe(veMoi, conn); 
-            if (maVeVuaThem == null || maVeVuaThem.trim().isEmpty()) {
-                throw new SQLException("Thêm vé thất bại, không nhận được mã vé.");
-            }
-            
-            LichSuVe lichSu = new LichSuVe(null, ID_BAN_VE, LocalDateTime.now(), maVeVuaThem,
-                    nvlap.getMaNhanVien());
-                lichSu.setMaHanhKhach(veMoi.getMaHanhkhach().getMaKH());
-                lichSu.setLyDo("Bán vé thành công");
-                lichSu.setPhiXuLy(BigDecimal.ZERO);
-                lsvDao.themLichSuVe(lichSu, conn); 
 
-            // NẾU TẤT CẢ THÀNH CÔNG: COMMIT GIAO DỊCH
-            conn.commit(); 
+            maVeVuaThem = veDao.themVe(veMoi, conn);
+            if (maVeVuaThem == null || maVeVuaThem.trim().isEmpty()) {
+                throw new SQLException("Thêm vé thất bại.");
+            }
+
+            LichSuVe lichSu = new LichSuVe(null, ID_BAN_VE, LocalDateTime.now(), maVeVuaThem, nvlap.getMaNhanVien());
+            lichSu.setMaHanhKhach(veMoi.getMaHanhkhach().getMaKH());
+            lichSu.setLyDo("Bán vé thành công");
+            lichSu.setPhiXuLy(BigDecimal.ZERO);
+            lsvDao.themLichSuVe(lichSu, conn);
+
+            conn.commit();
             return maVeVuaThem;
 
         } catch (SQLException e) {
-            // Nếu có bất kỳ lỗi CSDL nào (ví dụ: mất kết nối, lỗi FK, lỗi sequence), ROLLBACK
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException exRollback) {
-                    System.err.println("LỖI CẢNH BÁO: Không thể rollback giao dịch: " + exRollback.getMessage());
-                }
-            }
-            // Ném ngoại lệ nghiệp vụ sau khi rollback
-            throw new Exception("Đặt vé thất bại (Đã Rollback CSDL): " + e.getMessage());
-        } catch (Exception e) {
-            // Xử lý các lỗi logic/nghiệp vụ khác
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException exRollback) {}
-            }
+            if (conn != null) try { conn.rollback(); } catch (SQLException ignored) {}
             throw new Exception("Đặt vé thất bại: " + e.getMessage());
         } finally {
-            // Đảm bảo kết nối luôn được đóng
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true); // Trả lại chế độ mặc định nếu cần
-                    conn.close();
-                } catch (SQLException exClose) {}
-            }
+            if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException ignored) {}
         }
     }
-    public String getTenGaDen(String maLichTrinh) throws SQLException {
-        // Gọi thẳng đến phương thức đã có trong GaDAO [1, 2]
-        return gaDao.getTenGaDenByMaLichTrinh(maLichTrinh); 
-    }
+    
+    public String getTenGaDen(String maLichTrinh) throws SQLException { return gaDao.getTenGaDenByMaLichTrinh(maLichTrinh); }
+    public String getTenGaDi(String maLichTrinh) throws SQLException { return gaDao.getTenGaDiByMaLichTrinh(maLichTrinh); }
     public String getTenTau(String maTau) throws SQLException {
-    
-        Tau tau = tauDao.getTauByMaTau(maTau); // Giả định TauDAO có getTauByMa
-        return (tau != null) ? tau.getTenTau() : maTau; 
+        Tau tau = tauDao.getTauByMaTau(maTau);
+        return (tau != null) ? tau.getTenTau() : maTau;
     }
-    
     public boolean capNhatTrangThaiChoNgoi(String maChoNgoi, String trangThai) throws SQLException {
-        // Gọi DAO để cập nhật (sử dụng ChoNgoiDAO [9])
-        return choNgoiDAO.updateTrangThai(maChoNgoi, trangThai); 
+        return cnDao.updateTrangThai(maChoNgoi, trangThai);
     }
-
+    
     private BigDecimal tinhPhiHuy(BigDecimal giaGoc, LocalDateTime thoiGianKhoiHanh) {
         LocalDateTime thoiGianNOW = LocalDateTime.now();
         Duration duration = Duration.between(thoiGianNOW, thoiGianKhoiHanh); // [17]
@@ -273,10 +243,6 @@ public class QuanLyVeControl {
         }
     }
 
-	public String getTenGaDi(String maLichTrinh) throws SQLException {
-		// TODO Auto-generated method stub
-		 return gaDao.getTenGaDiByMaLichTrinh(maLichTrinh); 
-	}
 	public String getTenLoaiGhe(int IDloaiGhe) throws SQLException {
 	    return loaiGheDao.getTenLoaiGheByID(IDloaiGhe);
 	}
