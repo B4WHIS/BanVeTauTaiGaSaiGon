@@ -25,7 +25,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -33,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 
 import control.QuanLyHoaDonControl;
 import control.QuanLyVeControl;
+import dao.HanhKhachDAO;
 import dao.VeDAO;
 import entity.ChuyenTau;
 import entity.HanhKhach;
@@ -73,7 +73,7 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
     private GiaoDienNhapThongTinHK previousScreen;
     
     public GiaoDienThanhToan(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,
-    		GiaoDienNhapThongTinHK previous) {
+    		GiaoDienNhapThongTinHK previous) throws Exception {
         if (danhSachVe == null || danhSachVe.isEmpty()) {
             throw new IllegalArgumentException("Danh sách vé không được rỗng.");
         }
@@ -86,10 +86,14 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
         this.nhanVienLap = nv;
         this.nguoiThanhToan = nguoiThanhToan;
 
+        List<Ve> danhSachVeDaDat = new ArrayList<>();
+        
         for (Ve ve : danhSachVe) {
-            ve.setMaHanhkhach(this.nguoiThanhToan);
+            String maVe = dieuKhienVe.datVe(ve, ve.getMaHanhkhach(), nhanVienLap);
+            ve.setMaVe(maVe);
+            danhSachVeDaDat.add(ve);
         }
-
+        
         if (!danhSachVe.isEmpty()) {
             this.chuyenTauDuocChon = danhSachVe.get(0).getMaChuyenTau();
         }
@@ -322,64 +326,54 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
 
 
     private void xuLyThanhToan() {
-        
-        if (danhSachVe != null) {
-            System.out.println("Số vé: " + danhSachVe.size());
-            danhSachVe.forEach(v -> System.out.println("Vé: " + v.getMaVe()));
-        }
+        btnThanhToan.setEnabled(false);
 
-        
-        if (danhSachVe == null || danhSachVe.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Danh sách vé trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        HoaDon hoaDonDaLap = null;
-        List<Ve> danhSachVeDaDat = new ArrayList<>();
         try {
-           
-            for (Ve veChuaMa : danhSachVe) {
-                
-                
-                String maVe = dieuKhienVe.datVe(veChuaMa, veChuaMa.getMaHanhkhach(), nhanVienLap); 
-                if (maVe == null || maVe.isEmpty()) {
-                     throw new Exception("Lỗi CSDL: Không thể đặt vé cho chỗ ngồi: " + veChuaMa.getMaChoNgoi().getMaChoNgoi());
+            // BƯỚC 1: ĐẢM BẢO HÀNH KHÁCH CÓ MÃ TRONG DB
+            HanhKhachDAO hkDao = new HanhKhachDAO();
+            String maHK = nguoiThanhToan.getMaKH();
+
+            if (maHK == null || maHK.trim().isEmpty()) {
+                // Chưa có trong DB → thêm mới
+                if (!hkDao.themHanhKhach(nguoiThanhToan)) {
+                    throw new Exception("Không thể thêm hành khách mới.");
                 }
-                if (nhanVienLap != null) {
-                    System.out.println("Mã NV lập: " + nhanVienLap.getMaNhanVien());
-                } else {
-                    System.out.println("LỖI: Đối tượng nhanVienLap là NULL.");
+                // Lấy mã vừa thêm (giả sử DAO có hàm lấy theo CMND)
+                HanhKhach hkVuaThem = hkDao.layHanhKhachTheoCMND(nguoiThanhToan.getCmndCccd());
+                if (hkVuaThem == null || hkVuaThem.getMaKH() == null) {
+                    throw new Exception("Không lấy được mã hành khách sau khi thêm.");
                 }
-                veChuaMa.setMaVe(maVe);
-                danhSachVeDaDat.add(veChuaMa); 
+                maHK = hkVuaThem.getMaKH();
+                nguoiThanhToan.setMaKH(maHK); // CẬP NHẬT LẠI
             }
-            
-            
-            hoaDonDaLap = hdControl.lapHoaDon(nguoiThanhToan, nhanVienLap, danhSachVeDaDat); // [8]
+
+            // GÁN maHanhKhach CHO TẤT CẢ VÉ
+            for (Ve ve : danhSachVe) {
+                ve.getMaHanhkhach().setMaKH(maHK); // Quan trọng!
+            }
+
+            List<Ve> danhSachVeDaDat = new ArrayList<>();
+
+            // BƯỚC 2: ĐẶT TỪNG VÉ
+            for (Ve ve : danhSachVe) {
+                String maVe = dieuKhienVe.datVe(ve, nguoiThanhToan, nhanVienLap);
+                ve.setMaVe(maVe);
+                danhSachVeDaDat.add(ve);
+            }
+
+            // BƯỚC 3: LẬP HÓA ĐƠN
+            HoaDon hd = hdControl.lapHoaDon(nguoiThanhToan, nhanVienLap, danhSachVeDaDat);
+            JOptionPane.showMessageDialog(this, "Thanh toán thành công! Mã HD: " + hd.getMaHoaDon());
+            this.dispose();
+            new GiaoDienLapHoaDon(danhSachVeDaDat, nguoiThanhToan, nhanVienLap, this).setVisible(true);
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi: " + e.getMessage(), "Thanh toán thất bại",
-            JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                "Lỗi đặt vé cho chỗ A-001:\n" + e.getMessage(),
+                "Đặt vé thất bại", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-            
-            
             btnThanhToan.setEnabled(true);
-            return;
         }
-
-        if (hoaDonDaLap != null) {
-            JOptionPane.showMessageDialog(this, "Thanh toán thành công! Mã HD: " + hoaDonDaLap.getMaHoaDon());
-            this.dispose();
-           
-            SwingUtilities.invokeLater(() -> {
-                new GiaoDienLapHoaDon(danhSachVe, nguoiThanhToan, nhanVienLap, this).setVisible(true);
-            });
-        }
-    }
-
-    private void xuLyApDungKhuyenMai() {
-       
-        JOptionPane.showMessageDialog(this, "Chức năng áp dụng mã Khuyến Mãi chưa được tích hợp logic tính toán.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
@@ -396,7 +390,7 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
                 previousScreen.setVisible(true); 
             }
         } else if (nguon == btnApDungMa) {
-            xuLyApDungKhuyenMai();
+//            xuLyApDungKhuyenMai();
         }
     }
 }

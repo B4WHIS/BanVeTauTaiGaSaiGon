@@ -20,13 +20,13 @@ import entity.NhanVien;
 
 public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener {
 
-    private JButton btnDatVe;
-    private JButton btnHuyVe;
-    private JButton btnDoiVe;
-    private JButton btnTimChuyenTau;
+    private JButton btnQLNV;
+    private JButton btnQLHK;
+    private JButton btnQLCT;
+    private JButton btnQLKM;
     private JButton btnDangXuat;
 	private JButton btnQuanLyGa;
-	private JButton btnQuanLyLichTrinh;
+	private JButton btnQLLT;
 	private JButton btnLoaiChucVu;
 
    
@@ -35,14 +35,14 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
         pnlChucNang = taoPanelMenuChinh();
         pnlChinh.add(pnlChucNang, BorderLayout.CENTER);
         
-        btnQuanLyLichTrinh.addActionListener(this);
-       btnQuanLyGa.addActionListener(this);
-        btnDatVe.addActionListener(this);
-        btnHuyVe.addActionListener(this);
-        btnDoiVe.addActionListener(this);
-        btnTimChuyenTau.addActionListener(this);
+        btnQLLT.addActionListener(this);
+   
+        btnQLNV.addActionListener(this);
+        btnQLHK.addActionListener(this);
+        btnQLCT.addActionListener(this);
+        btnQLKM.addActionListener(this);
         btnDangXuat.addActionListener(this);
-        btnLoaiChucVu.addActionListener(this);
+ 
     }
 
    
@@ -56,59 +56,47 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
         pnlChucNang.setBackground(new Color(221, 218, 208));
 
         // Nút Quản lý nhân viên
-        btnDatVe = new JButton("QUẢN LÝ NHÂN VIÊN");
-        btnDatVe.setBackground(Color.white);
-        btnDatVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnDatVe.setForeground(new Color(93, 156, 236));
-        btnDatVe.setIcon(chinhKichThuoc("/img/group.png", 60, 60));
-        themHieuUngHover(btnDatVe, new Color(93, 156, 236));
+        btnQLNV = new JButton("QUẢN LÝ NHÂN VIÊN");
+        btnQLNV.setBackground(Color.white);
+        btnQLNV.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnQLNV.setForeground(new Color(93, 156, 236));
+        btnQLNV.setIcon(chinhKichThuoc("/img/group.png", 60, 60));
+        themHieuUngHover(btnQLNV, new Color(93, 156, 236));
 
         // Nút Quản lý hành khách
-        btnHuyVe = new JButton("QUẢN LÝ HÀNH KHÁCH");
-        btnHuyVe.setBackground(Color.white);
-        btnHuyVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnHuyVe.setForeground(new Color(74, 140, 103));
-        btnHuyVe.setIcon(chinhKichThuoc("/img/passenger.png", 55, 55));
-        themHieuUngHover(btnHuyVe, new Color(74, 140, 103));
+        btnQLHK = new JButton("QUẢN LÝ HÀNH KHÁCH");
+        btnQLHK.setBackground(Color.white);
+        btnQLHK.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnQLHK.setForeground(new Color(74, 140, 103));
+        btnQLHK.setIcon(chinhKichThuoc("/img/passenger.png", 55, 55));
+        themHieuUngHover(btnQLHK, new Color(74, 140, 103));
 
         //  Nút Quản lý chuyến tàu 
-        btnDoiVe = new JButton("QUẢN LÝ CHUYẾN TÀU");
-        btnDoiVe.setBackground(Color.white);
-        btnDoiVe.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnDoiVe.setForeground(new Color(247, 82, 112));
-        btnDoiVe.setIcon(chinhKichThuoc("/img/QLtrain.png", 55, 55));
-        themHieuUngHover(btnDoiVe, new Color(247, 82, 112));
+        btnQLCT = new JButton("QUẢN LÝ CHUYẾN TÀU");
+        btnQLCT.setBackground(Color.white);
+        btnQLCT.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnQLCT.setForeground(new Color(247, 82, 112));
+        btnQLCT.setIcon(chinhKichThuoc("/img/QLtrain.png", 55, 55));
+        themHieuUngHover(btnQLCT, new Color (102, 11, 5));
 
         // === Nút Quản lý khuyến mãi ===
-        btnTimChuyenTau = new JButton("QUẢN LÝ KHUYẾN MÃI");
-        btnTimChuyenTau.setBackground(Color.white);
-        btnTimChuyenTau.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnTimChuyenTau.setForeground(new Color(228, 90, 146));
-        btnTimChuyenTau.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
-        themHieuUngHover(btnTimChuyenTau, new Color(228, 90, 146));
+        btnQLKM = new JButton("QUẢN LÝ KHUYẾN MÃI");
+        btnQLKM.setBackground(Color.white);
+        btnQLKM.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnQLKM.setForeground(new Color(228, 90, 146));
+        btnQLKM.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
+        themHieuUngHover(btnQLKM, new Color (83, 59, 77));
 
-        // === Nút Quản lý khuyến mãi ===
-        btnQuanLyGa = new JButton("QUẢN LÝ GA");
-        btnQuanLyGa.setBackground(Color.white);
-        btnQuanLyGa.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnQuanLyGa.setForeground(new Color(247, 82, 112));
-//        btnQuanLyGa.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
-//        themHieuUngHover(btnQuanLyGa, new Color(228, 90, 146));
+    
         
      // === Nút Quản lý khuyến mãi ===
-        btnQuanLyLichTrinh = new JButton("QUẢN LÝ LỊCH TRÌNH");
-        btnQuanLyLichTrinh.setBackground(Color.white);
-        btnQuanLyLichTrinh.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnQuanLyLichTrinh.setForeground(Color.CYAN);
-//        btnQuanLyGa.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
-//        themHieuUngHover(btnQuanLyLichTrinh, new Color(228, 90, 146));
+        btnQLLT = new JButton("QUẢN LÝ LỊCH TRÌNH");
+        btnQLLT.setBackground(Color.white);
+        btnQLLT.setFont(new Font("Segoe UI", Font.BOLD, 35));
+        btnQLLT.setForeground(new Color (138, 190, 185));
+        btnQLLT.setIcon(chinhKichThuoc("/img/lichTrinh.png", 55, 55));
+        themHieuUngHover(btnQLLT, new Color (48, 86, 105));
         
-        btnLoaiChucVu = new JButton("QUẢN LÝ LOẠI CHỨC VỤ");
-        btnLoaiChucVu.setBackground(Color.white);
-        btnLoaiChucVu.setFont(new Font("Segoe UI", Font.BOLD, 35));
-        btnLoaiChucVu.setForeground(Color.BLACK);
-//        btnQuanLyGa.setIcon(chinhKichThuoc("/img/coupon.png", 65, 65));
-//        themHieuUngHover(btnQuanLyLichTrinh, new Color(228, 90, 146));
         
         //Nút Đăng xuất
         btnDangXuat = new JButton("ĐĂNG XUẤT");
@@ -116,18 +104,16 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
         btnDangXuat.setFont(new Font("Segoe UI", Font.BOLD, 30));
         btnDangXuat.setForeground(Color.orange);
         btnDangXuat.setIcon(chinhKichThuoc("/img/export.png", 55, 55));
-        themHieuUngHover(btnDangXuat, Color.orange);
+        themHieuUngHover(btnDangXuat,new Color (123, 84, 47));
 
         //THÊM NÚT VÀO PANEL
         
 
-        pnlChucNang.add(btnDatVe);
-        pnlChucNang.add(btnHuyVe);
-        pnlChucNang.add(btnDoiVe);
-        pnlChucNang.add(btnTimChuyenTau);
-        pnlChucNang.add(btnQuanLyLichTrinh);	
-        pnlChucNang.add(btnQuanLyGa);
-        pnlChucNang.add(btnLoaiChucVu);
+        pnlChucNang.add(btnQLNV);
+        pnlChucNang.add(btnQLHK);
+        pnlChucNang.add(btnQLCT);
+        pnlChucNang.add(btnQLKM);
+        pnlChucNang.add(btnQLLT);	
         pnlChucNang.add(btnDangXuat);
         
         pnlChucNang.setPreferredSize(new Dimension(350, 70));
@@ -156,19 +142,19 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
 
-        if (src == btnDatVe) {
+        if (src == btnQLNV) {
             new QuanLyNhanVien().setVisible(true);
             this.dispose();
         } 
-        else if (src == btnHuyVe) {
+        else if (src == btnQLHK) {
             new QuanLyHanhKhach().setVisible(true);
             this.dispose();
         } 
-        else if (src == btnDoiVe) {
+        else if (src == btnQLCT) {
             new QuanLyChuyenTau().setVisible(true);
             this.dispose();
         } 
-        else if (src == btnTimChuyenTau) {
+        else if (src == btnQLKM) {
             new QuanLykhuyenMai().setVisible(true);
             this.dispose();
         } 
@@ -188,15 +174,14 @@ public class MHC_NhanVienQuanLy extends GiaoDienChinh implements ActionListener 
                 this.dispose();
             }
         }
-        else if (src == btnQuanLyGa) {
-            new QuanLyGa().setVisible(true);
-            this.dispose();
-        } 
-        else if (src == btnQuanLyLichTrinh) {
-            new QuanLyLichTrinh().setVisible(true);
-            this.dispose();
-        } else if (src == btnLoaiChucVu) {
-            new QuanLyLoaiChucVu().setVisible(true);
+      
+        else if (src == btnQLLT) {
+            try {
+				new QuanLyLichTrinh().setVisible(true);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
             this.dispose();
         } 
         

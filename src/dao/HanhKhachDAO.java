@@ -46,25 +46,25 @@ public class HanhKhachDAO {
 	    return hk;
 	}
     
-    public boolean themHanhKhach(HanhKhach hk) throws SQLException {
-        String sql = "INSERT INTO HanhKhach (hoTen, cmndCccd, soDienThoai, ngaySinh, maUuDai, TrangThai) VALUES (?, ?, ?, ?, ?, ?)";
-        try(
-            Connection con = connectDB.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)){
-            
-            ps.setString(1, hk.getHoTen());
-            ps.setString(2, hk.getCmndCccd());
-            ps.setString(3, hk.getSoDT());
-            ps.setDate(4, Date.valueOf(hk.getNgaySinh()));
-            ps.setString(5, hk.getMaUuDai());
-            ps.setString(6, hk.getTrangThai()); 
-            
-            return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-    }
+	public boolean themHanhKhach(HanhKhach hk) throws SQLException {
+	    String sql = "INSERT INTO HanhKhach (hoTen, cmndCccd, soDienThoai, ngaySinh, maUuDai, TrangThai) VALUES (?, ?, ?, ?, ?, ?)";
+	    try (Connection con = connectDB.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+
+	        ps.setString(1, hk.getHoTen());
+	        ps.setString(2, hk.getCmndCccd());
+	        ps.setString(3, hk.getSoDT());
+	        ps.setDate(4, hk.getNgaySinh() != null ? Date.valueOf(hk.getNgaySinh()) : null);
+
+	        String maUuDai = hk.getMaUuDai();
+	        if (maUuDai == null || maUuDai.trim().isEmpty()) maUuDai = "UD-01";
+	        ps.setString(5, maUuDai);
+
+	        ps.setString(6, hk.getTrangThai() != null ? hk.getTrangThai() : "Hoạt động");
+
+	        return ps.executeUpdate() > 0;
+	    }
+	}
     
     public List<HanhKhach> layDanhSachHanhKhachHoatDong() throws SQLException {
         List<HanhKhach> danhSachHK = new ArrayList<>();
@@ -85,22 +85,22 @@ public class HanhKhachDAO {
     
     public boolean capNhatHanhKhach(HanhKhach hk) throws SQLException {
         String sql = "UPDATE HanhKhach SET hoTen = ?, cmndCccd = ?, soDienThoai = ?, ngaySinh = ?, maUuDai = ?, TrangThai = ? WHERE maHanhKhach = ?";
-        try(
-            Connection con = connectDB.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setString(1, hk.getHoTen());
             ps.setString(2, hk.getCmndCccd());
             ps.setString(3, hk.getSoDT());
-            ps.setDate(4, Date.valueOf(hk.getNgaySinh()));
-            ps.setString(5, hk.getMaUuDai());
-            ps.setString(6, hk.getTrangThai());
+            ps.setDate(4, hk.getNgaySinh() != null ? Date.valueOf(hk.getNgaySinh()) : null);
+
+            String maUuDai = hk.getMaUuDai();
+            if (maUuDai == null || maUuDai.trim().isEmpty()) maUuDai = "UD-01";
+            ps.setString(5, maUuDai);
+
+            ps.setString(6, hk.getTrangThai() != null ? hk.getTrangThai() : "Hoạt động");
             ps.setString(7, hk.getMaKH());
-            
+
             return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
         }
     }
     
@@ -134,94 +134,65 @@ public class HanhKhachDAO {
     }
 
     
-    public HanhKhach layHanhKhachTheoCMND(String cmndCccd) throws SQLException {
-        String sql = "SELECT * FROM HanhKhach WHERE cmndCccd = ? AND TrangThai = N'Hoạt động'";
-        HanhKhach hk = null;
-        try (
-            Connection con = connectDB.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, cmndCccd);
+    public HanhKhach layHanhKhachTheoCMND(String cmnd) throws SQLException {
+        String sql = "SELECT * FROM HanhKhach WHERE cmndCccd = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, cmnd);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    hk = layHanhKhachTuResultSet(rs);
+                    return layHanhKhachTuResultSet(rs);
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
         }
-        return hk;
+        return null;
     }
     
-    public HanhKhach layHanhKhachTheoSDT(String soDT) throws SQLException {
+    public HanhKhach layHanhKhachTheoSDT(String sdt) throws SQLException {
         String sql = "SELECT * FROM HanhKhach WHERE soDienThoai = ? AND TrangThai = N'Hoạt động'";
-        HanhKhach hk = null;
-        try (
-            Connection con = connectDB.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, soDT);
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, sdt);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    hk = layHanhKhachTuResultSet(rs);
-                }
+                return rs.next() ? layHanhKhachTuResultSet(rs) : null;
             }
-        } catch (SQLException ex) {
-            System.err.println("Lỗi tìm kiếm hành khách theo SĐT: " + ex.getMessage());
-            throw ex;
         }
-        return hk;
     }
 
+    
+    
     public List<HanhKhach> timHanhKhachTheoDieuKien(String ten, String cmnd, String sdt, LocalDate ngaySinh, String maUuDai) throws SQLException {
         List<HanhKhach> ds = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM HanhKhach WHERE TrangThai = N'Hoạt động'");
+        List<Object> params = new ArrayList<>();
 
-        if (!ten.isEmpty()) sql.append(" AND hoTen LIKE ?");
-        if (!cmnd.isEmpty()) sql.append(" AND cmndCccd LIKE ?");
-        if (!sdt.isEmpty()) sql.append(" AND soDienThoai LIKE ?");
-        if (ngaySinh != null) sql.append(" AND ngaySinh = ?");  // Exact match cho ngày sinh, vì là date
-        if (maUuDai != null && !maUuDai.isEmpty() && !"UD-01".equals(maUuDai)) {  // Bỏ qua nếu default
-            sql.append(" AND maUuDai = ?");
-        }
+        if (ten != null && !ten.isEmpty()) { sql.append(" AND hoTen LIKE ?"); params.add("%" + ten + "%"); }
+        if (cmnd != null && !cmnd.isEmpty()) { sql.append(" AND cmndCccd LIKE ?"); params.add("%" + cmnd + "%"); }
+        if (sdt != null && !sdt.isEmpty()) { sql.append(" AND soDienThoai LIKE ?"); params.add("%" + sdt + "%"); }
+        if (ngaySinh != null) { sql.append(" AND ngaySinh = ?"); params.add(Date.valueOf(ngaySinh)); }
+        if (maUuDai != null && !maUuDai.isEmpty() && !"UD-01".equals(maUuDai)) { sql.append(" AND maUuDai = ?"); params.add(maUuDai); }
 
         try (Connection con = connectDB.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql.toString())) {
-
-            int index = 1;
-            if (!ten.isEmpty()) stmt.setString(index++, "%" + ten + "%");
-            if (!cmnd.isEmpty()) stmt.setString(index++, "%" + cmnd + "%");
-            if (!sdt.isEmpty()) stmt.setString(index++, "%" + sdt + "%");
-            if (ngaySinh != null) stmt.setDate(index++, java.sql.Date.valueOf(ngaySinh));  // Chuyển LocalDate sang sql.Date
-            if (maUuDai != null && !maUuDai.isEmpty() && !"UD-01".equals(maUuDai)) {
-                stmt.setString(index++, maUuDai);
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    ds.add(layHanhKhachTuResultSet(rs));
-                }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ds.add(layHanhKhachTuResultSet(rs));
             }
         }
         return ds;
     }
     
     public HanhKhach layHanhKhachTheoMa(String maHK) throws SQLException {
-        String sql = "SELECT maHanhKhach, hoTen, ngaySinh, soDienThoai, cmndCccd, maUuDai FROM HanhKhach WHERE maHanhKhach = ?";
-        try (   Connection conn = connectDB.getConnection();
-        		PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM HanhKhach WHERE maHanhKhach = ?";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maHK);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String ma = rs.getString("maHanhKhach");
-                    String hoTen = rs.getString("hoTen");
-                    LocalDate ngaySinh = rs.getDate("ngaySinh").toLocalDate();
-                    String sdt = rs.getString("soDienThoai");
-                    String cmnd = rs.getString("cmndCccd");
-                    String maUuDai = rs.getString("maUuDai");
-                    return new HanhKhach(ma, hoTen, ngaySinh, sdt, cmnd, maUuDai);
-                }
+                return rs.next() ? layHanhKhachTuResultSet(rs) : null;
             }
         }
-        return null;
     }
     
     public List<HanhKhach> timKiemHanhKhach(String tuKhoa) throws SQLException {
@@ -252,5 +223,37 @@ public class HanhKhachDAO {
         rs.close();
         ps.close(); 
         return ds;
+    }
+    public String themHanhKhach2(HanhKhach hk) throws SQLException {
+        String sql = "INSERT INTO HanhKhach (hoTen, cmndCccd, soDienThoai, ngaySinh, maUuDai, TrangThai) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection con = connectDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, hk.getHoTen());
+            ps.setString(2, hk.getCmndCccd());
+            ps.setString(3, hk.getSoDT());
+            ps.setDate(4, Date.valueOf(hk.getNgaySinh()));
+
+            // BẮT BUỘC maUuDai KHÔNG ĐƯỢC RỖNG
+            String maUD = hk.getMaUuDai();
+            System.out.println("DEBUG: maUD vào DAO = " + maUD);
+            if (maUD == null || maUD.trim().isEmpty()) {
+                throw new IllegalArgumentException("maUuDai không được để trống khi thêm hành khách");
+            }
+            ps.setString(5, maUD.trim());
+
+            ps.setString(6, hk.getTrangThai() != null ? hk.getTrangThai() : "Hoạt động");
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int id = generatedKeys.getInt(1);
+                        String generatedMaHK = "HK-" + String.format("%05d", id);
+                        hk.setMaKH(generatedMaHK);
+                        return generatedMaHK;
+                    }
+                }
+            }
+            return null;
+        }
     }
 }

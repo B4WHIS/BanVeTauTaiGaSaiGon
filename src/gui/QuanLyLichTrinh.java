@@ -1,27 +1,13 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import control.QuanLyLichTrinhController;
@@ -31,37 +17,35 @@ import entity.Ga;
 import entity.LichTrinh;
 
 public class QuanLyLichTrinh extends GiaoDienChinh {
-    // Components
+
     private JTable tblLichTrinh;
     private DefaultTableModel modelLT;
     private JTextField txtMaLichTrinh, txtTenLichTrinh, txtKhoangCach;
     private JComboBox<String> cbGaDi, cbGaDen;
-    private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe;
-    private JButton btnLuu;
-
-    // Controller & DAO
+    private JButton btnThem, btnSua, btnXoa, btnReset, btnExport, btnTroVe, btnTim;
     private QuanLyLichTrinhController controller;
-    private LichTrinhDAO lichTrinhDAO;
-    private GaDAO gaDAO;
+    private LichTrinhDAO lichTrinhDAO = new LichTrinhDAO();
+    private GaDAO gaDAO = new GaDAO();
 
-    public QuanLyLichTrinh() {
+    // Trạng thái
+    private boolean dangNhap = false;
+    private boolean dangSua = false;
+	private QuanLyLichTrinh view;
+
+    public QuanLyLichTrinh() throws Exception {
         super();
-        lichTrinhDAO = new LichTrinhDAO();
-        gaDAO = new GaDAO();
         controller = new QuanLyLichTrinhController(this);
-
         setTitle("Quản lý lịch trình");
-        setSize(1300, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setJMenuBar(taoMenuBar());
 
         JPanel pnlMain = new JPanel(new BorderLayout(10, 10));
         pnlMain.setBackground(new Color(245, 247, 250));
 
         // ===== TITLE =====
         JLabel lblTitle = new JLabel("QUẢN LÝ LỊCH TRÌNH", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 44));
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setOpaque(true);
         lblTitle.setBackground(new Color(103, 192, 144));
@@ -70,13 +54,12 @@ public class QuanLyLichTrinh extends GiaoDienChinh {
 
         // ===== LEFT PANEL =====
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
-        pnlLeft.setPreferredSize(new Dimension(500, 0));
+        pnlLeft.setPreferredSize(new Dimension(540, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
 
-        JLabel lblLeftTitle = new JLabel("THÔNG TIN LỊCH TRÌNH", SwingConstants.CENTER);
-        lblLeftTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblLeftTitle.setForeground(new Color(103, 192, 144));
-        lblLeftTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        TitledBorder titleBorder = BorderFactory.createTitledBorder("Nhập Thông Tin Tra Cứu");
+        titleBorder.setTitleFont(new Font("Segoe UI", Font.BOLD, 24));
+        pnlLeft.setBorder(titleBorder);
 
         // ===== FORM =====
         JPanel pnlForm = new JPanel(new GridBagLayout());
@@ -89,7 +72,7 @@ public class QuanLyLichTrinh extends GiaoDienChinh {
         Font lblFont = new Font("Segoe UI", Font.BOLD, 19);
         Font txtFont = new Font("Segoe UI", Font.PLAIN, 20);
 
-        JLabel lblMaLT = new JLabel("Mã lịch trình:");
+        JLabel lblMaLT = new JLabel("Mã LT:");
         JLabel lblTenLT = new JLabel("Tên lịch trình:");
         JLabel lblGaDi = new JLabel("Ga đi:");
         JLabel lblGaDen = new JLabel("Ga đến:");
@@ -101,74 +84,60 @@ public class QuanLyLichTrinh extends GiaoDienChinh {
             lbl.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        txtMaLichTrinh = new JTextField();
-        txtMaLichTrinh.setEditable(false);
+        txtMaLichTrinh = new JTextField(); txtMaLichTrinh.setEnabled(false);
         txtTenLichTrinh = new JTextField();
         txtKhoangCach = new JTextField();
         cbGaDi = new JComboBox<>();
         cbGaDen = new JComboBox<>();
 
-        Component[] inputs = {txtMaLichTrinh, txtTenLichTrinh, cbGaDi, cbGaDen, txtKhoangCach};
-        for (Component comp : inputs) {
-            if (comp instanceof JTextField) {
-                JTextField txt = (JTextField) comp;
-                txt.setFont(txtFont);
-                txt.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(150, 150, 150)),
-                        BorderFactory.createEmptyBorder(5, 8, 5, 8)
-                ));
-                txt.setPreferredSize(new Dimension(220, 30));
-            } else if (comp instanceof JComboBox) {
-                JComboBox<?> cb = (JComboBox<?>) comp;
-                cb.setFont(txtFont);
-                cb.setPreferredSize(new Dimension(220, 30));
-            }
+        JTextField[] textFields = {txtMaLichTrinh, txtTenLichTrinh, txtKhoangCach};
+        for (JTextField txt : textFields) {
+            txt.setFont(txtFont);
+            txt.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(150, 150, 150)),
+                    BorderFactory.createEmptyBorder(5, 8, 5, 8)
+            ));
         }
+        cbGaDi.setFont(txtFont); cbGaDen.setFont(txtFont);
+        cbGaDi.setPreferredSize(new Dimension(200, 40)); cbGaDen.setPreferredSize(new Dimension(200, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 8, 10, 8);
+        gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        for (int i = 0; i < labels.length; i++) {
-            gbc.gridx = 0;
-            gbc.gridy = i;
-            gbc.weightx = 0.35;
-            pnlForm.add(labels[i], gbc);
-            gbc.gridx = 1;
-            gbc.weightx = 0.65;
-            pnlForm.add(inputs[i], gbc);
+        int row = 0;
+        for (JLabel lbl : labels) {
+            gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0.3; gbc.anchor = GridBagConstraints.EAST;
+            pnlForm.add(lbl, gbc);
+            gbc.gridx = 1; gbc.weightx = 0.7; gbc.anchor = GridBagConstraints.WEST;
+            if (row == 0) pnlForm.add(txtMaLichTrinh, gbc);
+            else if (row == 1) pnlForm.add(txtTenLichTrinh, gbc);
+            else if (row == 2) pnlForm.add(cbGaDi, gbc);
+            else if (row == 3) pnlForm.add(cbGaDen, gbc);
+            else if (row == 4) pnlForm.add(txtKhoangCach, gbc);
+            row++;
         }
 
         // ===== BUTTONS =====
-        btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus.png");
-        btnSua = taoButton("Sửa", new Color(241, 196, 15), "/img/maintenance.png");
-        btnXoa = taoButton("Xóa", new Color(231, 76, 60), "/img/bin.png");
-        btnReset = taoButton("Làm mới", new Color(52, 152, 219), "/img/reset.png");
-        btnExport = taoButton("Xuất Excel", new Color(155, 89, 182), "/img/export.png");
+        btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus2.png");
+        btnSua = taoButton("Sửa", new Color(187, 102, 83), "/img/repair.png");
+        btnXoa = taoButton("Xóa", new Color(231, 76, 60), "/img/trash-bin.png");
+        btnReset = taoButton("Làm mới", new Color(52, 152, 219), "/img/undo2.png");
+        btnExport = taoButton("Xuất Excel", new Color(241, 196, 15), "/img/export2.png");
+        btnTim = taoButton("Tìm", new Color(155, 89, 182), "/img/magnifying-glass.png");
 
-        btnLuu = new JButton("Lưu");
-        btnLuu.setBackground(new Color(46, 204, 113));
-        btnLuu.setForeground(Color.WHITE);
-        btnLuu.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnLuu.setPreferredSize(new Dimension(100, 35));
-        btnLuu.setEnabled(false);
-
-        JPanel pnlButtons = new JPanel(new GridLayout(2, 3, 10, 10));
+        JPanel pnlButtons = new JPanel(new GridLayout(3, 2, 10, 10));
         pnlButtons.setBackground(new Color(245, 247, 250));
-        pnlButtons.add(btnThem);
-        pnlButtons.add(btnSua);
-        pnlButtons.add(btnXoa);
-        pnlButtons.add(btnReset);
-        pnlButtons.add(btnLuu);
-        pnlButtons.add(btnExport);
+        pnlButtons.add(btnThem); pnlButtons.add(btnSua);
+        pnlButtons.add(btnXoa); pnlButtons.add(btnReset);
+        pnlButtons.add(btnExport); pnlButtons.add(btnTim);
 
-        pnlLeft.add(lblLeftTitle, BorderLayout.NORTH);
         pnlLeft.add(pnlForm, BorderLayout.CENTER);
         pnlLeft.add(pnlButtons, BorderLayout.SOUTH);
 
         // ===== RIGHT PANEL =====
         JPanel pnlRight = new JPanel(new BorderLayout(10, 10));
-        pnlRight.setBackground(new Color(245, 247, 250));
+        pnlRight.setBackground(Color.WHITE);
 
         String[] colHeader = {"Mã LT", "Tên lịch trình", "Ga đi", "Ga đến", "Khoảng cách (km)"};
         modelLT = new DefaultTableModel(colHeader, 0);
@@ -176,21 +145,26 @@ public class QuanLyLichTrinh extends GiaoDienChinh {
         tblLichTrinh.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         tblLichTrinh.setRowHeight(28);
         tblLichTrinh.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
-        tblLichTrinh.setSelectionBackground(new Color(173, 216, 230));
+        tblLichTrinh.setSelectionBackground(new Color(58, 111, 67));
 
         JScrollPane scroll = new JScrollPane(tblLichTrinh);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
-        pnlRight.add(scroll, BorderLayout.CENTER);
+
+        TitledBorder tblBorder = BorderFactory.createTitledBorder("Danh Sách Lịch Trình");
+        tblBorder.setTitleFont(new Font("Segoe UI", Font.BOLD, 24));
+        JPanel pnlTable = new JPanel(new BorderLayout());
+        pnlTable.setBorder(tblBorder);
+        pnlTable.add(scroll, BorderLayout.CENTER);
+        pnlRight.add(pnlTable, BorderLayout.CENTER);
 
         // ===== FOOTER =====
         JPanel pnlFooter = new JPanel(new BorderLayout());
-        pnlFooter.setBackground(new Color(103, 192, 144));
-        pnlFooter.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        btnTroVe = taoButton("Trở về", new Color(41, 128, 185), "/img/loginicon.png");
-        btnTroVe.setPreferredSize(new Dimension(130, 45));
+        pnlFooter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        btnTroVe = taoButton("Trở về", new Color(41, 128, 185), "");
+        btnTroVe.setForeground(Color.WHITE);
+        btnTroVe.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        btnTroVe.setPreferredSize(new Dimension(160, 60));
         pnlFooter.add(btnTroVe, BorderLayout.WEST);
-        
 
         // ===== ADD ALL =====
         pnlMain.add(pnlLeft, BorderLayout.WEST);
@@ -204,135 +178,185 @@ public class QuanLyLichTrinh extends GiaoDienChinh {
 
         // Attach listeners
         attachListeners();
+
+        enableFormFields(false);
     }
 
-    // Load combo ga
-    private void loadCombosFromDB() {
-        cbGaDi.removeAllItems();
-        cbGaDen.removeAllItems();
-        List<Ga> listGa = gaDAO.getAllGa();
-        for (Ga ga : listGa) {
-            String item = ga.getTenGa() + " (" + ga.getMaGa() + ")";
-            cbGaDi.addItem(item);
-            cbGaDen.addItem(item);
-        }
-    }
-
-    // Load table
-    private void loadDataFromDB() {
-        modelLT.setRowCount(0);
-        try {
-            List<LichTrinh> list = lichTrinhDAO.getAllLichTrinh();
-            for (LichTrinh lt : list) {
-                modelLT.addRow(new Object[]{
-                    lt.getMaLichTrinh(),
-                    lt.getTenLichTrinh(),
-                    lt.getMaGaDi().getTenGa(),
-                    lt.getMaGaDen().getTenGa(),
-                    lt.getKhoangCach()
-                });
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi load dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // Attach listeners
     private void attachListeners() {
-        btnThem.addActionListener(controller);
-        btnSua.addActionListener(controller);
-        btnXoa.addActionListener(controller);
-        btnReset.addActionListener(controller);
-        btnExport.addActionListener(controller);
-        btnTroVe.addActionListener(controller);
-        btnLuu.addActionListener(controller);
+        // === THÊM: NHẤN 2 LẦN ===
+        btnThem.addActionListener(e -> {
+            if (!dangNhap && !dangSua) {
+                controller.them();
+                dangNhap = true;
+                btnThem.setText("Xác nhận thêm");
+                btnThem.setIcon(chinhKichThuoc("/img/check.png", 24, 24));
+            } else if (dangNhap) {
+                try {
+                    controller.xuLyThem();
+                    dangNhap = false;
+                    btnThem.setText("Thêm");
+                    btnThem.setIcon(chinhKichThuoc("/img/plus2.png", 24, 24));
+                } catch (Exception ex) {
+                    showMessage("Lỗi thêm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
 
-        tblLichTrinh.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                controller.handleTableSelection();
+        // === SỬA: NHẤN 2 LẦN ===
+        btnSua.addActionListener(e -> {
+            if (!dangSua && !dangNhap) {
+                controller.sua();
+                dangSua = true;
+                btnSua.setText("Xác nhận sửa");
+                btnSua.setIcon(chinhKichThuoc("/img/check.png", 24, 24));
+            } else if (dangSua) {
+                try {
+                    controller.xuLySua();
+                    dangSua = false;
+                    btnSua.setText("Sửa");
+                    btnSua.setIcon(chinhKichThuoc("/img/repair.png", 24, 24));
+                } catch (Exception ex) {
+                    showMessage("Lỗi sửa: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // === HỦY KHI LÀM MỚI ===
+        btnReset.addActionListener(e -> {
+            dangNhap = false;
+            dangSua = false;
+            btnThem.setText("Thêm");
+            btnThem.setIcon(chinhKichThuoc("/img/plus2.png", 24, 24));
+            btnSua.setText("Sửa");
+            btnSua.setIcon(chinhKichThuoc("/img/repair.png", 24, 24));
+            try {
+				view.refreshData();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        });
+
+        btnXoa.addActionListener(controller);
+        btnExport.addActionListener(controller);
+        btnTim.addActionListener(controller);
+        btnTroVe.addActionListener(controller);
+
+        tblLichTrinh.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+					controller.handleTableSelection();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             }
         });
     }
 
-    // ===== GETTERS =====
-    public JButton getBtnThem() { return btnThem; }
-    public JButton getBtnSua() { return btnSua; }
-    public JButton getBtnXoa() { return btnXoa; }
-    public JButton getBtnReset() { return btnReset; }
-    public JButton getBtnExport() { return btnExport; }
-    public JButton getBtnTroVe() { return btnTroVe; }
-    public JButton getBtnLuu() { return btnLuu; }
-    public JTable getTblLichTrinh() { return tblLichTrinh; }
-    public DefaultTableModel getModelLT() { return modelLT; }
-    public JTextField getTxtMaLichTrinh() { return txtMaLichTrinh; }
-    public JTextField getTxtTenLichTrinh() { return txtTenLichTrinh; }
-    public JComboBox<String> getCbGaDi() { return cbGaDi; }
-    public JComboBox<String> getCbGaDen() { return cbGaDen; }
-    public JTextField getTxtKhoangCach() { return txtKhoangCach; }
+    public JButton taoButton(String text, Color bg, String iconPath) {
+        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
+        btn.setBackground(bg);
+        btn.setForeground(Color.BLACK);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+        });
+        return btn;
+    }
 
-    // Load form
-    public void loadFormData(LichTrinh lt) {
-        if (lt != null) {
-            txtMaLichTrinh.setText(lt.getMaLichTrinh());
-            txtTenLichTrinh.setText(lt.getTenLichTrinh());
-            txtKhoangCach.setText(String.valueOf(lt.getKhoangCach()));
-            setComboSelection(cbGaDi, lt.getMaGaDi().getTenGa());
-            setComboSelection(cbGaDen, lt.getMaGaDen().getTenGa());
+    public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
+        URL iconUrl = QuanLyLichTrinh.class.getResource(duongDan);
+        if (iconUrl == null) return null;
+        ImageIcon icon = new ImageIcon(iconUrl);
+        Image img = icon.getImage().getScaledInstance(rong, cao, Image.SCALE_SMOOTH);
+        return new ImageIcon(img);
+    }
+
+    private void loadCombosFromDB() {
+        cbGaDi.removeAllItems(); cbGaDen.removeAllItems();
+        List<Ga> listGa = gaDAO.getAllGa();
+        for (Ga ga : listGa) {
+            String item = ga.getTenGa() + " - " + ga.getDiaChi() + " (" + ga.getMaGa() + ")";
+            cbGaDi.addItem(item); cbGaDen.addItem(item);
         }
     }
 
-    private void setComboSelection(JComboBox<String> combo, String tenGa) {
-        for (int i = 0; i < combo.getItemCount(); i++) {
-            String item = combo.getItemAt(i);
-            if (item.startsWith(tenGa)) {
-                combo.setSelectedIndex(i);
+    public void loadDataFromDB() throws Exception {
+        modelLT.setRowCount(0);
+        List<LichTrinh> list = lichTrinhDAO.getAllLichTrinh();
+        for (LichTrinh lt : list) {
+            modelLT.addRow(new Object[]{
+                lt.getMaLichTrinh(),
+                lt.getTenLichTrinh(),
+                lt.getMaGaDi().getTenGa() + " (" + lt.getMaGaDi().getMaGa() + ")",
+                lt.getMaGaDen().getTenGa() + " (" + lt.getMaGaDen().getMaGa() + ")",
+                String.format("%,.0f km", lt.getKhoangCach())
+            });
+        }
+    }
+
+    public void loadFormData(LichTrinh lt) {
+        txtMaLichTrinh.setText(lt.getMaLichTrinh());
+        txtTenLichTrinh.setText(lt.getTenLichTrinh());
+        txtKhoangCach.setText(String.valueOf(lt.getKhoangCach()));
+        setComboSelection(cbGaDi, lt.getMaGaDi().getMaGa());
+        setComboSelection(cbGaDen, lt.getMaGaDen().getMaGa());
+    }
+
+    private void setComboSelection(JComboBox<String> cb, String maGa) {
+        for (int i = 0; i < cb.getItemCount(); i++) {
+            String item = cb.getItemAt(i);
+            if (item.contains("(" + maGa + ")")) {
+                cb.setSelectedIndex(i);
                 break;
             }
         }
     }
 
-    // Reset form
     public void resetForm() {
         txtMaLichTrinh.setText("");
         txtTenLichTrinh.setText("");
         txtKhoangCach.setText("");
         cbGaDi.setSelectedIndex(0);
         cbGaDen.setSelectedIndex(0);
-        btnLuu.setEnabled(false);
         tblLichTrinh.clearSelection();
-        enableFormFields(false);
     }
 
-    // Enable fields
-    public void enableFormFields(boolean enable) {
-        txtTenLichTrinh.setEnabled(enable);
-        cbGaDi.setEnabled(enable);
-        cbGaDen.setEnabled(enable);
-        txtKhoangCach.setEnabled(enable);
+    public void enableFormFields(boolean b) {
+        txtTenLichTrinh.setEnabled(b);
+        txtKhoangCach.setEnabled(b);
+        cbGaDi.setEnabled(b);
+        cbGaDen.setEnabled(b);
     }
 
-    // Get selected maLichTrinh
     public String getSelectedMaLichTrinh() {
         int row = tblLichTrinh.getSelectedRow();
-        if (row >= 0) {
-            return (String) modelLT.getValueAt(row, 0);
-        }
-        return null;
+        return row >= 0 ? (String) modelLT.getValueAt(row, 0) : null;
     }
 
-    // Refresh
-    public void refreshData() {
+    public void refreshData() throws Exception {
         loadDataFromDB();
         resetForm();
     }
 
-    // Show message
-    public void showMessage(String message, String title, int type) {
-        JOptionPane.showMessageDialog(this, message, title, type);
+    public void showMessage(String msg, String title, int type) {
+        JOptionPane.showMessageDialog(this, msg, title, type);
     }
 
-    // Main
-    public static void main(String[] args) {
+    // ===== GETTERS =====
+    public JTextField getTxtTenLichTrinh() { return txtTenLichTrinh; }
+    public JTextField getTxtKhoangCach() { return txtKhoangCach; }
+    public JComboBox<String> getCbGaDi() { return cbGaDi; }
+    public JComboBox<String> getCbGaDen() { return cbGaDen; }
+    public DefaultTableModel getModelLT() { return modelLT; }
+
+    public static void main(String[] args) throws Exception {
         LookAndFeelManager.setNimbusLookAndFeel();
         new QuanLyLichTrinh().setVisible(true);
     }

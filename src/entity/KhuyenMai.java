@@ -10,20 +10,42 @@ public class KhuyenMai {
     private LocalDate ngayBatDau;
     private LocalDate ngayKetThuc;
     private String dieuKien;
+    private String trangThai;
 
     public KhuyenMai() {}
 
     public KhuyenMai(String maKhuyenMai, String tenKhuyenMai, BigDecimal mucGiamGia,
-                     LocalDate ngayBatDau, LocalDate ngayKetThuc, String dieuKien) {
+                     LocalDate ngayBatDau, LocalDate ngayKetThuc, String dieuKien, String trangThai) {
         setMaKhuyenMai(maKhuyenMai);
         setTenKhuyenMai(tenKhuyenMai);
         setMucGiamGia(mucGiamGia);
         setNgayBatDau(ngayBatDau);
         setNgayKetThuc(ngayKetThuc);
         setDieuKien(dieuKien);
+        setTrangThai(trangThai);
     }
+    
+    public KhuyenMai(String maKhuyenMai, String tenKhuyenMai, BigDecimal mucGiamGia, LocalDate ngayBatDau,
+			LocalDate ngayKetThuc, String dieuKien) {
+		super();
+		this.maKhuyenMai = maKhuyenMai;
+		this.tenKhuyenMai = tenKhuyenMai;
+		this.mucGiamGia = mucGiamGia;
+		this.ngayBatDau = ngayBatDau;
+		this.ngayKetThuc = ngayKetThuc;
+		this.dieuKien = dieuKien;
+		this.trangThai = "Hoạt động";
+	}
 
-    public KhuyenMai(String maKhuyenMai2, BigDecimal heSoUuDai) {
+	public String getTrangThai() {
+		return trangThai;
+	}
+
+	public void setTrangThai(String trangThai) {
+		this.trangThai = trangThai;
+	}
+
+	public KhuyenMai(String maKhuyenMai2, BigDecimal heSoUuDai) {
 		// TODO Auto-generated constructor stub
     	setMaKhuyenMai(maKhuyenMai2);
     	setMucGiamGia(heSoUuDai);
@@ -49,15 +71,7 @@ public class KhuyenMai {
         this.tenKhuyenMai = tenKhuyenMai;
     }
 
-//    public int getMucGiamGia() {
-//        return mucGiamGia;
-//    }
-//
-//    public void setMucGiamGia(int mucGiamGia) {
-//        if (mucGiamGia < 0 || mucGiamGia > 100)
-//            throw new IllegalArgumentException("Mức giảm giá phải từ 0 đến 100%");
-//        this.mucGiamGia = mucGiamGia;
-//    }
+
 
     public BigDecimal getMucGiamGia() {
         return mucGiamGia;

@@ -2,7 +2,8 @@ package control;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 import dao.GaDAO;
@@ -25,121 +26,247 @@ public class QuanLyLichTrinhController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
-        if (cmd.equals("Thêm")) them();
-        else if (cmd.equals("Sửa")) sua();
-        else if (cmd.equals("Xóa")) xoa();
-        else if (cmd.equals("Làm mới")) view.refreshData();
-        else if (cmd.equals("Lưu"))
-			try {
-				luu();
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		else if (cmd.equals("Xuất Excel")) xuatExcel();
-        else if (cmd.equals("Trở về")) view.dispose();
+
+        switch (cmd) {
+            case "Thêm" -> {
+                them();
+                try {
+                    xuLyThem();  // ← TỰ ĐỘNG LƯU
+                } catch (Exception ex) {
+                    view.showMessage("Lỗi thêm: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            case "Sửa" -> {
+                sua();
+                try {
+                    xuLySua();   // ← TỰ ĐỘNG LƯU
+                } catch (Exception ex) {
+                    view.showMessage("Lỗi sửa: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            case "Xóa" -> {
+            	
+            	try {
+            		xoa();
+            	} 
+            catch (Exception e1){// TODO Auto-generated catch block
+            	e1.printStackTrace();
+            	}
+            }
+            case "Làm mới" ->{ 
+            	try  
+            	{
+            		view.refreshData();
+            		} catch (Exception e1){// TODO Auto-generated catch block
+            			e1.printStackTrace();
+            			}
+            	}
+            case "Xuất Excel" -> xuatExcel();
+            case "Tìm" -> {
+            	try 
+            	{
+            		timKiem();
+            		} catch (Exception e1){// TODO Auto-generated catch block
+            			e1.printStackTrace();
+            			}
+            	}
+            case "Trở về" -> view.dispose();
+        }
     }
 
-    private void them() {
+    public void them() {
         view.resetForm();
         view.enableFormFields(true);
-        view.getBtnLuu().setEnabled(true);
-        view.getBtnLuu().putClientProperty("action", "add");
+        view.showMessage("Nhập thông tin lịch trình mới → Nhấn THÊM để lưu!", "Hướng dẫn", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void sua() {
-        if (view.getSelectedMaLichTrinh() == null) {
-            view.showMessage("Chọn lịch trình để sửa!", "Cảnh báo", 2);
+    public void sua() {
+        String ma = view.getSelectedMaLichTrinh();
+        if (ma == null) {
+            view.showMessage("Vui lòng chọn lịch trình cần sửa!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
         view.enableFormFields(true);
-        view.getBtnLuu().setEnabled(true);
-        view.getBtnLuu().putClientProperty("action", "edit");
+        view.showMessage("Sửa thông tin → Nhấn SỬA để lưu!", "Hướng dẫn", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void xoa() {
+    private void xoa() throws Exception {
         String ma = view.getSelectedMaLichTrinh();
         if (ma == null) {
-            view.showMessage("Chọn lịch trình để xóa!", "Cảnh báo", 2);
+            view.showMessage("Vui lòng chọn lịch trình để XÓA!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int c = JOptionPane.showConfirmDialog(view, "Xóa lịch trình " + ma + "?", "Xác nhận", 0);
-        if (c == 0 && dao.deleteLichTrinh(ma)) {
-            view.showMessage("Xóa thành công!", "Thành công", 1);
-            view.refreshData();
-        } else if (c == 0) {
-            view.showMessage("Xóa thất bại!", "Lỗi", 0);
+
+        LichTrinh lt = dao.getLichTrinhByMaLichTrinh(ma);
+        if (lt == null) return;
+
+        int confirm = JOptionPane.showConfirmDialog(view,
+            "<html><b>XÁC NHẬN ẨN LỊCH TRÌNH</b><br><br>" +
+            "Mã: <font color='blue'><b>" + ma + "</b></font><br>" +
+            "Tên: <b>" + lt.getTenLichTrinh() + "</b><br>" +
+            "Từ <b>" + lt.getMaGaDi().getTenGa() + "</b> → <b>" + lt.getMaGaDen().getTenGa() + "</b><br><br>" +
+            "<i>Lịch trình sẽ <u>không hiển thị</u> trong danh sách chính<br>" +
+            "và <u>không dùng để đặt vé</u> nữa.</i></html>",
+            "Xóa Lịch Trình", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (dao.deleteLichTrinh(ma)) {
+                view.showMessage("Đã ẨN lịch trình thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                view.refreshData();
+                view.resetForm();
+            } else {
+                view.showMessage("Không thể ẩn! Lịch trình đang có chuyến tàu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
-    private void luu() throws Exception {
-        String action = (String) view.getBtnLuu().getClientProperty("action");
-        String tenLT = view.getTxtTenLichTrinh().getText().trim();
-        String kcStr = view.getTxtKhoangCach().getText().trim();
-        String gaDiItem = (String) view.getCbGaDi().getSelectedItem();
-        String gaDenItem = (String) view.getCbGaDen().getSelectedItem();
+    // === THÊM LỊCH TRÌNH ===
+    public void xuLyThem() throws Exception {
+        if (!validateInput()) return;
+        
+        LichTrinh lt = taoLichTrinhTuForm();
+        if (dao.addLichTrinh(lt)) {
+            view.showMessage("Thêm thành công! Mã: " + lt.getMaLichTrinh(), "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            view.refreshData();
+            view.resetForm();
+            view.enableFormFields(false);
+        } else {
+            view.showMessage("Thêm thất bại!\nĐã tồn tại lịch trình từ ga này đến ga kia!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-        if (tenLT.isEmpty() || kcStr.isEmpty() || gaDiItem == null || gaDenItem == null) {
-            view.showMessage("Điền đầy đủ thông tin!", "Lỗi", 0);
+    // === SỬA LỊCH TRÌNH ===
+    public void xuLySua() throws Exception {
+        String ma = view.getSelectedMaLichTrinh();
+        if (ma == null) {
+            view.showMessage("Chưa chọn lịch trình!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
+        }
+        if (!validateInput()) return;
+
+        LichTrinh lt = taoLichTrinhTuForm();
+        lt.setMaLichTrinh(ma);
+
+        if (dao.updateLichTrinh(lt)) {
+            view.showMessage("Sửa thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            view.refreshData();
+            view.resetForm();
+            view.enableFormFields(false);
+        } else {
+            view.showMessage("Sửa thất bại!\nĐã tồn tại lịch trình từ ga này đến ga kia!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private boolean validateInput() {
+        String ten = view.getTxtTenLichTrinh().getText().trim();
+        String kcStr = view.getTxtKhoangCach().getText().trim();
+        String gaDi = (String) view.getCbGaDi().getSelectedItem();
+        String gaDen = (String) view.getCbGaDen().getSelectedItem();
+
+        if (ten.isEmpty() || kcStr.isEmpty() || gaDi == null || gaDen == null) {
+            view.showMessage("Vui lòng điền đầy đủ thông tin!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            return false;
         }
 
         double kc;
         try {
             kc = Double.parseDouble(kcStr);
-            if (kc < 0) throw new Exception();
+            if (kc <= 0) throw new Exception();
         } catch (Exception ex) {
-            view.showMessage("Khoảng cách phải là số >= 0!", "Lỗi", 0);
-            return;
+            view.showMessage("Khoảng cách phải là số dương!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
 
-        String maGaDi = extractMaGa(gaDiItem);
-        String maGaDen = extractMaGa(gaDenItem);
-        if (maGaDi.equals(maGaDen)) {
-            view.showMessage("Ga đi và ga đến phải khác nhau!", "Lỗi", 0);
-            return;
+        String maDi = extractMaGa(gaDi);
+        String maDen = extractMaGa(gaDen);
+        if (maDi.equals(maDen)) {
+            view.showMessage("Ga đi và ga đến phải khác nhau!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
 
-        Ga gaDi = gaDAO.getGaByMaGa(maGaDi);
-        Ga gaDen = gaDAO.getGaByMaGa(maGaDen);
+        Ga gaDiObj = gaDAO.getGaByMaGa(maDi);
+        Ga gaDenObj = gaDAO.getGaByMaGa(maDen);
+        if (gaDiObj == null || gaDenObj == null) {
+            view.showMessage("Ga không tồn tại trong hệ thống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private LichTrinh taoLichTrinhTuForm() throws Exception {
+        String ten = view.getTxtTenLichTrinh().getText().trim();
+        double kc = Double.parseDouble(view.getTxtKhoangCach().getText().trim());
+        String maDi = extractMaGa((String) view.getCbGaDi().getSelectedItem());
+        String maDen = extractMaGa((String) view.getCbGaDen().getSelectedItem());
+
+        Ga gaDi = gaDAO.getGaByMaGa(maDi);
+        Ga gaDen = gaDAO.getGaByMaGa(maDen);
+
         LichTrinh lt = new LichTrinh();
-        try {
-            lt.setTenLichTrinh(tenLT);
-            lt.setMaGaDi(gaDi);
-            lt.setMaGaDen(gaDen);
-            lt.setKhoangCach(kc);
-        } catch (Exception ex) {
-            view.showMessage("Lỗi: " + ex.getMessage(), "Lỗi", 0);
-            return;
-        }
-
-        boolean success = false;
-        if ("add".equals(action)) {
-            success = dao.addLichTrinh(lt);
-            if (success) view.showMessage("Thêm thành công! Mã: " + lt.getMaLichTrinh(), "Thành công", 1);
-        } else {
-            lt.setMaLichTrinh(view.getSelectedMaLichTrinh());
-            success = dao.updateLichTrinh(lt);
-            if (success) view.showMessage("Sửa thành công!", "Thành công", 1);
-        }
-
-        if (success) view.refreshData();
-        else view.showMessage("Thao tác thất bại!", "Lỗi", 0);
+        lt.setTenLichTrinh(ten);
+        lt.setMaGaDi(gaDi);
+        lt.setMaGaDen(gaDen);
+        lt.setKhoangCach(kc);
+        return lt;
     }
 
     private String extractMaGa(String item) {
-        return item.substring(item.indexOf("(") + 1, item.indexOf(")"));
+        if (item == null) return "";
+        int start = item.lastIndexOf("(");
+        int end = item.lastIndexOf(")");
+        return (start != -1 && end != -1) ? item.substring(start + 1, end) : "";
+    }
+
+    private void timKiem() throws Exception {
+        String keyword = view.getTxtTenLichTrinh().getText().trim();
+        if (keyword.isEmpty()) {
+            view.refreshData();
+            view.showMessage("Nhập tên lịch trình hoặc ga để tìm!", "Tìm kiếm", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        view.getModelLT().setRowCount(0);
+        List<LichTrinh> allLichTrinh = dao.getAllLichTrinh();
+        
+        List<LichTrinh> ketQuaTim = new ArrayList<>();
+        for (LichTrinh lt : allLichTrinh) {
+            if (lt.getTenLichTrinh().toLowerCase().contains(keyword.toLowerCase()) ||
+                lt.getMaGaDi().getTenGa().toLowerCase().contains(keyword.toLowerCase()) ||
+                lt.getMaGaDen().getTenGa().toLowerCase().contains(keyword.toLowerCase())) {
+                ketQuaTim.add(lt);
+            }
+        }
+        
+        for (LichTrinh lt : ketQuaTim) {
+            view.getModelLT().addRow(new Object[]{
+                lt.getMaLichTrinh(),
+                lt.getTenLichTrinh(),
+                lt.getMaGaDi().getTenGa() + " (" + lt.getMaGaDi().getMaGa() + ")",
+                lt.getMaGaDen().getTenGa() + " (" + lt.getMaGaDen().getMaGa() + ")",
+                lt.getKhoangCach()
+            });
+        }
+
+        int count = ketQuaTim.size();
+        if (count == 0) {
+            view.showMessage("Không tìm thấy lịch trình nào phù hợp!", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            view.showMessage("Tìm thấy " + count + " kết quả cho: \"" + keyword + "\"", "Kết quả", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     private void xuatExcel() {
-        view.showMessage("Chức năng đang phát triển!", "Thông báo", 1);
+        view.showMessage("Chức năng Xuất Excel đang phát triển!\nSắp có hỗ trợ phân trang + lọc.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void handleTableSelection() {
+    public void handleTableSelection() throws Exception {
         String ma = view.getSelectedMaLichTrinh();
         if (ma != null) {
             LichTrinh lt = dao.getLichTrinhByMaLichTrinh(ma);
-            view.loadFormData(lt);
+            if (lt != null) {
+                view.loadFormData(lt);
+                view.enableFormFields(false);
+            }
         }
     }
 }

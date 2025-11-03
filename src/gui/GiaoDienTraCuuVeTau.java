@@ -1,24 +1,46 @@
 package gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.border.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import control.TraCuuVeControl;
-import entity.Ve;
-import entity.HanhKhach;
-import entity.ChuyenTau;
 import entity.ChoNgoi;
+import entity.ChuyenTau;
+import entity.HanhKhach;
+import entity.NhanVien;
+import entity.Ve;
 
 public class GiaoDienTraCuuVeTau extends JFrame {
     private TraCuuVeControl dieuKhienTraCuu = new TraCuuVeControl();
+	private NhanVien nhanVien;
 
     public GiaoDienTraCuuVeTau() {
+    	this.nhanVien = nhanVien;
         setTitle("Tra cứu vé tàu");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

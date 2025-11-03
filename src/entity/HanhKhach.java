@@ -11,28 +11,43 @@ public class HanhKhach {
     private String maUuDai;
     private String trangThai;
 
-    public HanhKhach(String maHK, String hoTen, String soCMND, String soDienThoai, LocalDate ngaySinh, String trangThai) {
-        this.maKH = maHK;
-        this.hoTen = hoTen;
-        this.cmndCccd = soCMND;
-        this.soDT = soDienThoai;
-        this.ngaySinh = ngaySinh;
-        this.trangThai = trangThai;
-        
-    }
+//    public HanhKhach(String maHK, String hoTen, String soCMND, String soDienThoai, LocalDate ngaySinh, String trangThai) {
+//        this.maKH = maHK;
+//        this.hoTen = hoTen;
+//        this.cmndCccd = soCMND;
+//        this.soDT = soDienThoai;
+//        this.ngaySinh = ngaySinh;
+//        this.trangThai = trangThai;
+//        
+//    }
+    
     public HanhKhach() {
 
     }
-    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai, String trangThai) {
-        super();
-        this.maKH = maKH; 
-        setHoTen(hoTen);
-        setCmndCccd(cmndCccd);
-        setSoDT(soDT);
-        setNgaySinh(ngaySinh);
-        setMaUuDai(maUuDai);
-        setTrangThai(trangThai);
+    
+ // Trong entity.HanhKhach.java
+    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, 
+                     LocalDate ngaySinh, String maUuDai, String trangThai) {
+        this.maKH = maKH;
+        this.hoTen = hoTen;
+        this.cmndCccd = cmndCccd;
+        this.soDT = soDT;
+        this.ngaySinh = ngaySinh;
+        this.maUuDai = (maUuDai == null || maUuDai.trim().isEmpty()) ? "UD-01" : maUuDai.trim(); // FIX NGAY TẠI ĐÂY
+        this.trangThai = trangThai != null ? trangThai : "Hoạt động";
     }
+    
+    
+//    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai, String trangThai) {
+//        super();
+//        this.maKH = maKH; 
+//        setHoTen(hoTen);
+//        setCmndCccd(cmndCccd);
+//        setSoDT(soDT);
+//        setNgaySinh(ngaySinh);
+//        setMaUuDai(maUuDai);
+//        setTrangThai(trangThai);
+//    }
 //    public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
 //		super();
 //		setMaKH(maKH);
@@ -59,17 +74,30 @@ public class HanhKhach {
 	    setMaUuDai(maUuDai);
 	    this.trangThai = "Hoạt động"; 
 	}
+	// TRONG entity.HanhKhach.java
+	public HanhKhach(String maKH, String hoTen, String cmndCccd, String soDT, LocalDate ngaySinh, String maUuDai) {
+	    this.maKH = maKH;
+	    this.hoTen = hoTen;
+	    this.cmndCccd = cmndCccd;
+	    this.soDT = soDT;
+	    this.ngaySinh = ngaySinh;
+
+	    // BẮT BUỘC maUuDai ≠ null
+	    if (maUuDai == null || maUuDai.trim().isEmpty()) {
+	        throw new IllegalArgumentException("Mã ưu đãi không được để trống khi tạo hành khách.");
+	    }
+	    this.maUuDai = maUuDai.trim();
+	}
 	
 	public String getMaUuDai() {
         return maUuDai;
     }
 
 	public void setMaUuDai(String maUuDai) {
-	    if (maUuDai != null && !maUuDai.trim().isEmpty()) {
-	        this.maUuDai = maUuDai.trim();
-	    } else {
-	        this.maUuDai = null; // không ném lỗi
+	    if (maUuDai == null || maUuDai.trim().isEmpty()) {
+	        throw new IllegalArgumentException("Mã ưu đãi không được để trống.");
 	    }
+	    this.maUuDai = maUuDai.trim();
 	}
 
     public String getMaKH() {
