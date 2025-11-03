@@ -73,7 +73,7 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
     private GiaoDienNhapThongTinHK previousScreen;
     
     public GiaoDienThanhToan(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,
-    		GiaoDienNhapThongTinHK previous) {
+    		GiaoDienNhapThongTinHK previous) throws Exception {
         if (danhSachVe == null || danhSachVe.isEmpty()) {
             throw new IllegalArgumentException("Danh sách vé không được rỗng.");
         }
@@ -86,10 +86,14 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
         this.nhanVienLap = nv;
         this.nguoiThanhToan = nguoiThanhToan;
 
+        List<Ve> danhSachVeDaDat = new ArrayList<>();
+        
         for (Ve ve : danhSachVe) {
-            ve.setMaHanhkhach(this.nguoiThanhToan);
+            String maVe = dieuKhienVe.datVe(ve, ve.getMaHanhkhach(), nhanVienLap);
+            ve.setMaVe(maVe);
+            danhSachVeDaDat.add(ve);
         }
-
+        
         if (!danhSachVe.isEmpty()) {
             this.chuyenTauDuocChon = danhSachVe.get(0).getMaChuyenTau();
         }

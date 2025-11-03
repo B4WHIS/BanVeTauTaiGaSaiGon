@@ -21,6 +21,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -70,8 +71,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
 
     private JButton btnThem, btnTroVe, btnTiepTuc, btnChonNTT, btnLamMoi, btnSua;
     private JLabel lblTongTien;
-
-    // Dữ liệu
+    private List<Ve> danhSachVeDaTao = new ArrayList<>();
     private ChuyenTau chuyenTauDuocChon;
     private List<ChoNgoi> danhSachChoNgoi;
     private NhanVien nhanVienLap;
@@ -92,7 +92,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
         this.daoUuDai = new UuDaiDAO();
         this.daoHanhKhach = new HanhKhachDAO();
         this.dieuKhienVe = new QuanLyVeControl();
-
+        
         this.danhSachHanhKhachDaNhap = new ArrayList<>();
         for (ChoNgoi cho : danhSachChoNgoi) {
             if (cho != null && cho.getMaChoNgoi() != null) {
@@ -124,6 +124,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
         txtCmndCccd = new JTextField(15);
         chonNgaySinh = new JDateChooser();
         hopChonUuDai = new JComboBox<>();
+//        taiDanhSachUuDai();
         modelDSCho = new DefaultTableModel(
                 new String[]{"STT", "Chuyến", "Toa/Ghế", "Họ tên HK", "Ngày sinh", "Ưu đãi", "Giá TT (VNĐ)", "Tình trạng", "Người TT"}, 0) {
             @Override
@@ -146,7 +147,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
         btnThem = taoButton("Thêm", new Color(46, 204, 113), "/img/plus2.png");
         btnChonNTT = taoButton("Chọn Người TT", new Color(241, 196, 15), "/img/choose.png");
         btnLamMoi = taoButton("Làm Mới", new Color(255, 184, 0), "/img/undo2.png");
-        btnSua = taoButton("Sửa TT Hành Khách", new Color(187, 102, 83), "/img/repair.png");
+        btnSua = taoButton("Sửa", new Color(187, 102, 83), "/img/repair.png");
 
         lblTongTien = new JLabel("TỔNG CỘNG: 0.00 VNĐ", SwingConstants.RIGHT);
         lblTongTien.setForeground(Color.BLACK);
@@ -164,7 +165,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
 
         // Form nhập
         JPanel pnlThongTinHanhKhach = new JPanel(new BorderLayout(10, 10));
-        pnlThongTinHanhKhach.setPreferredSize(new Dimension(500, 0));
+        pnlThongTinHanhKhach.setPreferredSize(new Dimension(600, 0));
         pnlThongTinHanhKhach.setBackground(new Color(245, 247, 250));
 
         TitledBorder titleBorder = BorderFactory.createTitledBorder(
@@ -313,7 +314,8 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
         btnSua.addActionListener(this);
 
         // Tải dữ liệu
-        taiDanhSachUuDai();
+        napUuDaiVaoComboBox();
+        xuLyChonDongTrongBang();
         hienThiDanhSachChoNgoiBanDau(danhSachChoNgoi);
         capNhatTongTien();
     }
@@ -340,6 +342,32 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
         }
     }
 
+    private void napUuDaiVaoComboBox() {
+        try {
+            hopChonUuDai.removeAllItems(); // XÓA HẾT
+
+            List<String> dsTen = daoUuDai.getAllTenUuDai();
+            if (dsTen.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Không có ưu đãi nào trong hệ thống!");
+                return;
+            }
+
+            for (String ten : dsTen) {
+                hopChonUuDai.addItem(ten);
+            }
+
+            // CHỌN MẶC ĐỊNH ITEM ĐẦU TIÊN (KHÔNG CÓ "Chọn ưu đãi")
+            if (hopChonUuDai.getItemCount() > 0) {
+                hopChonUuDai.setSelectedIndex(0);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi tải danh sách ưu đãi: " + e.getMessage());
+        }
+    }
+
+    
     private void xuLyThemHanhKhach() {
         int dong = tblCho.getSelectedRow();
         if (dong < 0 || !"CHỜ NHẬP".equals(modelDSCho.getValueAt(dong, 7))) {
@@ -365,66 +393,94 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
                     String cmnd = txtCmndCccd.getText().trim();
                     tenUD = (String) hopChonUuDai.getSelectedItem();
 
-                    if (hoTen.isEmpty() || ngaySinhDate == null || tenUD == null || tenUD.contains("--- Chọn")) {
-                        error = "Vui lòng nhập đầy đủ Họ tên, Ngày sinh và chọn Ưu đãi hợp lệ.";
+                    // 1. BẮT BUỘC NHẬP
+                    if (hoTen.isEmpty()) {
+                        error = "Vui lòng nhập Họ tên.";
+                        return null;
+                    }
+                    if (ngaySinhDate == null) {
+                        error = "Vui lòng chọn Ngày sinh.";
+                        return null;
+                    }
+                    if (tenUD == null || tenUD.trim().isEmpty()) {
+                        error = "Lỗi hệ thống: Không có ưu đãi nào được chọn.";
                         return null;
                     }
 
-                    String maUuDai = layMaUuDaiTuTenFull(tenUD);
-                    if (maUuDai == null || maUuDai.isEmpty()) maUuDai = "UD-01";
+                    // 2. LẤY MÃ ƯU ĐÃI
+                    String maUuDai;
+                    try {
+                        maUuDai = layMaUuDaiTuTenFull(tenUD);
+                        System.out.println("DEBUG: maUuDai trước khi tạo HK = " + maUuDai); // PHẢI IN RA UD-01, UD-04...
+                    } catch (Exception ex) {
+                        error = "Lỗi lấy mã ưu đãi: " + ex.getMessage();
+                        return null;
+                    }
 
+                    // 3. TÍNH TUỔI
                     LocalDate ngaySinh = ngaySinhDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     LocalDate now = LocalDate.now();
                     if (!ngaySinh.isBefore(now)) {
-                        error = "Ngày sinh không hợp lệ.";
+                        error = "Ngày sinh phải trước ngày hiện tại.";
+                        return null;
+                    }
+                    long tuoi = Period.between(ngaySinh, now).getYears();
+
+                    // 4. KIỂM TRA TUỔI vs ƯU ĐÃI
+                    boolean isChild = maUuDai.equals("UD-02") || maUuDai.equals("UD-03");
+                    if (tuoi < 14 && !isChild) {
+                        error = "Hành khách dưới 14 tuổi PHẢI chọn ưu đãi Trẻ em (UD-02 hoặc UD-03).";
+                        return null;
+                    }
+                    if (tuoi >= 14 && isChild) {
+                        error = "Hành khách từ 14 tuổi trở lên KHÔNG được chọn ưu đãi Trẻ em.";
                         return null;
                     }
 
-                    int tuoi = java.time.Period.between(ngaySinh, now).getYears();
-                    boolean laTreEm = "UD-02".equals(maUuDai) || "UD-03".equals(maUuDai);
-
-                    if (tuoi < 14) {
-                        if (!laTreEm) { error = "Trẻ dưới 14 tuổi phải chọn ưu đãi trẻ em."; return null; }
-                    } else {
-                        if (laTreEm) { error = "Ưu đãi trẻ em chỉ dành cho dưới 14 tuổi."; return null; }
-                        if (cmnd.isEmpty() || sdt.isEmpty()) {
-                            error = "Người lớn phải nhập CMND và SĐT.";
-                            return null;
-                        }
-                    }
-
-                    if (!cmnd.isEmpty() && !cmnd.matches("^(\\d{9}|\\d{12})$")) {
-                        error = "CMND/CCCD phải là 9 hoặc 12 số.";
-                        return null;
-                    }
+                    // 5. KIỂM TRA SĐT
                     if (!sdt.isEmpty() && !sdt.matches("^0\\d{9}$")) {
-                        error = "SĐT phải bắt đầu bằng 0, 10 số.";
+                        error = "SĐT phải bắt đầu bằng 0 và có 10 số.";
                         return null;
                     }
 
-                    HanhKhach hkMoi = new HanhKhach(null, hoTen, cmnd, sdt, ngaySinh, maUuDai);
-
+                    // 6. TẠO HOẶC CẬP NHẬT HÀNH KHÁCH
+                    HanhKhach hkMoi = new HanhKhach(null, hoTen, cmnd.isEmpty() ? null : cmnd, sdt.isEmpty() ? null : sdt, ngaySinh, maUuDai);
+                    System.out.println("DEBUG: hkMoi.getMaUuDai() = " + hkMoi.getMaUuDai());
                     HanhKhach hkTonTai = null;
-                    if (!cmnd.isEmpty()) hkTonTai = daoHanhKhach.layHanhKhachTheoCMND(cmnd);
-                    if (hkTonTai == null && !sdt.isEmpty() && !laTreEm)
+
+                    if (!cmnd.isEmpty()) {
+                        hkTonTai = daoHanhKhach.layHanhKhachTheoCMND(cmnd);
+                    }
+                    if (hkTonTai == null && !sdt.isEmpty() && tuoi >= 14) {
                         hkTonTai = daoHanhKhach.layHanhKhachTheoSDT(sdt);
+                    }
 
                     if (hkTonTai == null) {
-                        daoHanhKhach.themHanhKhach(hkMoi);
+                        String maHK = daoHanhKhach.themHanhKhach2(hkMoi);
+                        if (maHK == null) {
+                            error = "Không thể thêm hành khách vào CSDL.";
+                            return null;
+                        }
                         hkKetQua = hkMoi;
+                        hkKetQua.setMaKH(maHK);
                     } else {
-                        hkTonTai.setHoTen(hoTen); hkTonTai.setNgaySinh(ngaySinh);
-                        hkTonTai.setMaUuDai(maUuDai); if (!sdt.isEmpty()) hkTonTai.setSoDT(sdt);
+                        hkTonTai.setHoTen(hoTen);
+                        hkTonTai.setNgaySinh(ngaySinh);
+                        hkTonTai.setMaUuDai(maUuDai);
+                        if (!sdt.isEmpty()) hkTonTai.setSoDT(sdt);
+                        if (!cmnd.isEmpty()) hkTonTai.setCmndCccd(cmnd);
                         daoHanhKhach.capNhatHanhKhach(hkTonTai);
                         hkKetQua = hkTonTai;
                     }
 
+                    // 7. TÍNH GIÁ VÉ
                     ChoNgoi cho = danhSachChoNgoi.get(dong);
                     BigDecimal giaGoc = layGiaVeCoBan(cho);
                     giaTT = dieuKhienVe.tinhGiaVeCuoiCung(giaGoc, maUuDai, null);
 
                 } catch (Exception ex) {
-                    error = ex.getMessage();
+                    error = "Lỗi: " + ex.getMessage();
+                    ex.printStackTrace(); // IN RA CONSOLE ĐỂ DEBUG
                 }
                 return null;
             }
@@ -434,14 +490,14 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
                 btnThem.setEnabled(true);
                 setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 if (error != null) {
-                    JOptionPane.showMessageDialog(GiaoDienNhapThongTinHK.this, error, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(GiaoDienNhapThongTinHK.this, error, "Lỗi thêm hành khách", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 capNhatBangSauThem(dong, hkKetQua, tenUD, giaTT);
             }
         }.execute();
     }
-
+    
     private void xuLySuaHanhKhach() {
         int dong = tblCho.getSelectedRow();
         if (dong < 0 || !dangSua) return;
@@ -463,24 +519,60 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
                     String cmnd = txtCmndCccd.getText().trim();
                     tenUD = (String) hopChonUuDai.getSelectedItem();
 
-                    if (hoTen.isEmpty() || ngaySinhDate == null || tenUD == null || tenUD.contains("--- Chọn")) {
-                        error = "Vui lòng nhập đầy đủ thông tin để sửa.";
+                    if (hoTen.isEmpty() || ngaySinhDate == null) {
+                        error = "Vui lòng nhập Họ tên và Ngày sinh.";
+                        return null;
+                    }
+
+                    if (tenUD == null || tenUD.contains("--- Chọn")) {
+                        error = "Vui lòng chọn một ưu đãi hợp lệ.";
                         return null;
                     }
 
                     String maUuDai = layMaUuDaiTuTenFull(tenUD);
-                    if (maUuDai == null || maUuDai.isEmpty()) maUuDai = "UD-01";
+                    if (maUuDai == null || maUuDai.trim().isEmpty()) {
+                        error = "Không thể xác định mã ưu đãi.";
+                        return null;
+                    }
 
                     LocalDate ngaySinh = ngaySinhDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    LocalDate now = LocalDate.now();
+                    if (!ngaySinh.isBefore(now)) {
+                        error = "Ngày sinh phải trước ngày hiện tại.";
+                        return null;
+                    }
+                    long tuoi = Period.between(ngaySinh, now).getYears();
 
-                    HanhKhach hk = danhSachHanhKhachDaNhap.get(dongDangSua);
-                    hk.setHoTen(hoTen); hk.setNgaySinh(ngaySinh);
-                    hk.setSoDT(sdt); hk.setCmndCccd(cmnd);
-                    hk.setMaUuDai(maUuDai);
+                    boolean isChildUD = maUuDai.equals("UD-02") || maUuDai.equals("UD-03");
+                    if (tuoi < 14 && !isChildUD) {
+                        error = "Hành khách dưới 14 tuổi phải chọn ưu đãi Trẻ em.";
+                        return null;
+                    }
+                    if (tuoi >= 14 && isChildUD) {
+                        error = "Hành khách từ 14 tuổi trở lên không được chọn ưu đãi Trẻ em.";
+                        return null;
+                    }
 
-                    daoHanhKhach.capNhatHanhKhach(hk);
+                    if (!sdt.isEmpty() && !sdt.matches("^0\\d{9}$")) {
+                        error = "SĐT phải bắt đầu bằng 0, đúng 10 số.";
+                        return null;
+                    }
 
-                    ChoNgoi cho = danhSachChoNgoi.get(dong);
+                    HanhKhach hkCu = danhSachHanhKhachDaNhap.get(dongDangSua);
+                    if (hkCu == null) {
+                        error = "Không tìm thấy hành khách để sửa.";
+                        return null;
+                    }
+
+                    hkCu.setHoTen(hoTen);
+                    hkCu.setNgaySinh(ngaySinh);
+                    hkCu.setMaUuDai(maUuDai);
+                    hkCu.setSoDT(sdt.isEmpty() ? null : sdt);
+                    hkCu.setCmndCccd(cmnd.isEmpty() ? null : cmnd);
+
+                    daoHanhKhach.capNhatHanhKhach(hkCu);
+
+                    ChoNgoi cho = danhSachChoNgoi.get(dongDangSua);
                     BigDecimal giaGoc = layGiaVeCoBan(cho);
                     giaTT = dieuKhienVe.tinhGiaVeCuoiCung(giaGoc, maUuDai, null);
 
@@ -561,7 +653,6 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
         chonNgaySinh.setDate(null);
         txtSoDienThoai.setText("");
         txtCmndCccd.setText("");
-        hopChonUuDai.setSelectedIndex(0);
         txtHoTen.requestFocus();
     }
 
@@ -590,31 +681,32 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
             else if (mucGiam.compareTo(new BigDecimal("100")) == 0) mucGiamStr = "Miễn phí";
             else mucGiamStr = "Giảm " + mucGiam.setScale(0, RoundingMode.HALF_UP) + "%";
 
-            String tenHienThi = mucGiamStr + " - " + tenLoai + " (ID: " + ma + ")";
-            hopChonUuDai.addItem(tenHienThi);
+            String hienThi = mucGiamStr + " - " + tenLoai + " (ID: " + ma + ")";
+            hopChonUuDai.addItem(hienThi);
         }
         hopChonUuDai.insertItemAt("--- Chọn Ưu đãi ---", 0);
-        for (int i = 0; i < hopChonUuDai.getItemCount(); i++) {
-            if (hopChonUuDai.getItemAt(i).contains("Nguyên giá") && hopChonUuDai.getItemAt(i).contains("UD-01")) {
-                hopChonUuDai.setSelectedIndex(i);
-                break;
-            }
-        }
-        if (hopChonUuDai.getSelectedIndex() == -1) hopChonUuDai.setSelectedIndex(0);
+        hopChonUuDai.setSelectedIndex(0); 
     }
 
+ // TRONG GiaoDienNhapThongTinHK.java
     private String layMaUuDaiTuTenFull(String tenFull) {
-        if (tenFull == null || tenFull.contains("--- Chọn") || tenFull.trim().isEmpty()) {
-            return "UD-01";
+        if (tenFull == null || tenFull.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên ưu đãi rỗng");
         }
-        try {
-            String[] parts = tenFull.split("\\(ID: ");
-            if (parts.length < 2) return "UD-01";
-            String idPart = parts[1].replace(")", "").trim();
-            return idPart.isEmpty() ? "UD-01" : idPart;
-        } catch (Exception e) {
-            return "UD-01";
+
+        // IN RA ĐỂ DEBUG
+        System.out.println("DEBUG: Chuỗi ưu đãi nhận được: [" + tenFull + "]");
+
+        // Regex chính xác
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\(ID: ([A-Z]+-\\d+)\\)").matcher(tenFull);
+        if (m.find()) {
+            String ma = m.group(1);
+            System.out.println("DEBUG: Tìm thấy mã ưu đãi: " + ma);
+            return ma;
         }
+
+        // Nếu không tìm thấy → in lỗi chi tiết
+        throw new IllegalStateException("Không tìm thấy mã ưu đãi trong chuỗi: " + tenFull);
     }
 
     private boolean kiemTraTatCaDaNhap() {
@@ -707,36 +799,45 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
             return;
         }
 
-        List<Ve> dsVe = new ArrayList<>();
+        danhSachVeDaTao.clear();
         try {
             for (int i = 0; i < danhSachChoNgoi.size(); i++) {
                 ChoNgoi cho = danhSachChoNgoi.get(i);
-                HanhKhach hk = danhSachHanhKhachDaNhap.get(i);
-                BigDecimal giaTT = parseGiaFromTableCell(modelDSCho.getValueAt(i, 6).toString());
-                if (giaTT.compareTo(BigDecimal.ZERO) <= 0) {
-                    BigDecimal giaGoc = layGiaVeCoBan(cho);
-                    giaTT = dieuKhienVe.tinhGiaVeCuoiCung(giaGoc, hk.getMaUuDai(), null);
+                HanhKhach hk = danhSachHanhKhachDaNhap.get(i); 
+                if (hk == null || hk.getMaKH() == null || hk.getMaKH().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Hành khách tại ghế " + cho.getMaChoNgoi() + " chưa có mã!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
+
+                BigDecimal giaGoc = layGiaVeCoBan(cho);
+                BigDecimal giaTT = dieuKhienVe.tinhGiaVeCuoiCung(giaGoc, hk.getMaUuDai(), null);
 
                 Ve ve = new Ve();
                 ve.setNgayDat(LocalDateTime.now());
-                ve.setTrangThai("Đã đặt");
-                ve.setGiaVeGoc(layGiaVeCoBan(cho));
+                ve.setTrangThai("Chờ thanh toán");
+                ve.setGiaVeGoc(giaGoc);
                 ve.setGiaThanhToan(giaTT);
                 ve.setMaChoNgoi(cho);
                 ve.setMaChuyenTau(chuyenTauDuocChon);
-                ve.setMaHanhkhach(hk);
-                ve.setMaKhuyenMai(null);
+                ve.setMaHanhkhach(hk); 
                 ve.setMaNhanVien(nhanVienLap);
-                dsVe.add(ve);
+                ve.setMaKhuyenMai(null);
+
+                danhSachVeDaTao.add(ve);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Lỗi tạo vé: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        // Chuyển sang thanh toán
         SwingUtilities.invokeLater(() -> {
-            new GiaoDienThanhToan(dsVe, nguoiThanhToan, nhanVienLap, this).setVisible(true);
+            try {
+				new GiaoDienThanhToan(danhSachVeDaTao, nguoiThanhToan, nhanVienLap, this).setVisible(true);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             this.setVisible(false);
         });
     }
