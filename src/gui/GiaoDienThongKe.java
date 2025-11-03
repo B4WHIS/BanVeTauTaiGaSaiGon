@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -405,7 +406,11 @@ public class GiaoDienThongKe extends JFrame implements ActionListener {
         if (nguon == cboLoaiThoiGian) {
             capNhatHienThiBoLoc();
         } else if (nguon == nutTroVe) {
-     	
+        	try {
+				new MHC_NhanVienBanVe().setVisible(true);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
             dispose();
         } else if (nguon == nutTimKiem) {
             String loai = (String) cboLoaiThoiGian.getSelectedItem();
