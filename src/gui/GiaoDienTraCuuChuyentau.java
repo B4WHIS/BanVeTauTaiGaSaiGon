@@ -36,8 +36,6 @@ import javax.swing.border.TitledBorder;
 import com.toedter.calendar.JDateChooser;
 
 import control.TraCuuChuyenTauControl;
-import dao.ToaTauDAO;
-import dao.VeDAO;
 import entity.ChuyenTau;
 import entity.NhanVien;
 
@@ -49,11 +47,11 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
     private JPanel pnlTrungTam, pnlNutChucNang;
     private JButton btnTim, btnLamMoi, btnTroVe;
     private NhanVien nhanVienHienTai;
-    private VeDAO veDAO = new VeDAO();
-    private ToaTauDAO toaTaudao = new ToaTauDAO();
+    private JFrame parentFrame;
 
-    public GiaoDienTraCuuChuyentau(NhanVien nhanVien) {
-        this.nhanVienHienTai = nhanVien != null ? nhanVien : new NhanVien("NV-001");
+    public GiaoDienTraCuuChuyentau(JFrame parent, NhanVien nhanVien) {
+    	this.parentFrame = parent;
+        this.nhanVienHienTai = nhanVien;
         this.control = new TraCuuChuyenTauControl(this);
 
         setTitle("Tra cứu chuyến tàu");
@@ -77,7 +75,7 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
 
         // Left panel - form nhập liệu
         JPanel pnlLeft = new JPanel(new BorderLayout(10, 10));
-        pnlLeft.setPreferredSize(new Dimension(540, 0));
+        pnlLeft.setPreferredSize(new Dimension(440, 0));
         pnlLeft.setBackground(new Color(245, 247, 250));
 
         Font fontTieuDe = new Font("Segoe UI", Font.BOLD, 24);
@@ -113,10 +111,10 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
         cbGaDen = new JComboBox<>();
         dateChooser = new JDateChooser();
         dateChooser.setFont(txtFont);
-        dateChooser.setPreferredSize(new Dimension(200, 40));
+        dateChooser.setPreferredSize(new Dimension(100, 40));
         dateChooser.setMinSelectableDate(new Date());
-        cbGaDen.setPreferredSize(new Dimension(200,40));
-        cbGaDi.setPreferredSize(new Dimension(200,40));
+        cbGaDen.setPreferredSize(new Dimension(100,40));
+        cbGaDi.setPreferredSize(new Dimension(10,40));
         JComboBox<?>[] combos = {cbGaDi, cbGaDen};
         for (JComboBox<?> cb : combos) {
             cb.setFont(txtFont);
@@ -203,47 +201,17 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
 
         pnlMain.add(pnlNutChucNang, BorderLayout.SOUTH);
 
-        // Thêm vào frame
         add(pnlMain);
 
-        // Gán sự kiện
         btnTim.addActionListener(this);
         btnLamMoi.addActionListener(this);
         btnTroVe.addActionListener(this);
 
-        // Tải dữ liệu ga
-        loadGaDataToComboBox();
-    }
-
-    // Hàm tạo button giống QuanLyHanhKhach
-    private JButton taoButton(String text, Color bg, String iconPath) {
-        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
-        btn.setBackground(bg);
-        btn.setForeground(Color.BLACK);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        btn.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
-            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
-        });
-
-        return btn;
-    }
-
-    // Hàm resize icon
-    public static ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
-        URL iconUrl = GiaoDienTraCuuChuyentau.class.getResource(duongDan);
-        if (iconUrl == null) return null;
-        ImageIcon icon = new ImageIcon(iconUrl);
-        java.awt.Image img = icon.getImage().getScaledInstance(rong, cao, java.awt.Image.SCALE_SMOOTH);
-        return new ImageIcon(img);
+        taiDuLieuGaLenCB();
     }
 
     // Tải ga vào combo box
-    private void loadGaDataToComboBox() {
+    private void taiDuLieuGaLenCB() {
         List<String> tenGaList = control.loadGaData();
         cbGaDi.removeAllItems();
         cbGaDen.removeAllItems();
@@ -401,17 +369,39 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
             pnlTrungTam.repaint();
         } else if (src == btnTroVe) {
             this.dispose();
-            try {
-                new MHC_NhanVienBanVe(nhanVienHienTai).setVisible(true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            if (parentFrame != null) {
+                parentFrame.setVisible(true); 
             }
         }
     }
+    private JButton taoButton(String text, Color bg, String iconPath) {
+        JButton btn = new JButton(text, chinhKichThuoc(iconPath, 24, 24));
+        btn.setBackground(bg);
+        btn.setForeground(Color.BLACK);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-    public static void main(String[] args) {
-        LookAndFeelManager.setNimbusLookAndFeel();
-        NhanVien nv = new NhanVien("NV-001");
-        SwingUtilities.invokeLater(() -> new GiaoDienTraCuuChuyentau(nv).setVisible(true));
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) { btn.setBackground(bg.darker()); }
+            public void mouseExited(MouseEvent e) { btn.setBackground(bg); }
+        });
+
+        return btn;
     }
+
+    private ImageIcon chinhKichThuoc(String duongDan, int rong, int cao) {
+        URL iconUrl = GiaoDienTraCuuChuyentau.class.getResource(duongDan);
+        if (iconUrl == null) return null;
+        ImageIcon icon = new ImageIcon(iconUrl);
+        java.awt.Image img = icon.getImage().getScaledInstance(rong, cao, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(img);
+    }
+    
+//    public static void main(String[] args) {
+//        LookAndFeelManager.setNimbusLookAndFeel();
+//        NhanVien nv = new NhanVien("NV-001");
+//        SwingUtilities.invokeLater(() -> new GiaoDienTraCuuChuyentau(nv).setVisible(true));
+//    }
 }

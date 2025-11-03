@@ -341,11 +341,12 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     	new QuanLyGa().setVisible(true);
     }
     private void moGiaoDienDatVe() {
-        new GiaoDienTraCuuChuyentau(nhanVien).setVisible(true);
+    	this.setVisible(false);
+        new GiaoDienTraCuuChuyentau(this, this.nhanVien).setVisible(true);
     }
 
     private void moGiaoDienHuyVe() {
-        new GiaoDienTraCuuVeTau().setVisible(true); // Sẽ cần truyền danh sách vé sau
+        new GiaoDienTraCuuVeTau().setVisible(true); 
     }
 
     private void moGiaoDienDoiVe() {
@@ -377,7 +378,8 @@ public abstract class GiaoDienChinh extends JFrame implements ActionListener{
     }
 
     private void moGiaoDienTimChuyenTau() {
-        new GiaoDienTraCuuChuyentau(nhanVien).setVisible(true);
+    	this.setVisible(false); 
+        new GiaoDienTraCuuChuyentau(this, nhanVien).setVisible(true);
     }
 
     private void moGiaoDienTimKhachHang() {
