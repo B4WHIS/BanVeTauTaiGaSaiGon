@@ -2,7 +2,9 @@ package control;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import connectDB.connectDB;
@@ -36,8 +38,6 @@ public class QuanLyHoaDonControl {
         conn.setAutoCommit(false);
 
         try {
-            
-
             // 2. Tính tổng + VAT
             BigDecimal tongTruocVAT = dsVe.stream()
                     .map(Ve::getGiaThanhToan)
@@ -78,6 +78,54 @@ public class QuanLyHoaDonControl {
                 conn.setAutoCommit(true);
                 conn.close();
             }
+        }
+    }
+
+    /**
+     * Tìm kiếm hóa đơn tổng hợp theo thông tin nhập
+     * @param maHD mã hóa đơn (có thể để trống)
+     * @param tenHanhKhach tên hành khách (có thể để trống)
+     * @param tenNhanVien tên nhân viên lập (có thể để trống)
+     * @param ngayLap ngày lập (có thể null)
+     * @param tongTien tổng tiền (có thể null)
+     * @return danh sách hóa đơn khớp điều kiện
+     */
+    public List<HoaDon> timKiemHoaDon(String maHD, String tenHanhKhach, String tenNhanVien,
+                                      LocalDateTime ngayLap, BigDecimal tongTien) {
+        try {
+            List<HoaDon> ds = hoaDonDAO.getAll();
+            List<HoaDon> ketQua = new ArrayList<>();
+
+            for (HoaDon hd : ds) {
+                boolean match = true;
+
+                if (maHD != null && !maHD.isEmpty() && !hd.getMaHoaDon().toLowerCase().contains(maHD.toLowerCase())) {
+                    match = false;
+                }
+                if (tenHanhKhach != null && !tenHanhKhach.isEmpty() &&
+                        !hd.getMaHanhKhach().getHoTen().toLowerCase().contains(tenHanhKhach.toLowerCase())) {
+                    match = false;
+                }
+                if (tenNhanVien != null && !tenNhanVien.isEmpty() &&
+                        !hd.getMaNhanVien().getHoTen().toLowerCase().contains(tenNhanVien.toLowerCase())) {
+                    match = false;
+                }
+                if (ngayLap != null && !hd.getNgayLap().toLocalDate().equals(ngayLap.toLocalDate())) {
+                    match = false;
+                }
+                if (tongTien != null && hd.getTongTien().compareTo(tongTien) != 0) {
+                    match = false;
+                }
+
+                if (match) {
+                    ketQua.add(hd);
+                }
+            }
+            return ketQua;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 }
