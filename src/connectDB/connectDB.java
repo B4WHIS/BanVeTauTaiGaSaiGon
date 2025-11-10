@@ -15,7 +15,7 @@ public class connectDB {
             	        + "trustServerCertificate=true";
 
                 String user = "sa";
-                String password = "sa"; 
+                String password = "sapassword";
 
 
                 return DriverManager.getConnection(url, user, password);

@@ -71,7 +71,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         this.nhanVienHienTai = nv;
         this.control = new ChonChoNgoiControl();
         
-        
+        capNhatThongTinChuyenTau();
         setTitle("CHỌN CHỖ");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -149,7 +149,7 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         capNhatThongTinChuyenTau();
 
     }
-    
+  
     
 	@Override
     public void actionPerformed(ActionEvent e) {
