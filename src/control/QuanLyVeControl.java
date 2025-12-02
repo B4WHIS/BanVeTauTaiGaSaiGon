@@ -107,17 +107,18 @@ public class QuanLyVeControl {
         String maChoNgoi = veMoi.getMaChoNgoi().getMaChoNgoi();
         String maChuyenTau = veMoi.getMaChuyenTau().getMaChuyenTau();
 
-        // KIỂM TRA TRẠNG THÁI ĐỘNG: ĐÃ CÓ VÉ NÀO ĐẶT CHỖ NÀY TRONG CHUYẾN NÀY CHƯA?
-        if (veDao.kiemTraChoNgoiDaDuocDat(maChoNgoi, maChuyenTau)) {
-            throw new Exception("Chỗ ngồi " + maChoNgoi + " không còn trống.");
-        }
-
         Connection conn = null;
         String maVeVuaThem = null;
 
         try {
+            // Kiểm tra trước: nếu đã có vé 'Đã đặt' cho chỗ ngồi + chuyến này thì ngừng
+            if (veDao.kiemTraChoNgoiDaDuocDat(maChoNgoi, maChuyenTau)) {
+                throw new Exception("Chỗ ngồi " + maChoNgoi + " trên chuyến " + maChuyenTau + " đã được đặt.");
+            }
+
             conn = connectDB.getConnection();
             conn.setAutoCommit(false);
+
 
             veMoi.setTrangThai("Đã đặt");
             veMoi.setMaNhanVien(nvlap);

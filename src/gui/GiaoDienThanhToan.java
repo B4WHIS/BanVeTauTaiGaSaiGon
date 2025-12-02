@@ -86,14 +86,7 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
         this.nhanVienLap = nv;
         this.nguoiThanhToan = nguoiThanhToan;
 
-        List<Ve> danhSachVeDaDat = new ArrayList<>();
-        
-        for (Ve ve : danhSachVe) {
-            String maVe = dieuKhienVe.datVe(ve, ve.getMaHanhkhach(), nhanVienLap);
-            ve.setMaVe(maVe);
-            danhSachVeDaDat.add(ve);
-        }
-        
+        // Không đặt vé ở đây, chỉ chuẩn bị dữ liệu hiển thị
         if (!danhSachVe.isEmpty()) {
             this.chuyenTauDuocChon = danhSachVe.get(0).getMaChuyenTau();
         }

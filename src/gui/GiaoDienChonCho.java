@@ -197,8 +197,8 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         lblThongTinChuyen = new JLabel("Tàu: N/A - Chuyến: N/A");
         lblGioDi = new JLabel("Khởi hành: N/A");
         int dong = 0;
-        pnlNoiDung.add(lblThongTinChuyen, taogbcLabel(0, dong++, gbc.insets));
-        pnlNoiDung.add(lblGioDi, taogbcLabel(0, dong++, gbc.insets));
+//        pnlNoiDung.add(lblThongTinChuyen, taogbcLabel(0, dong++, gbc.insets));
+//        pnlNoiDung.add(lblGioDi, taogbcLabel(0, dong++, gbc.insets));
         txtDanhSachChoNgoi = new JTextArea(12, 20);
         txtDanhSachChoNgoi.setEditable(false);
         txtDanhSachChoNgoi.setFont(new Font("Monospaced", Font.PLAIN, 13));
@@ -305,8 +305,8 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
             String gioDi = (chuyenTauDuocChon.getThoiGianKhoiHanh() != null) ?
                 chuyenTauDuocChon.getThoiGianKhoiHanh().format(DTF_FULL)
                 : "N/A";
-            lblThongTinChuyen.setText("Tàu: " + tenTauDisplay + " | Chuyến: " + hanhTrinhDisplay);
-            lblGioDi.setText("Khởi hành: " + gioDi);
+//            lblThongTinChuyen.setText("Tàu: " + tenTauDisplay + " | Chuyến: " + hanhTrinhDisplay);
+//            lblGioDi.setText("Khởi hành: " + gioDi);
         }
     }
     private void taiDanhSachToa(String maTau) throws SQLException {
