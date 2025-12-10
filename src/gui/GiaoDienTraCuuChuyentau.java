@@ -37,7 +37,9 @@ import com.toedter.calendar.JDateChooser;
 
 import control.TraCuuChuyenTauControl;
 import entity.ChuyenTau;
+import entity.HanhKhach;
 import entity.NhanVien;
+import entity.Ve;
 
 public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
 
@@ -48,6 +50,9 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
     private JButton btnTim, btnLamMoi, btnTroVe;
     private NhanVien nhanVienHienTai;
     private JFrame parentFrame;
+    
+    private Ve veCu; 
+    private HanhKhach hanhKhachCu;
 
     public GiaoDienTraCuuChuyentau(JFrame parent, NhanVien nhanVien) {
     	this.parentFrame = parent;
@@ -209,6 +214,11 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
 
         taiDuLieuGaLenCB();
     }
+    public GiaoDienTraCuuChuyentau(JFrame parent, NhanVien nhanVien, Ve veCu, HanhKhach hanhKhachCu) {
+        this(parent, nhanVien); 
+        this.veCu = veCu;
+        this.hanhKhachCu = hanhKhachCu;
+    }
 
     // Tải ga vào combo box
     private void taiDuLieuGaLenCB() {
@@ -301,15 +311,33 @@ public class GiaoDienTraCuuChuyentau extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin chuyến tàu.", "Lỗi", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            this.dispose();
+            if (nhanVienHienTai == null || nhanVienHienTai.getMaNhanVien() == null || nhanVienHienTai.getMaNhanVien().isEmpty()) { 
+                JOptionPane.showMessageDialog(this, "Thông tin nhân viên không hợp lệ (mã nhân viên rỗng). Vui lòng kiểm tra đăng nhập hoặc dữ liệu hệ thống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            this.dispose();  
+            
             SwingUtilities.invokeLater(() -> {
                 try {
-                    new GiaoDienChonCho(ct, nhanVienHienTai).setVisible(true);
+                    GiaoDienChonCho chonChoScreen;
+                    if (veCu != null && hanhKhachCu != null) {  
+                        if (veCu.getMaVe() == null || veCu.getMaVe().isEmpty() || hanhKhachCu.getMaKH() == null || hanhKhachCu.getMaKH().isEmpty()) { 
+                            JOptionPane.showMessageDialog(null, "Thông tin vé cũ hoặc hành khách không hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        chonChoScreen = new GiaoDienChonCho(ct, nhanVienHienTai, veCu, hanhKhachCu);
+                    } else { 
+                        chonChoScreen = new GiaoDienChonCho(ct, nhanVienHienTai);
+                    }
+                    chonChoScreen.setVisible(true);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Lỗi khi mở màn hình chọn chỗ: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             });
         });
+        
+        
 
         return pnlVe;
     }

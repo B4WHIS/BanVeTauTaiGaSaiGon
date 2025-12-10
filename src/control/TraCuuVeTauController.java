@@ -16,8 +16,13 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import connectDB.connectDB;
+import dao.HanhKhachDAO;
+import dao.VeDAO;
+import entity.HanhKhach;
 import entity.NhanVien;
+import entity.Ve;
 import gui.GiaoDienHuyVe;
+import gui.GiaoDienTraCuuChuyentau;
 import gui.GiaoDienTraCuuVeTau;
 
 public class TraCuuVeTauController implements ActionListener {
@@ -25,13 +30,25 @@ public class TraCuuVeTauController implements ActionListener {
  private final QuanLyVeControl quanLyVeControl;
  private final DefaultTableModel tableModel;
  private NhanVien nhanVien;
+ private DoiVeControl doiVeControl = new DoiVeControl();
+ private VeDAO veDAO = new VeDAO();
+ private HanhKhachDAO hanhKhachDAO = new HanhKhachDAO();
 
+// public TraCuuVeTauController(GiaoDienTraCuuVeTau view, NhanVien nv) {
+//     this.view = view;
+//     this.nhanVien = nv;
+//     this.quanLyVeControl = new QuanLyVeControl();
+//     this.tableModel = view.getTableModel();
+// }
  public TraCuuVeTauController(GiaoDienTraCuuVeTau view, NhanVien nv) {
-     this.view = view;
-     this.quanLyVeControl = new QuanLyVeControl();
-     this.tableModel = view.getTableModel();
- }
-
+	    this.view = view;
+	    this.nhanVien = nv;
+	    if (this.nhanVien == null) {  // Thêm check an toàn
+	        System.err.println("Cảnh báo: NhanVien null trong TraCuuVeTauController - Kiểm tra login");
+	    }
+	    this.quanLyVeControl = new QuanLyVeControl();
+	    this.tableModel = view.getTableModel();
+	}
  @Override
  public void actionPerformed(ActionEvent e) {
      String cmd = e.getActionCommand();
@@ -182,8 +199,48 @@ public class TraCuuVeTauController implements ActionListener {
  }
 
  private void doiVe() {
-     JOptionPane.showMessageDialog(view, "Chức năng đổi vé đang phát triển...", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
- }
+	    List<String> danhSachMaVe = new ArrayList<>();
+	    for (int i = 0; i < tableModel.getRowCount(); i++) {
+	        Boolean checked = (Boolean) tableModel.getValueAt(i, 6);
+	        if (checked != null && checked) {
+	            String maVe = ((String) tableModel.getValueAt(i, 2)).split("\n")[0];
+	            danhSachMaVe.add(maVe);
+	        }
+	    }
+
+	    if (danhSachMaVe.isEmpty()) {
+	        JOptionPane.showMessageDialog(view, "Vui lòng chọn ít nhất một vé để đổi!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+	    if (danhSachMaVe.size() > 1) {
+	        JOptionPane.showMessageDialog(view, "Chỉ hỗ trợ đổi 1 vé một lúc!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+
+	    String maVeCu = danhSachMaVe.get(0);
+	    try {
+	        Ve veCu = veDAO.layVeTheoMa(maVeCu); 
+	       
+	        if (!doiVeControl.kiemTraCoTheDoiVe(veCu)) {
+	            JOptionPane.showMessageDialog(view, "Vé không thể đổi (đã hủy hoặc thời gian <4h)!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        HanhKhach hanhKhachCu = hanhKhachDAO.layHanhKhachTheoMa(veCu.getMaHanhkhach().getMaKH());
+	        if (hanhKhachCu == null || hanhKhachCu.getHoTen() == null || hanhKhachCu.getHoTen().trim().isEmpty()) {  // Check null và field chính
+	            JOptionPane.showMessageDialog(view, "Không tìm thấy thông tin hành khách cho vé cũ! Kiểm tra dữ liệu DB hoặc vé không hợp lệ.", "Lỗi Đổi Vé", JOptionPane.ERROR_MESSAGE);
+	            return;  
+	        }
+	        if (this.nhanVien == null) {  
+	            JOptionPane.showMessageDialog(view, "Thông tin nhân viên không hợp lệ. Vui lòng đăng nhập lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        GiaoDienTraCuuChuyentau traCuuChuyen = new GiaoDienTraCuuChuyentau(view, this.nhanVien, veCu, hanhKhachCu);
+	        traCuuChuyen.setVisible(true);
+	        view.dispose();
+	    } catch (Exception ex) {
+	        JOptionPane.showMessageDialog(view, "Lỗi khi đổi vé: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
 
  private void lamMoiForm() {
      view.getTxtHoTen().setText("");

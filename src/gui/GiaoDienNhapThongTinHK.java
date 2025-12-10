@@ -85,7 +85,7 @@ public class GiaoDienNhapThongTinHK extends JFrame implements ActionListener {
     private int dongDangSua = -1;
     private BigDecimal tongTienCanThanhToan = BigDecimal.ZERO;
 
-    public GiaoDienNhapThongTinHK(ChuyenTau ct, List<ChoNgoi> gheDaChon, NhanVien nv) {
+    public GiaoDienNhapThongTinHK(ChuyenTau ct, List<ChoNgoi> gheDaChon, NhanVien nv, GiaoDienChonCho giaoDienChonCho) {
         this.chuyenTauDuocChon = ct;
         this.danhSachChoNgoi = gheDaChon != null ? gheDaChon : new ArrayList<>();
         this.nhanVienLap = nv != null ? nv : new NhanVien("NV-001");

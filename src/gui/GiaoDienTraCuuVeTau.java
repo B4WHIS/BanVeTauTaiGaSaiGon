@@ -39,6 +39,7 @@ public class GiaoDienTraCuuVeTau extends JFrame {
     private JTable table;
     private DefaultTableModel tableModel;
     private NhanVien nhanVien;
+    
 
     private final Color COLOR_PRIMARY = new Color(74, 140, 103);
     private final Color COLOR_ACCENT = new Color(93, 156, 236);
@@ -60,7 +61,32 @@ public class GiaoDienTraCuuVeTau extends JFrame {
         setupActions();
         setupEmptyTable();
     }
+//    public GiaoDienTraCuuVeTau(NhanVien nhanVien) {  
+//        
+//        setTitle("Tra cứu vé tàu");
+//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        setLocationRelativeTo(null);
+//
+//        initComponents();
+//        setupLayout();
+//        setupActions();
+//        setupEmptyTable();
+//    }
+    public GiaoDienTraCuuVeTau(NhanVien nhanVien) {
+        this.nhanVien = nhanVien;  
+        if (this.nhanVien == null) 
+            System.err.println("Cảnh báo: NhanVien null khi khởi tạo GiaoDienTraCuuVeTau");
+        setTitle("Tra cứu vé tàu");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setLocationRelativeTo(null);
 
+        initComponents(); 
+        setupLayout();
+        setupActions();
+        setupEmptyTable();
+    }
     private void initComponents() {
         pnlChinh = new JPanel(new BorderLayout(12, 12));
         pnlChinh.setBorder(new EmptyBorder(12, 12, 12, 12));
@@ -102,7 +128,7 @@ public class GiaoDienTraCuuVeTau extends JFrame {
         	    public boolean isCellEditable(int row, int column) {
         	        if (column != 6) return false;
         	        Object value = getValueAt(row, 6);
-        	        // Chỉ cho phép chỉnh sửa nếu là Boolean (true/false) → tức là vé cho phép hủy
+        	       
         	        return value instanceof Boolean;
         	    }
         	};
@@ -118,10 +144,10 @@ public class GiaoDienTraCuuVeTau extends JFrame {
 
             if (value instanceof Boolean) {
                 cb.setSelected((Boolean) value);
-                cb.setEnabled(true); // Cho phép click
+                cb.setEnabled(true); 
             } else {
                 cb.setSelected(false);
-                cb.setEnabled(false); // Không cho click
+                cb.setEnabled(false); 
                 cb.setToolTipText("Vé không đủ điều kiện hủy");
             }
 
