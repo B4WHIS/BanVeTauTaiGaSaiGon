@@ -55,7 +55,16 @@ public class ChoNgoiDAO {
             return stmt.executeUpdate() > 0;
         }
     }
-    
+ // Thêm vào class ChoNgoiDAO (nếu chưa có)
+    public boolean capNhatTrangThaiCho(String maChoNgoi, String trangThai) throws SQLException {
+        String sql = "UPDATE ChoNgoi SET trangThai = ? WHERE maChoNgoi = ?";
+        try (Connection conn = connectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, trangThai);
+            ps.setString(2, maChoNgoi);
+            return ps.executeUpdate() > 0;
+        }
+    }
     //  Cập nhật thông tin chỗ ngồi
     public boolean updateChoNgoi(ChoNgoi cn) throws SQLException {
         Connection conn = connectDB.getConnection();

@@ -145,7 +145,7 @@ public class MHC_NhanVienBanVe extends GiaoDienChinh implements ActionListener {
         	} else if (command.equals("HỦY VÉ") || e.getSource() == btnHuyVe) {
                 new GiaoDienTraCuuVeTau().setVisible(true); 
             } else if (command.equals("ĐỔI VÉ") || e.getSource() == btnDoiVe) {
-                new GiaoDienTraCuuVeTau().setVisible(true);
+            	new GiaoDienTraCuuVeTau(this.nhanVien).setVisible(true);
             } else if (command.equals("TÌM CHUYẾN") || e.getSource() == btnTimChuyenTau) {
             	this.setVisible(false); 
                 new GiaoDienTraCuuChuyentau(this, this.nhanVien).setVisible(true);

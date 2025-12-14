@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import control.DoiVeControl;
 import control.QuanLyHoaDonControl;
 import control.QuanLyVeControl;
 import dao.HanhKhachDAO;
@@ -70,6 +72,9 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
     private BigDecimal tongTienTruocVAT = BigDecimal.ZERO;
     private ChuyenTau chuyenTauDuocChon;
     
+    private Ve veCu; 
+    private DoiVeControl doiVeControl = new DoiVeControl();
+    
     private GiaoDienNhapThongTinHK previousScreen;
     
     public GiaoDienThanhToan(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,
@@ -86,14 +91,7 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
         this.nhanVienLap = nv;
         this.nguoiThanhToan = nguoiThanhToan;
 
-        List<Ve> danhSachVeDaDat = new ArrayList<>();
-        
-        for (Ve ve : danhSachVe) {
-            String maVe = dieuKhienVe.datVe(ve, ve.getMaHanhkhach(), nhanVienLap);
-            ve.setMaVe(maVe);
-            danhSachVeDaDat.add(ve);
-        }
-        
+        // Không đặt vé ở đây, chỉ chuẩn bị dữ liệu hiển thị
         if (!danhSachVe.isEmpty()) {
             this.chuyenTauDuocChon = danhSachVe.get(0).getMaChuyenTau();
         }
@@ -108,7 +106,10 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
         taiDuLieuGiaoDich();
     }
 
-    
+    public GiaoDienThanhToan(List<Ve> danhSachVe, HanhKhach nguoiThanhToan, NhanVien nv,GiaoDienNhapThongTinHK previous, Ve veCu) throws Exception {
+				this(danhSachVe, nguoiThanhToan, nv, previous);
+				this.veCu = veCu; 
+}
     private GridBagConstraints taoGBC(int x, int y, int fill, int anchor, double weightx, Insets insets) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x;
@@ -236,6 +237,8 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
         getContentPane().add(khungChinh);
     }
 
+   
+    
     private JPanel taoPanelThaoTac() {
         JPanel pnlThaoTac = new JPanel(new BorderLayout());
         pnlThaoTac.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15)); 
@@ -323,7 +326,9 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
         txtThueVAT.setText(String.format("%,.0f VNĐ", thueVAT.doubleValue()));
         txtTongThanhToanCuoi.setText(String.format("%,.0f VNĐ", tongPhaiThu.doubleValue()));
     }
-
+    public void setVeCu(Ve veCu) {
+        this.veCu = veCu;
+    }
 
     private void xuLyThanhToan() {
         btnThanhToan.setEnabled(false);
@@ -364,6 +369,14 @@ public class GiaoDienThanhToan extends JFrame implements ActionListener {
             // BƯỚC 3: LẬP HÓA ĐƠN
             HoaDon hd = hdControl.lapHoaDon(nguoiThanhToan, nhanVienLap, danhSachVeDaDat);
             JOptionPane.showMessageDialog(this, "Thanh toán thành công! Mã HD: " + hd.getMaHoaDon());
+            if (veCu != null) {
+                try {
+                    doiVeControl.huyVeCu(veCu.getMaVe());
+                    JOptionPane.showMessageDialog(this, "Đổi vé thành công! Vé cũ đã hủy.");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "Lỗi hủy vé cũ: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
             this.dispose();
             new GiaoDienLapHoaDon(danhSachVeDaDat, nguoiThanhToan, nhanVienLap, this).setVisible(true);
 

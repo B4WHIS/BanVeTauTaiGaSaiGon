@@ -15,8 +15,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,8 +44,10 @@ import javax.swing.border.TitledBorder;
 import control.ChonChoNgoiControl;
 import entity.ChoNgoi;
 import entity.ChuyenTau;
+import entity.HanhKhach;
 import entity.NhanVien;
 import entity.ToaTau;
+import entity.Ve;
 
 public class GiaoDienChonCho extends JFrame implements ActionListener {
 
@@ -64,6 +68,8 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
 	private JFrame parentFrame;
     private List<ChoNgoi> danhSachGheDuocChon = new ArrayList<>();
     private Map<String, ToaTau> mapMaToa = new HashMap<>();
+    private Ve veCu; 
+    private HanhKhach hanhKhachCu;
 
     public GiaoDienChonCho(ChuyenTau chuyentau, NhanVien nv) throws SQLException {
 
@@ -150,36 +156,67 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
 
     }
   
-    
-	@Override
+    public GiaoDienChonCho(ChuyenTau chuyenTau, NhanVien nv, Ve veCu, HanhKhach hanhKhachCu) throws SQLException {
+        this(chuyenTau, nv); 
+        this.veCu = veCu;
+        this.hanhKhachCu = hanhKhachCu;
+    }
+	
+    @Override
     public void actionPerformed(ActionEvent e) {
-        Object nguon = e.getSource();
-        if (nguon == btnTiepTuc) {
+    	Object src = e.getSource();
+        if (src == btnTiepTuc) {
             if (danhSachGheDuocChon.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn chỗ ngồi.", "Cảnh báo",
-                        JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một chỗ!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            danhSachGheDuocChon = danhSachGheDuocChon.stream()
-                    .filter(cho -> cho != null && cho.getMaChoNgoi() != null)
-                    .collect(Collectors.toList());
-            if (danhSachGheDuocChon.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Danh sách ghế được chọn không hợp lệ.",
-                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            if (nhanVienHienTai == null || nhanVienHienTai.getMaNhanVien() == null) {
+                JOptionPane.showMessageDialog(this, "Thông tin nhân viên không hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            SwingUtilities.invokeLater(() -> {
-                new GiaoDienNhapThongTinHK(chuyenTauDuocChon, danhSachGheDuocChon,
-                        nhanVienHienTai).setVisible(true);
-                this.dispose();
-            });
-        } else if (nguon == nutTroVe) {
-            SwingUtilities.invokeLater(() -> {
-                new GiaoDienTraCuuChuyentau(null, nhanVienHienTai).setVisible(true);
-                this.dispose();
-            });
+            
+            try {
+                if (veCu != null && hanhKhachCu != null) { 
+                    if (hanhKhachCu.getMaKH() == null) {  
+                        throw new Exception("Thông tin hành khách cũ không hợp lệ (mã KH rỗng).");
+                    }
+                    
+                  
+                    List<Ve> danhSachVeMoi = new ArrayList<>();
+                    for (ChoNgoi cho : danhSachGheDuocChon) {
+                        Ve veMoi = new Ve();
+                        veMoi.setMaChoNgoi(cho);
+                        veMoi.setMaChuyenTau(chuyenTauDuocChon);
+                        veMoi.setGiaVeGoc(new BigDecimal("100000"));  
+                        veMoi.setGiaThanhToan(veMoi.getGiaVeGoc());  
+                        veMoi.setNgayDat(LocalDateTime.now());
+                        veMoi.setMaHanhkhach(hanhKhachCu);  
+                        veMoi.setMaNhanVien(nhanVienHienTai);
+                        veMoi.setTrangThai("Đã đặt");
+                        veMoi.setMaKhuyenMai(null);  
+                        danhSachVeMoi.add(veMoi);
+                    }
+                    
+                    
+                    GiaoDienThanhToan thanhToanScreen = new GiaoDienThanhToan(danhSachVeMoi, hanhKhachCu, nhanVienHienTai, null);
+                    thanhToanScreen.setVeCu(veCu);  
+                    thanhToanScreen.setVisible(true);
+                } else { 
+                	GiaoDienNhapThongTinHK nhapHK = new GiaoDienNhapThongTinHK( chuyenTauDuocChon,danhSachGheDuocChon, nhanVienHienTai, this);
+                    nhapHK.setVisible(true);
+                }
+                this.dispose();  
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi xử lý: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        else if (src == nutTroVe || src == btnTroVe) { 
+            this.dispose();
+            
+            new GiaoDienTraCuuChuyentau(null, nhanVienHienTai).setVisible(true);
         }
     }
+
     private JPanel taoPanelThongTinChiTiet() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setPreferredSize(new Dimension(350, 0));
@@ -197,8 +234,8 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
         lblThongTinChuyen = new JLabel("Tàu: N/A - Chuyến: N/A");
         lblGioDi = new JLabel("Khởi hành: N/A");
         int dong = 0;
-        pnlNoiDung.add(lblThongTinChuyen, taogbcLabel(0, dong++, gbc.insets));
-        pnlNoiDung.add(lblGioDi, taogbcLabel(0, dong++, gbc.insets));
+//        pnlNoiDung.add(lblThongTinChuyen, taogbcLabel(0, dong++, gbc.insets));
+//        pnlNoiDung.add(lblGioDi, taogbcLabel(0, dong++, gbc.insets));
         txtDanhSachChoNgoi = new JTextArea(12, 20);
         txtDanhSachChoNgoi.setEditable(false);
         txtDanhSachChoNgoi.setFont(new Font("Monospaced", Font.PLAIN, 13));
@@ -305,8 +342,8 @@ public class GiaoDienChonCho extends JFrame implements ActionListener {
             String gioDi = (chuyenTauDuocChon.getThoiGianKhoiHanh() != null) ?
                 chuyenTauDuocChon.getThoiGianKhoiHanh().format(DTF_FULL)
                 : "N/A";
-            lblThongTinChuyen.setText("Tàu: " + tenTauDisplay + " | Chuyến: " + hanhTrinhDisplay);
-            lblGioDi.setText("Khởi hành: " + gioDi);
+//            lblThongTinChuyen.setText("Tàu: " + tenTauDisplay + " | Chuyến: " + hanhTrinhDisplay);
+//            lblGioDi.setText("Khởi hành: " + gioDi);
         }
     }
     private void taiDanhSachToa(String maTau) throws SQLException {
